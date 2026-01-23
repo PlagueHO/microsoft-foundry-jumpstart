@@ -190,7 +190,7 @@ module resourceGroup 'br/public:avm/res/resources/resource-group:0.4.3' = {
 }
 
 // ---------- MONITORING RESOURCES ----------
-module logAnalyticsWorkspace 'br/public:avm/res/operational-insights/workspace:0.14.1' = {
+module logAnalyticsWorkspace 'br/public:avm/res/operational-insights/workspace:0.15.0' = {
   name: 'logAnalytics-workspace-deployment'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -365,7 +365,7 @@ module aiServicesAiDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0' = 
 }
 
 // ---------- STORAGE ACCOUNT SAMPLE DATA (OPTIONAL) ----------
-module sampleDataStorageAccount 'br/public:avm/res/storage/storage-account:0.30.0' = if (deploySampleData) {
+module sampleDataStorageAccount 'br/public:avm/res/storage/storage-account:0.31.0' = if (deploySampleData) {
   name: 'sample-data-storage-account-deployment'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -467,7 +467,7 @@ module sampleDataStorageAccountRoles './core/security/role_storageaccount.bicep'
 }
 
 // ---------- AI SEARCH (OPTIONAL) ----------
-module aiSearchService 'br/public:avm/res/search/search-service:0.11.1' = if (azureAiSearchDeploy) {
+module aiSearchService 'br/public:avm/res/search/search-service:0.12.0' = if (azureAiSearchDeploy) {
   name: 'ai-search-service-deployment'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -747,7 +747,7 @@ module foundryProjectToAiSearchRoleAssignments './core/security/role_aisearch.bi
   }
 ]
 
-module bastionHost 'br/public:avm/res/network/bastion-host:0.8.1' = if (bastionHostDeploy && azureNetworkIsolation) {
+module bastionHost 'br/public:avm/res/network/bastion-host:0.8.2' = if (bastionHostDeploy && azureNetworkIsolation) {
   name: 'bastion-host-deployment'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]

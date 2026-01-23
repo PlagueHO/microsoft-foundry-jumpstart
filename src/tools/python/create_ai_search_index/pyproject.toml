@@ -25,23 +25,23 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "python-dotenv==1.1.0",
-    "azure-identity==1.23.0",
-    "azure-search-documents==11.6.0b11", # Note: data_generator uses 11.4.0b8, consider aligning if issues arise
-    "azure-storage-blob==12.25.1",
-    "openai==1.79.0",
+    "python-dotenv==1.2.1",
+    "azure-identity==1.25.1",
+    "azure-search-documents==11.6.0",
+    "azure-storage-blob==12.28.0",
+    "openai==2.15.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest==8.3.5", # Align with data_generator's pytest version (e.g., >=8.1) if desired
-    "pytest-cov==6.1.1", # Align with data_generator's pytest-cov version (e.g., >=5.0)
-    "pytest-asyncio==0.23.7", # If async tests are planned
-    "flake8==7.2.0", # Consider switching to ruff fully, data_generator uses ruff
-    "black==24.4.2", # Align with data_generator
-    "mypy==1.15.0",    # Align with data_generator
-    "isort==5.0",    # Ruff can handle import sorting
-    "ruff==0.11.10",   # Add ruff, align with data_generator
+    "pytest==9.0.2",
+    "pytest-cov==7.0.0",
+    "pytest-asyncio==1.3.0",
+    "flake8==7.3.0",
+    "black==26.1.0",
+    "mypy==1.19.1",
+    "isort==5.0",
+    "ruff==0.14.14",
     # "types-azure-identity", # Optional: if available and useful
     # "types-azure-search-documents", # Optional
 ]

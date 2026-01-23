@@ -1,12 +1,12 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
-  "languageVersion": "2.1-experimental",
+  "languageVersion": "2.0",
   "contentVersion": "1.0.0.0",
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.36.268.17113",
-      "templateHash": "15937649467639859116"
+      "version": "0.39.26.7824",
+      "templateHash": "1350793722974563055"
     }
   },
   "definitions": {
@@ -632,7 +632,7 @@
   "resources": {
     "resourceGroup": {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "[format('resource-group-deployment-{0}', parameters('location'))]",
       "location": "[deployment().location]",
       "properties": {
@@ -1132,7 +1132,7 @@
     },
     "logAnalyticsWorkspace": {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "logAnalytics-workspace-deployment",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -1159,7 +1159,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.39.26.7824",
-              "templateHash": "10435319847223617109"
+              "templateHash": "14099489006827800075"
             },
             "name": "Log Analytics Workspaces",
             "description": "This module deploys a Log Analytics Workspace."
@@ -1600,7 +1600,7 @@
                   "type": "object",
                   "metadata": {
                     "__bicep_resource_derived_type!": {
-                      "source": "Microsoft.OperationalInsights/workspaces/dataSources@2025-02-01#properties/tags"
+                      "source": "Microsoft.OperationalInsights/workspaces/dataSources@2025-07-01#properties/tags"
                     },
                     "description": "Optional. Tags to configure in the resource."
                   },
@@ -2261,11 +2261,10 @@
               }
             },
             "dailyQuotaGb": {
-              "type": "int",
-              "defaultValue": -1,
-              "minValue": -1,
+              "type": "string",
+              "defaultValue": "-1",
               "metadata": {
-                "description": "Optional. The workspace daily quota for ingestion."
+                "description": "Optional. The workspace daily quota for ingestion in GB. Supports decimal values. Example: '0.5' for 0.5 GB, '2' for 2 GB. Default is '-1' (no limit)."
               }
             },
             "defaultDataCollectionRuleResourceId": {
@@ -2358,7 +2357,7 @@
               "type": "object",
               "metadata": {
                 "__bicep_resource_derived_type!": {
-                  "source": "Microsoft.OperationalInsights/workspaces@2025-02-01#properties/tags"
+                  "source": "Microsoft.OperationalInsights/workspaces@2025-07-01#properties/tags"
                 },
                 "description": "Optional. Tags of the resource."
               },
@@ -2402,7 +2401,7 @@
               "condition": "[parameters('enableTelemetry')]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2024-03-01",
-              "name": "[format('46d3xbcp.res.operationalinsights-workspace.{0}.{1}', replace('0.14.1', '.', '-'), substring(uniqueString(deployment().name, parameters('location')), 0, 4))]",
+              "name": "[format('46d3xbcp.res.operationalinsights-workspace.{0}.{1}', replace('0.15.0', '.', '-'), substring(uniqueString(deployment().name, parameters('location')), 0, 4))]",
               "properties": {
                 "mode": "Incremental",
                 "template": {
@@ -2438,7 +2437,7 @@
                 },
                 "retentionInDays": "[parameters('dataRetention')]",
                 "workspaceCapping": {
-                  "dailyQuotaGb": "[parameters('dailyQuotaGb')]"
+                  "dailyQuotaGb": "[json(parameters('dailyQuotaGb'))]"
                 },
                 "publicNetworkAccessForIngestion": "[parameters('publicNetworkAccessForIngestion')]",
                 "publicNetworkAccessForQuery": "[parameters('publicNetworkAccessForQuery')]",
@@ -2571,7 +2570,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.39.26.7824",
-                      "templateHash": "15555486835943827858"
+                      "templateHash": "140290971998938797"
                     },
                     "name": "Log Analytics Workspace Storage Insight Configs",
                     "description": "This module deploys a Log Analytics Workspace Storage Insight Config."
@@ -2620,7 +2619,7 @@
                       "type": "object",
                       "metadata": {
                         "__bicep_resource_derived_type!": {
-                          "source": "Microsoft.OperationalInsights/workspaces/storageInsightConfigs@2025-02-01#properties/tags"
+                          "source": "Microsoft.OperationalInsights/workspaces/storageInsightConfigs@2025-07-01#properties/tags"
                         },
                         "description": "Optional. Tags to configure in the resource."
                       },
@@ -2631,18 +2630,18 @@
                     "storageAccount": {
                       "existing": true,
                       "type": "Microsoft.Storage/storageAccounts",
-                      "apiVersion": "2024-01-01",
+                      "apiVersion": "2025-06-01",
                       "name": "[last(split(parameters('storageAccountResourceId'), '/'))]"
                     },
                     "workspace": {
                       "existing": true,
                       "type": "Microsoft.OperationalInsights/workspaces",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[parameters('logAnalyticsWorkspaceName')]"
                     },
                     "storageinsightconfig": {
                       "type": "Microsoft.OperationalInsights/workspaces/storageInsightConfigs",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[format('{0}/{1}', parameters('logAnalyticsWorkspaceName'), parameters('name'))]",
                       "tags": "[parameters('tags')]",
                       "properties": {
@@ -2650,7 +2649,7 @@
                         "tables": "[parameters('tables')]",
                         "storageAccount": {
                           "id": "[parameters('storageAccountResourceId')]",
-                          "key": "[listKeys('storageAccount', '2024-01-01').keys[0].value]"
+                          "key": "[listKeys('storageAccount', '2025-06-01').keys[0].value]"
                         }
                       }
                     }
@@ -2719,7 +2718,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.39.26.7824",
-                      "templateHash": "8517561285031465616"
+                      "templateHash": "14482465616812596213"
                     },
                     "name": "Log Analytics Workspace Linked Services",
                     "description": "This module deploys a Log Analytics Workspace Linked Service."
@@ -2755,7 +2754,7 @@
                       "type": "object",
                       "metadata": {
                         "__bicep_resource_derived_type!": {
-                          "source": "Microsoft.OperationalInsights/workspaces/linkedServices@2025-02-01#properties/tags"
+                          "source": "Microsoft.OperationalInsights/workspaces/linkedServices@2025-07-01#properties/tags"
                         },
                         "description": "Optional. Tags to configure in the resource."
                       },
@@ -2766,12 +2765,12 @@
                     "workspace": {
                       "existing": true,
                       "type": "Microsoft.OperationalInsights/workspaces",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[parameters('logAnalyticsWorkspaceName')]"
                     },
                     "linkedService": {
                       "type": "Microsoft.OperationalInsights/workspaces/linkedServices",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[format('{0}/{1}', parameters('logAnalyticsWorkspaceName'), parameters('name'))]",
                       "tags": "[parameters('tags')]",
                       "properties": {
@@ -2841,7 +2840,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.39.26.7824",
-                      "templateHash": "3889914477453955601"
+                      "templateHash": "14864721709229272590"
                     },
                     "name": "Log Analytics Workspace Linked Storage Accounts",
                     "description": "This module deploys a Log Analytics Workspace Linked Storage Account."
@@ -2880,12 +2879,12 @@
                     "workspace": {
                       "existing": true,
                       "type": "Microsoft.OperationalInsights/workspaces",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[parameters('logAnalyticsWorkspaceName')]"
                     },
                     "linkedStorageAccount": {
                       "type": "Microsoft.OperationalInsights/workspaces/linkedStorageAccounts",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[format('{0}/{1}', parameters('logAnalyticsWorkspaceName'), parameters('name'))]",
                       "properties": {
                         "storageAccountIds": "[parameters('storageAccountIds')]"
@@ -2974,7 +2973,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.39.26.7824",
-                      "templateHash": "3727577253995784529"
+                      "templateHash": "17904092372918022238"
                     },
                     "name": "Log Analytics Workspace Saved Searches",
                     "description": "This module deploys a Log Analytics Workspace Saved Search."
@@ -3014,7 +3013,7 @@
                       "type": "array",
                       "metadata": {
                         "__bicep_resource_derived_type!": {
-                          "source": "Microsoft.OperationalInsights/workspaces/savedSearches@2025-02-01#properties/properties/properties/tags"
+                          "source": "Microsoft.OperationalInsights/workspaces/savedSearches@2025-07-01#properties/properties/properties/tags"
                         },
                         "description": "Optional. Tags to configure in the resource."
                       },
@@ -3053,12 +3052,12 @@
                     "workspace": {
                       "existing": true,
                       "type": "Microsoft.OperationalInsights/workspaces",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[parameters('logAnalyticsWorkspaceName')]"
                     },
                     "savedSearch": {
                       "type": "Microsoft.OperationalInsights/workspaces/savedSearches",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[format('{0}/{1}', parameters('logAnalyticsWorkspaceName'), parameters('name'))]",
                       "properties": {
                         "etag": "[parameters('etag')]",
@@ -3140,7 +3139,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.39.26.7824",
-                      "templateHash": "6434695407713682713"
+                      "templateHash": "17943947755417749524"
                     },
                     "name": "Log Analytics Workspace Data Exports",
                     "description": "This module deploys a Log Analytics Workspace Data Export."
@@ -3222,12 +3221,12 @@
                     "workspace": {
                       "existing": true,
                       "type": "Microsoft.OperationalInsights/workspaces",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[parameters('workspaceName')]"
                     },
                     "dataExport": {
                       "type": "Microsoft.OperationalInsights/workspaces/dataExports",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[format('{0}/{1}', parameters('workspaceName'), parameters('name'))]",
                       "properties": {
                         "destination": "[parameters('destination')]",
@@ -3333,7 +3332,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.39.26.7824",
-                      "templateHash": "8636447638029661740"
+                      "templateHash": "15360290236166491819"
                     },
                     "name": "Log Analytics Workspace Datasources",
                     "description": "This module deploys a Log Analytics Workspace Data Source."
@@ -3372,7 +3371,7 @@
                       "type": "object",
                       "metadata": {
                         "__bicep_resource_derived_type!": {
-                          "source": "Microsoft.OperationalInsights/workspaces/dataSources@2025-02-01#properties/tags"
+                          "source": "Microsoft.OperationalInsights/workspaces/dataSources@2025-07-01#properties/tags"
                         },
                         "description": "Optional. Tags to configure in the resource."
                       },
@@ -3460,12 +3459,12 @@
                     "workspace": {
                       "existing": true,
                       "type": "Microsoft.OperationalInsights/workspaces",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[parameters('logAnalyticsWorkspaceName')]"
                     },
                     "dataSource": {
                       "type": "Microsoft.OperationalInsights/workspaces/dataSources",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[format('{0}/{1}', parameters('logAnalyticsWorkspaceName'), parameters('name'))]",
                       "kind": "[parameters('kind')]",
                       "tags": "[parameters('tags')]",
@@ -3563,7 +3562,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.39.26.7824",
-                      "templateHash": "13928174215528939368"
+                      "templateHash": "18383178824663161801"
                     },
                     "name": "Log Analytics Workspace Tables",
                     "description": "This module deploys a Log Analytics Workspace Table."
@@ -3912,12 +3911,12 @@
                     "workspace": {
                       "existing": true,
                       "type": "Microsoft.OperationalInsights/workspaces",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[parameters('workspaceName')]"
                     },
                     "table": {
                       "type": "Microsoft.OperationalInsights/workspaces/tables",
-                      "apiVersion": "2025-02-01",
+                      "apiVersion": "2025-07-01",
                       "name": "[format('{0}/{1}', parameters('workspaceName'), parameters('name'))]",
                       "properties": {
                         "plan": "[parameters('plan')]",
@@ -4236,7 +4235,7 @@
     },
     "applicationInsights": {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "application-insights-deployment",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -4986,7 +4985,7 @@
     "virtualNetwork": {
       "condition": "[parameters('azureNetworkIsolation')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "virtualNetwork",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -6655,7 +6654,7 @@
     "storageBlobPrivateDnsZone": {
       "condition": "[and(parameters('deploySampleData'), parameters('azureNetworkIsolation'))]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "storage-blobservice-private-dns-zone",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -10030,7 +10029,7 @@
     "aiSearchPrivateDnsZone": {
       "condition": "[and(parameters('azureNetworkIsolation'), parameters('azureAiSearchDeploy'))]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "ai-search-private-dns-zone",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -13405,7 +13404,7 @@
     "aiServicesPrivateDnsZone": {
       "condition": "[parameters('azureNetworkIsolation')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "ai-services-private-dns-zone",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -16780,7 +16779,7 @@
     "aiServicesOpenAiDnsZone": {
       "condition": "[parameters('azureNetworkIsolation')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "ai-services-openai-dns-zone",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -20155,7 +20154,7 @@
     "aiServicesAiDnsZone": {
       "condition": "[parameters('azureNetworkIsolation')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "ai-services-ai-dns-zone",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -23530,7 +23529,7 @@
     "sampleDataStorageAccount": {
       "condition": "[parameters('deploySampleData')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "sample-data-storage-account-deployment",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -23612,7 +23611,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.39.26.7824",
-              "templateHash": "8444048237705693390"
+              "templateHash": "3442580996358459494"
             },
             "name": "Storage Accounts",
             "description": "This module deploys a Storage Account."
@@ -24200,14 +24199,14 @@
                   "type": "bool",
                   "nullable": true,
                   "metadata": {
-                    "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to an append blob while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API."
+                    "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to an append blob while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API. Defaults to false."
                   }
                 },
                 "allowProtectedAppendWritesAll": {
                   "type": "bool",
                   "nullable": true,
                   "metadata": {
-                    "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to both \"Append and Block Blobs\" while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API. The \"allowProtectedAppendWrites\" and \"allowProtectedAppendWritesAll\" properties are mutually exclusive."
+                    "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to both \"Append and Block Blobs\" while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API. The \"allowProtectedAppendWrites\" and \"allowProtectedAppendWritesAll\" properties are mutually exclusive. Defaults to false."
                   }
                 }
               },
@@ -25955,7 +25954,7 @@
               "condition": "[parameters('enableTelemetry')]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2025-04-01",
-              "name": "[format('46d3xbcp.res.storage-storageaccount.{0}.{1}', replace('0.30.0', '.', '-'), substring(uniqueString(deployment().name, parameters('location')), 0, 4))]",
+              "name": "[format('46d3xbcp.res.storage-storageaccount.{0}.{1}', replace('0.31.0', '.', '-'), substring(uniqueString(deployment().name, parameters('location')), 0, 4))]",
               "properties": {
                 "mode": "Incremental",
                 "template": {
@@ -27110,7 +27109,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.39.26.7824",
-                      "templateHash": "4804748808287128942"
+                      "templateHash": "15800736613372553659"
                     },
                     "name": "Storage Account blob Services",
                     "description": "This module deploys a Storage Account Blob Service."
@@ -27401,14 +27400,14 @@
                           "type": "bool",
                           "nullable": true,
                           "metadata": {
-                            "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to an append blob while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API."
+                            "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to an append blob while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API. Defaults to false."
                           }
                         },
                         "allowProtectedAppendWritesAll": {
                           "type": "bool",
                           "nullable": true,
                           "metadata": {
-                            "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to both \"Append and Block Blobs\" while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API. The \"allowProtectedAppendWrites\" and \"allowProtectedAppendWritesAll\" properties are mutually exclusive."
+                            "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to both \"Append and Block Blobs\" while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API. The \"allowProtectedAppendWrites\" and \"allowProtectedAppendWritesAll\" properties are mutually exclusive. Defaults to false."
                           }
                         }
                       },
@@ -27780,7 +27779,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.39.26.7824",
-                              "templateHash": "4737601268768949442"
+                              "templateHash": "63105523847589801"
                             },
                             "name": "Storage Account Blob Containers",
                             "description": "This module deploys a Storage Account Blob Container."
@@ -27800,14 +27799,14 @@
                                   "type": "bool",
                                   "nullable": true,
                                   "metadata": {
-                                    "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to an append blob while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API."
+                                    "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to an append blob while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API. Defaults to false."
                                   }
                                 },
                                 "allowProtectedAppendWritesAll": {
                                   "type": "bool",
                                   "nullable": true,
                                   "metadata": {
-                                    "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to both \"Append and Block Blobs\" while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API. The \"allowProtectedAppendWrites\" and \"allowProtectedAppendWritesAll\" properties are mutually exclusive."
+                                    "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to both \"Append and Block Blobs\" while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API. The \"allowProtectedAppendWrites\" and \"allowProtectedAppendWritesAll\" properties are mutually exclusive. Defaults to false."
                                   }
                                 }
                               },
@@ -28030,7 +28029,7 @@
                               "condition": "[parameters('enableTelemetry')]",
                               "type": "Microsoft.Resources/deployments",
                               "apiVersion": "2024-03-01",
-                              "name": "[format('46d3xbcp.res.storage-blobcontainer.{0}.{1}', replace('-..--..-', '.', '-'), substring(uniqueString(deployment().name), 0, 4))]",
+                              "name": "[format('46d3xbcp.res.storage-blobcontainer.{0}.{1}', replace('0.3.2', '.', '-'), substring(uniqueString(deployment().name), 0, 4))]",
                               "properties": {
                                 "mode": "Incremental",
                                 "template": {
@@ -28122,7 +28121,7 @@
                                     "_generator": {
                                       "name": "bicep",
                                       "version": "0.39.26.7824",
-                                      "templateHash": "9416359146780945405"
+                                      "templateHash": "9405311609774409339"
                                     },
                                     "name": "Storage Account Blob Container Immutability Policies",
                                     "description": "This module deploys a Storage Account Blob Container Immutability Policy."
@@ -28150,27 +28149,24 @@
                                     },
                                     "allowProtectedAppendWrites": {
                                       "type": "bool",
-                                      "defaultValue": true,
+                                      "defaultValue": false,
                                       "metadata": {
-                                        "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to an append blob while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API. The \"allowProtectedAppendWrites\" and \"allowProtectedAppendWritesAll\" properties are mutually exclusive."
+                                        "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to an append blob while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API. The \"allowProtectedAppendWrites\" and \"allowProtectedAppendWritesAll\" properties are mutually exclusive. Defaults to false."
                                       }
                                     },
                                     "allowProtectedAppendWritesAll": {
                                       "type": "bool",
-                                      "defaultValue": true,
+                                      "defaultValue": false,
                                       "metadata": {
-                                        "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to both \"Append and Block Blobs\" while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API. The \"allowProtectedAppendWrites\" and \"allowProtectedAppendWritesAll\" properties are mutually exclusive."
+                                        "description": "Optional. This property can only be changed for unlocked time-based retention policies. When enabled, new blocks can be written to both \"Append and Block Blobs\" while maintaining immutability protection and compliance. Only new blocks can be added and any existing blocks cannot be modified or deleted. This property cannot be changed with ExtendImmutabilityPolicy API. The \"allowProtectedAppendWrites\" and \"allowProtectedAppendWritesAll\" properties are mutually exclusive. Defaults to false."
                                       }
                                     }
-                                  },
-                                  "variables": {
-                                    "name": "default"
                                   },
                                   "resources": [
                                     {
                                       "type": "Microsoft.Storage/storageAccounts/blobServices/containers/immutabilityPolicies",
                                       "apiVersion": "2025-01-01",
-                                      "name": "[format('{0}/{1}/{2}/{3}', parameters('storageAccountName'), 'default', parameters('containerName'), variables('name'))]",
+                                      "name": "[format('{0}/{1}/{2}/{3}', parameters('storageAccountName'), 'default', parameters('containerName'), 'default')]",
                                       "properties": {
                                         "immutabilityPeriodSinceCreationInDays": "[parameters('immutabilityPeriodSinceCreationInDays')]",
                                         "allowProtectedAppendWrites": "[parameters('allowProtectedAppendWrites')]",
@@ -28184,14 +28180,14 @@
                                       "metadata": {
                                         "description": "The name of the deployed immutability policy."
                                       },
-                                      "value": "[variables('name')]"
+                                      "value": "default"
                                     },
                                     "resourceId": {
                                       "type": "string",
                                       "metadata": {
                                         "description": "The resource ID of the deployed immutability policy."
                                       },
-                                      "value": "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers/immutabilityPolicies', parameters('storageAccountName'), 'default', parameters('containerName'), variables('name'))]"
+                                      "value": "[resourceId('Microsoft.Storage/storageAccounts/blobServices/containers/immutabilityPolicies', parameters('storageAccountName'), 'default', parameters('containerName'), 'default')]"
                                     },
                                     "resourceGroupName": {
                                       "type": "string",
@@ -28305,7 +28301,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.39.26.7824",
-                      "templateHash": "8847095544204825048"
+                      "templateHash": "9213796824812470119"
                     },
                     "name": "Storage Account File Share Services",
                     "description": "This module deploys a Storage Account File Share Service."
@@ -28791,7 +28787,7 @@
                             "value": "[coalesce(parameters('shares'), createArray())[copyIndex()].name]"
                           },
                           "accessTier": {
-                            "value": "[coalesce(tryGet(coalesce(parameters('shares'), createArray())[copyIndex()], 'accessTier'), if(equals(reference('storageAccount', '2024-01-01', 'full').kind, 'FileStorage'), 'Premium', 'TransactionOptimized'))]"
+                            "value": "[coalesce(tryGet(coalesce(parameters('shares'), createArray())[copyIndex()], 'accessTier'), if(equals(reference('storageAccount', '2024-01-01', 'full').kind, 'FileStorage'), if(startsWith(reference('storageAccount', '2024-01-01', 'full').sku.name, 'PremiumV2_'), null(), 'Premium'), 'TransactionOptimized'))]"
                           },
                           "enabledProtocols": {
                             "value": "[tryGet(coalesce(parameters('shares'), createArray())[copyIndex()], 'enabledProtocols')]"
@@ -28817,7 +28813,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.39.26.7824",
-                              "templateHash": "1953115828549574279"
+                              "templateHash": "18417496053778592115"
                             },
                             "name": "Storage Account File Shares",
                             "description": "This module deploys a Storage Account File Share."
@@ -28922,7 +28918,7 @@
                             },
                             "accessTier": {
                               "type": "string",
-                              "defaultValue": "TransactionOptimized",
+                              "nullable": true,
                               "allowedValues": [
                                 "Premium",
                                 "Hot",
@@ -28930,7 +28926,7 @@
                                 "TransactionOptimized"
                               ],
                               "metadata": {
-                                "description": "Conditional. Access tier for specific share. Required if the Storage Account kind is set to FileStorage (should be set to \"Premium\"). GpV2 account can choose between TransactionOptimized (default), Hot, and Cool."
+                                "description": "Conditional. Access tier for specific share. Required if the Storage Account kind is set to FileStorage (should be set to \"Premium\"). GpV2 account can choose between TransactionOptimized, Hot, and Cool."
                               }
                             },
                             "shareQuota": {
@@ -29008,14 +29004,14 @@
                             "storageAccount::fileService": {
                               "existing": true,
                               "type": "Microsoft.Storage/storageAccounts/fileServices",
-                              "apiVersion": "2024-01-01",
+                              "apiVersion": "2025-01-01",
                               "name": "[format('{0}/{1}', parameters('storageAccountName'), parameters('fileServicesName'))]"
                             },
                             "avmTelemetry": {
                               "condition": "[parameters('enableTelemetry')]",
                               "type": "Microsoft.Resources/deployments",
                               "apiVersion": "2024-03-01",
-                              "name": "[format('46d3xbcp.res.storage-fileshare.{0}.{1}', replace('-..--..-', '.', '-'), substring(uniqueString(deployment().name), 0, 4))]",
+                              "name": "[format('46d3xbcp.res.storage-fileshare.{0}.{1}', replace('0.1.2', '.', '-'), substring(uniqueString(deployment().name), 0, 4))]",
                               "properties": {
                                 "mode": "Incremental",
                                 "template": {
@@ -29034,12 +29030,12 @@
                             "storageAccount": {
                               "existing": true,
                               "type": "Microsoft.Storage/storageAccounts",
-                              "apiVersion": "2024-01-01",
+                              "apiVersion": "2025-01-01",
                               "name": "[parameters('storageAccountName')]"
                             },
                             "fileShare": {
                               "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
-                              "apiVersion": "2024-01-01",
+                              "apiVersion": "2025-01-01",
                               "name": "[format('{0}/{1}/{2}', parameters('storageAccountName'), parameters('fileServicesName'), parameters('name'))]",
                               "properties": {
                                 "accessTier": "[parameters('accessTier')]",
@@ -31509,7 +31505,7 @@
     "sampleDataStorageAccountRoles": {
       "condition": "[parameters('deploySampleData')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "sample-data-storage-account-role-assignments",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -31532,8 +31528,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.36.268.17113",
-              "templateHash": "13764937367365135434"
+              "version": "0.39.26.7824",
+              "templateHash": "11446855404387907315"
             },
             "name": "Storage Account Role Assignments",
             "description": "Creates role assignments on an Azure Storage Account."
@@ -31724,7 +31720,7 @@
     "aiSearchService": {
       "condition": "[parameters('azureAiSearchDeploy')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "ai-search-service-deployment",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -31792,8 +31788,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.37.4.10188",
-              "templateHash": "10902281417196168235"
+              "version": "0.39.26.7824",
+              "templateHash": "6207719545398489494"
             },
             "name": "Search Services",
             "description": "This module deploys a Search Service."
@@ -31894,122 +31890,6 @@
                 "$ref": "#/definitions/secretSetType",
                 "metadata": {
                   "description": "An exported secret's references."
-                }
-              }
-            },
-            "authOptionsType": {
-              "type": "object",
-              "properties": {
-                "aadOrApiKey": {
-                  "type": "object",
-                  "properties": {
-                    "aadAuthFailureMode": {
-                      "type": "string",
-                      "allowedValues": [
-                        "http401WithBearerChallenge",
-                        "http403"
-                      ],
-                      "nullable": true,
-                      "metadata": {
-                        "description": "Optional. Describes what response the data plane API of a search service would send for requests that failed authentication."
-                      }
-                    }
-                  },
-                  "nullable": true,
-                  "metadata": {
-                    "description": "Optional. Indicates that either the API key or an access token from a Microsoft Entra ID tenant can be used for authentication."
-                  }
-                },
-                "apiKeyOnly": {
-                  "type": "object",
-                  "nullable": true,
-                  "metadata": {
-                    "description": "Optional. Indicates that only the API key can be used for authentication."
-                  }
-                }
-              },
-              "metadata": {
-                "__bicep_export!": true
-              }
-            },
-            "networkRuleSetType": {
-              "type": "object",
-              "properties": {
-                "bypass": {
-                  "type": "string",
-                  "allowedValues": [
-                    "AzurePortal",
-                    "AzureServices",
-                    "None"
-                  ],
-                  "nullable": true,
-                  "metadata": {
-                    "description": "Optional. Network specific rules that determine how the Azure AI Search service may be reached."
-                  }
-                },
-                "ipRules": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/ipRuleType"
-                  },
-                  "nullable": true,
-                  "metadata": {
-                    "description": "Optional. A list of IP restriction rules that defines the inbound network(s) with allowing access to the search service endpoint. At the meantime, all other public IP networks are blocked by the firewall. These restriction rules are applied only when the 'publicNetworkAccess' of the search service is 'enabled'; otherwise, traffic over public interface is not allowed even with any public IP rules, and private endpoint connections would be the exclusive access method."
-                  }
-                }
-              },
-              "metadata": {
-                "__bicep_export!": true
-              }
-            },
-            "ipRuleType": {
-              "type": "object",
-              "properties": {
-                "value": {
-                  "type": "string",
-                  "metadata": {
-                    "description": "Required. Value corresponding to a single IPv4 address (eg., 123.1.2.3) or an IP range in CIDR format (eg., 123.1.2.3/24) to be allowed."
-                  }
-                }
-              },
-              "metadata": {
-                "__bicep_export!": true
-              }
-            },
-            "_1.lockType": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "nullable": true,
-                  "metadata": {
-                    "description": "Optional. Specify the name of lock."
-                  }
-                },
-                "kind": {
-                  "type": "string",
-                  "allowedValues": [
-                    "CanNotDelete",
-                    "None",
-                    "ReadOnly"
-                  ],
-                  "nullable": true,
-                  "metadata": {
-                    "description": "Optional. Specify the type of lock."
-                  }
-                },
-                "notes": {
-                  "type": "string",
-                  "nullable": true,
-                  "metadata": {
-                    "description": "Optional. Specify the notes of the lock."
-                  }
-                }
-              },
-              "metadata": {
-                "description": "An AVM-aligned type for a lock.",
-                "__bicep_imported_from!": {
-                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.1"
                 }
               }
             },
@@ -32117,81 +31997,6 @@
                 }
               },
               "metadata": {
-                "__bicep_imported_from!": {
-                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.1"
-                }
-              }
-            },
-            "_1.roleAssignmentType": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "nullable": true,
-                  "metadata": {
-                    "description": "Optional. The name (as GUID) of the role assignment. If not provided, a GUID will be generated."
-                  }
-                },
-                "roleDefinitionIdOrName": {
-                  "type": "string",
-                  "metadata": {
-                    "description": "Required. The role to assign. You can provide either the display name of the role definition, the role definition GUID, or its fully qualified ID in the following format: '/providers/Microsoft.Authorization/roleDefinitions/c2f4ef07-c644-48eb-af81-4b1b4947fb11'."
-                  }
-                },
-                "principalId": {
-                  "type": "string",
-                  "metadata": {
-                    "description": "Required. The principal ID of the principal (user/group/identity) to assign the role to."
-                  }
-                },
-                "principalType": {
-                  "type": "string",
-                  "allowedValues": [
-                    "Device",
-                    "ForeignGroup",
-                    "Group",
-                    "ServicePrincipal",
-                    "User"
-                  ],
-                  "nullable": true,
-                  "metadata": {
-                    "description": "Optional. The principal type of the assigned principal ID."
-                  }
-                },
-                "description": {
-                  "type": "string",
-                  "nullable": true,
-                  "metadata": {
-                    "description": "Optional. The description of the role assignment."
-                  }
-                },
-                "condition": {
-                  "type": "string",
-                  "nullable": true,
-                  "metadata": {
-                    "description": "Optional. The conditions on the role assignment. This limits the resources it can be assigned to. e.g.: @Resource[Microsoft.Storage/storageAccounts/blobServices/containers:ContainerName] StringEqualsIgnoreCase \"foo_storage_container\"."
-                  }
-                },
-                "conditionVersion": {
-                  "type": "string",
-                  "allowedValues": [
-                    "2.0"
-                  ],
-                  "nullable": true,
-                  "metadata": {
-                    "description": "Optional. Version of the condition."
-                  }
-                },
-                "delegatedManagedIdentityResourceId": {
-                  "type": "string",
-                  "nullable": true,
-                  "metadata": {
-                    "description": "Optional. The Resource Id of the delegated managed identity resource."
-                  }
-                }
-              },
-              "metadata": {
-                "description": "An AVM-aligned type for a role assignment.",
                 "__bicep_imported_from!": {
                   "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.1"
                 }
@@ -32315,7 +32120,7 @@
               "metadata": {
                 "description": "An AVM-aligned type for a diagnostic setting. To be used if both logs & metrics are supported by the resource provider.",
                 "__bicep_imported_from!": {
-                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.5.1"
+                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.1"
                 }
               }
             },
@@ -32352,7 +32157,7 @@
               "metadata": {
                 "description": "An AVM-aligned type for a lock.",
                 "__bicep_imported_from!": {
-                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.0"
+                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.1"
                 }
               }
             },
@@ -32380,7 +32185,7 @@
               "metadata": {
                 "description": "An AVM-aligned type for a managed identity configuration. To be used if both a system-assigned & user-assigned identities are supported by the resource provider.",
                 "__bicep_imported_from!": {
-                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.5.1"
+                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.1"
                 }
               }
             },
@@ -32488,7 +32293,7 @@
                   }
                 },
                 "lock": {
-                  "$ref": "#/definitions/_1.lockType",
+                  "$ref": "#/definitions/lockType",
                   "nullable": true,
                   "metadata": {
                     "description": "Optional. Specify the type of lock."
@@ -32497,7 +32302,7 @@
                 "roleAssignments": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/definitions/_1.roleAssignmentType"
+                    "$ref": "#/definitions/roleAssignmentType"
                   },
                   "nullable": true,
                   "metadata": {
@@ -32600,7 +32405,7 @@
               "metadata": {
                 "description": "An AVM-aligned type for a role assignment.",
                 "__bicep_imported_from!": {
-                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.5.1"
+                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.1"
                 }
               }
             },
@@ -32635,11 +32440,14 @@
               }
             },
             "authOptions": {
-              "$ref": "#/definitions/authOptionsType",
-              "nullable": true,
+              "type": "object",
               "metadata": {
+                "__bicep_resource_derived_type!": {
+                  "source": "Microsoft.Search/searchServices@2025-05-01#properties/properties/properties/authOptions"
+                },
                 "description": "Optional. Defines the options for how the data plane API of a Search service authenticates requests. Must remain an empty object {} if 'disableLocalAuth' is set to true."
-              }
+              },
+              "nullable": true
             },
             "disableLocalAuth": {
               "type": "bool",
@@ -32655,6 +32463,17 @@
                 "description": "Optional. Enable/Disable usage telemetry for module."
               }
             },
+            "computeType": {
+              "type": "string",
+              "defaultValue": "Default",
+              "allowedValues": [
+                "Confidential",
+                "Default"
+              ],
+              "metadata": {
+                "description": "Optional. The compute type of the search service."
+              }
+            },
             "cmkEnforcement": {
               "type": "string",
               "defaultValue": "Unspecified",
@@ -32667,12 +32486,25 @@
                 "description": "Optional. Describes a policy that determines how resources within the search service are to be encrypted with Customer Managed Keys."
               }
             },
+            "dataExfiltrationProtections": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "nullable": true,
+              "allowedValues": [
+                "All"
+              ],
+              "metadata": {
+                "description": "Optional. A list of data exfiltration scenarios that are explicitly disallowed for the search service. Currently, the only supported value is 'All' to disable all possible data export scenarios with more fine grained controls planned for the future."
+              }
+            },
             "hostingMode": {
               "type": "string",
-              "defaultValue": "default",
+              "defaultValue": "Default",
               "allowedValues": [
-                "default",
-                "highDensity"
+                "Default",
+                "HighDensity"
               ],
               "metadata": {
                 "description": "Optional. Applicable only for the standard3 SKU. You can set this property to enable up to 3 high density partitions that allow up to 1000 indexes, which is much higher than the maximum indexes allowed for any other SKU. For the standard3 SKU, the value is either 'default' or 'highDensity'. For all other SKUs, this value must be 'default'."
@@ -32693,11 +32525,14 @@
               }
             },
             "networkRuleSet": {
-              "$ref": "#/definitions/networkRuleSetType",
-              "nullable": true,
+              "type": "object",
               "metadata": {
+                "__bicep_resource_derived_type!": {
+                  "source": "Microsoft.Search/searchServices@2025-05-01#properties/properties/properties/networkRuleSet"
+                },
                 "description": "Optional. Network specific rules that determine how the Azure Cognitive Search service may be reached."
-              }
+              },
+              "nullable": true
             },
             "partitionCount": {
               "type": "int",
@@ -32811,7 +32646,7 @@
               "type": "object",
               "metadata": {
                 "__bicep_resource_derived_type!": {
-                  "source": "Microsoft.Search/searchServices@2025-02-01-preview#properties/tags"
+                  "source": "Microsoft.Search/searchServices@2025-05-01#properties/tags"
                 },
                 "description": "Optional. Tags to help categorize the resource in the Azure portal."
               },
@@ -32845,7 +32680,7 @@
               "condition": "[parameters('enableTelemetry')]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2024-03-01",
-              "name": "[format('46d3xbcp.res.search-searchservice.{0}.{1}', replace('0.11.1', '.', '-'), substring(uniqueString(deployment().name, parameters('location')), 0, 4))]",
+              "name": "[format('46d3xbcp.res.search-searchservice.{0}.{1}', replace('0.12.0', '.', '-'), substring(uniqueString(deployment().name, parameters('location')), 0, 4))]",
               "properties": {
                 "mode": "Incremental",
                 "template": {
@@ -32863,7 +32698,7 @@
             },
             "searchService": {
               "type": "Microsoft.Search/searchServices",
-              "apiVersion": "2025-02-01-preview",
+              "apiVersion": "2025-05-01",
               "name": "[parameters('name')]",
               "location": "[parameters('location')]",
               "sku": {
@@ -32882,7 +32717,9 @@
                 "partitionCount": "[parameters('partitionCount')]",
                 "replicaCount": "[parameters('replicaCount')]",
                 "publicNetworkAccess": "[toLower(parameters('publicNetworkAccess'))]",
-                "semanticSearch": "[parameters('semanticSearch')]"
+                "semanticSearch": "[parameters('semanticSearch')]",
+                "computeType": "[parameters('computeType')]",
+                "dataExfiltrationProtections": "[parameters('dataExfiltrationProtections')]"
               }
             },
             "searchService_diagnosticSettings": {
@@ -32968,7 +32805,7 @@
                 "count": "[length(coalesce(parameters('privateEndpoints'), createArray()))]"
               },
               "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
+              "apiVersion": "2025-04-01",
               "name": "[format('{0}-searchService-PrivateEndpoint-{1}', uniqueString(deployment().name, parameters('location')), copyIndex())]",
               "subscriptionId": "[split(coalesce(tryGet(coalesce(parameters('privateEndpoints'), createArray())[copyIndex()], 'resourceGroupResourceId'), resourceGroup().id), '/')[2]]",
               "resourceGroup": "[split(coalesce(tryGet(coalesce(parameters('privateEndpoints'), createArray())[copyIndex()], 'resourceGroupResourceId'), resourceGroup().id), '/')[4]]",
@@ -33024,8 +32861,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.34.44.8038",
-                      "templateHash": "12389807800450456797"
+                      "version": "0.38.5.1644",
+                      "templateHash": "16604612898799598358"
                     },
                     "name": "Private Endpoints",
                     "description": "This module deploys a Private Endpoint."
@@ -33052,115 +32889,8 @@
                         }
                       },
                       "metadata": {
-                        "__bicep_export!": true
-                      }
-                    },
-                    "ipConfigurationType": {
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "string",
-                          "metadata": {
-                            "description": "Required. The name of the resource that is unique within a resource group."
-                          }
-                        },
-                        "properties": {
-                          "type": "object",
-                          "properties": {
-                            "groupId": {
-                              "type": "string",
-                              "metadata": {
-                                "description": "Required. The ID of a group obtained from the remote resource that this private endpoint should connect to. If used with private link service connection, this property must be defined as empty string."
-                              }
-                            },
-                            "memberName": {
-                              "type": "string",
-                              "metadata": {
-                                "description": "Required. The member name of a group obtained from the remote resource that this private endpoint should connect to. If used with private link service connection, this property must be defined as empty string."
-                              }
-                            },
-                            "privateIPAddress": {
-                              "type": "string",
-                              "metadata": {
-                                "description": "Required. A private IP address obtained from the private endpoint's subnet."
-                              }
-                            }
-                          },
-                          "metadata": {
-                            "description": "Required. Properties of private endpoint IP configurations."
-                          }
-                        }
-                      },
-                      "metadata": {
-                        "__bicep_export!": true
-                      }
-                    },
-                    "privateLinkServiceConnectionType": {
-                      "type": "object",
-                      "properties": {
-                        "name": {
-                          "type": "string",
-                          "metadata": {
-                            "description": "Required. The name of the private link service connection."
-                          }
-                        },
-                        "properties": {
-                          "type": "object",
-                          "properties": {
-                            "groupIds": {
-                              "type": "array",
-                              "items": {
-                                "type": "string"
-                              },
-                              "metadata": {
-                                "description": "Required. The ID of a group obtained from the remote resource that this private endpoint should connect to. If used with private link service connection, this property must be defined as empty string array `[]`."
-                              }
-                            },
-                            "privateLinkServiceId": {
-                              "type": "string",
-                              "metadata": {
-                                "description": "Required. The resource id of private link service."
-                              }
-                            },
-                            "requestMessage": {
-                              "type": "string",
-                              "nullable": true,
-                              "metadata": {
-                                "description": "Optional. A message passed to the owner of the remote resource with this connection request. Restricted to 140 chars."
-                              }
-                            }
-                          },
-                          "metadata": {
-                            "description": "Required. Properties of private link service connection."
-                          }
-                        }
-                      },
-                      "metadata": {
-                        "__bicep_export!": true
-                      }
-                    },
-                    "customDnsConfigType": {
-                      "type": "object",
-                      "properties": {
-                        "fqdn": {
-                          "type": "string",
-                          "nullable": true,
-                          "metadata": {
-                            "description": "Optional. FQDN that resolves to private endpoint IP address."
-                          }
-                        },
-                        "ipAddresses": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          },
-                          "metadata": {
-                            "description": "Required. A list of private IP addresses of the private endpoint."
-                          }
-                        }
-                      },
-                      "metadata": {
-                        "__bicep_export!": true
+                        "__bicep_export!": true,
+                        "description": "The type of a private dns zone group."
                       }
                     },
                     "lockType": {
@@ -33184,12 +32914,19 @@
                           "metadata": {
                             "description": "Optional. Specify the type of lock."
                           }
+                        },
+                        "notes": {
+                          "type": "string",
+                          "nullable": true,
+                          "metadata": {
+                            "description": "Optional. Specify the notes of the lock."
+                          }
                         }
                       },
                       "metadata": {
                         "description": "An AVM-aligned type for a lock.",
                         "__bicep_imported_from!": {
-                          "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.5.1"
+                          "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.1"
                         }
                       }
                     },
@@ -33211,6 +32948,7 @@
                         }
                       },
                       "metadata": {
+                        "description": "The type of a private DNS zone group configuration.",
                         "__bicep_imported_from!": {
                           "sourceTemplate": "private-dns-zone-group/main.bicep"
                         }
@@ -33287,7 +33025,7 @@
                       "metadata": {
                         "description": "An AVM-aligned type for a role assignment.",
                         "__bicep_imported_from!": {
-                          "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.5.1"
+                          "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.1"
                         }
                       }
                     }
@@ -33324,13 +33062,13 @@
                     },
                     "ipConfigurations": {
                       "type": "array",
-                      "items": {
-                        "$ref": "#/definitions/ipConfigurationType"
-                      },
-                      "nullable": true,
                       "metadata": {
+                        "__bicep_resource_derived_type!": {
+                          "source": "Microsoft.Network/privateEndpoints@2024-01-01#properties/properties/properties/ipConfigurations"
+                        },
                         "description": "Optional. A list of IP configurations of the private endpoint. This will be used to map to the First Party Service endpoints."
-                      }
+                      },
+                      "nullable": true
                     },
                     "privateDnsZoneGroup": {
                       "$ref": "#/definitions/privateDnsZoneGroupType",
@@ -33365,40 +33103,43 @@
                     },
                     "tags": {
                       "type": "object",
-                      "nullable": true,
                       "metadata": {
+                        "__bicep_resource_derived_type!": {
+                          "source": "Microsoft.Network/privateEndpoints@2024-01-01#properties/tags"
+                        },
                         "description": "Optional. Tags to be applied on all resources/resource groups in this deployment."
-                      }
+                      },
+                      "nullable": true
                     },
                     "customDnsConfigs": {
                       "type": "array",
-                      "items": {
-                        "$ref": "#/definitions/customDnsConfigType"
-                      },
-                      "nullable": true,
                       "metadata": {
+                        "__bicep_resource_derived_type!": {
+                          "source": "Microsoft.Network/privateEndpoints@2024-01-01#properties/properties/properties/customDnsConfigs"
+                        },
                         "description": "Optional. Custom DNS configurations."
-                      }
+                      },
+                      "nullable": true
                     },
                     "manualPrivateLinkServiceConnections": {
                       "type": "array",
-                      "items": {
-                        "$ref": "#/definitions/privateLinkServiceConnectionType"
-                      },
-                      "nullable": true,
                       "metadata": {
+                        "__bicep_resource_derived_type!": {
+                          "source": "Microsoft.Network/privateEndpoints@2024-01-01#properties/properties/properties/manualPrivateLinkServiceConnections"
+                        },
                         "description": "Conditional. A grouping of information about the connection to the remote resource. Used when the network admin does not have access to approve connections to the remote resource. Required if `privateLinkServiceConnections` is empty."
-                      }
+                      },
+                      "nullable": true
                     },
                     "privateLinkServiceConnections": {
                       "type": "array",
-                      "items": {
-                        "$ref": "#/definitions/privateLinkServiceConnectionType"
-                      },
-                      "nullable": true,
                       "metadata": {
+                        "__bicep_resource_derived_type!": {
+                          "source": "Microsoft.Network/privateEndpoints@2024-01-01#properties/properties/properties/privateLinkServiceConnections"
+                        },
                         "description": "Conditional. A grouping of information about the connection to the remote resource. Required if `manualPrivateLinkServiceConnections` is empty."
-                      }
+                      },
+                      "nullable": true
                     },
                     "enableTelemetry": {
                       "type": "bool",
@@ -33433,8 +33174,8 @@
                     "avmTelemetry": {
                       "condition": "[parameters('enableTelemetry')]",
                       "type": "Microsoft.Resources/deployments",
-                      "apiVersion": "2024-03-01",
-                      "name": "[format('46d3xbcp.res.network-privateendpoint.{0}.{1}', replace('0.11.0', '.', '-'), substring(uniqueString(deployment().name, parameters('location')), 0, 4))]",
+                      "apiVersion": "2025-04-01",
+                      "name": "[format('46d3xbcp.res.network-privateendpoint.{0}.{1}', replace('0.11.1', '.', '-'), substring(uniqueString(deployment().name, parameters('location')), 0, 4))]",
                       "properties": {
                         "mode": "Incremental",
                         "template": {
@@ -33452,7 +33193,7 @@
                     },
                     "privateEndpoint": {
                       "type": "Microsoft.Network/privateEndpoints",
-                      "apiVersion": "2024-05-01",
+                      "apiVersion": "2024-10-01",
                       "name": "[parameters('name')]",
                       "location": "[parameters('location')]",
                       "tags": "[parameters('tags')]",
@@ -33484,7 +33225,7 @@
                       "name": "[coalesce(tryGet(parameters('lock'), 'name'), format('lock-{0}', parameters('name')))]",
                       "properties": {
                         "level": "[coalesce(tryGet(parameters('lock'), 'kind'), '')]",
-                        "notes": "[if(equals(tryGet(parameters('lock'), 'kind'), 'CanNotDelete'), 'Cannot delete resource or child resources.', 'Cannot delete or modify the resource or child resources.')]"
+                        "notes": "[coalesce(tryGet(parameters('lock'), 'notes'), if(equals(tryGet(parameters('lock'), 'kind'), 'CanNotDelete'), 'Cannot delete resource or child resources.', 'Cannot delete or modify the resource or child resources.'))]"
                       },
                       "dependsOn": [
                         "privateEndpoint"
@@ -33515,7 +33256,7 @@
                     "privateEndpoint_privateDnsZoneGroup": {
                       "condition": "[not(empty(parameters('privateDnsZoneGroup')))]",
                       "type": "Microsoft.Resources/deployments",
-                      "apiVersion": "2022-09-01",
+                      "apiVersion": "2025-04-01",
                       "name": "[format('{0}-PrivateEndpoint-PrivateDnsZoneGroup', uniqueString(deployment().name))]",
                       "properties": {
                         "expressionEvaluationOptions": {
@@ -33540,8 +33281,8 @@
                           "metadata": {
                             "_generator": {
                               "name": "bicep",
-                              "version": "0.34.44.8038",
-                              "templateHash": "13997305779829540948"
+                              "version": "0.38.5.1644",
+                              "templateHash": "24141742673128945"
                             },
                             "name": "Private Endpoint Private DNS Zone Groups",
                             "description": "This module deploys a Private Endpoint Private DNS Zone Group."
@@ -33565,7 +33306,8 @@
                                 }
                               },
                               "metadata": {
-                                "__bicep_export!": true
+                                "__bicep_export!": true,
+                                "description": "The type of a private DNS zone group configuration."
                               }
                             }
                           },
@@ -33595,33 +33337,30 @@
                               }
                             }
                           },
-                          "variables": {
-                            "copy": [
-                              {
-                                "name": "privateDnsZoneConfigsVar",
-                                "count": "[length(parameters('privateDnsZoneConfigs'))]",
-                                "input": {
-                                  "name": "[coalesce(tryGet(parameters('privateDnsZoneConfigs')[copyIndex('privateDnsZoneConfigsVar')], 'name'), last(split(parameters('privateDnsZoneConfigs')[copyIndex('privateDnsZoneConfigsVar')].privateDnsZoneResourceId, '/')))]",
-                                  "properties": {
-                                    "privateDnsZoneId": "[parameters('privateDnsZoneConfigs')[copyIndex('privateDnsZoneConfigsVar')].privateDnsZoneResourceId]"
-                                  }
-                                }
-                              }
-                            ]
-                          },
                           "resources": {
                             "privateEndpoint": {
                               "existing": true,
                               "type": "Microsoft.Network/privateEndpoints",
-                              "apiVersion": "2024-05-01",
+                              "apiVersion": "2024-10-01",
                               "name": "[parameters('privateEndpointName')]"
                             },
                             "privateDnsZoneGroup": {
                               "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
-                              "apiVersion": "2024-05-01",
+                              "apiVersion": "2024-10-01",
                               "name": "[format('{0}/{1}', parameters('privateEndpointName'), parameters('name'))]",
                               "properties": {
-                                "privateDnsZoneConfigs": "[variables('privateDnsZoneConfigsVar')]"
+                                "copy": [
+                                  {
+                                    "name": "privateDnsZoneConfigs",
+                                    "count": "[length(parameters('privateDnsZoneConfigs'))]",
+                                    "input": {
+                                      "name": "[coalesce(tryGet(parameters('privateDnsZoneConfigs')[copyIndex('privateDnsZoneConfigs')], 'name'), last(split(parameters('privateDnsZoneConfigs')[copyIndex('privateDnsZoneConfigs')].privateDnsZoneResourceId, '/')))]",
+                                      "properties": {
+                                        "privateDnsZoneId": "[parameters('privateDnsZoneConfigs')[copyIndex('privateDnsZoneConfigs')].privateDnsZoneResourceId]"
+                                      }
+                                    }
+                                  }
+                                ]
                               }
                             }
                           },
@@ -33682,14 +33421,15 @@
                       "metadata": {
                         "description": "The location the resource was deployed into."
                       },
-                      "value": "[reference('privateEndpoint', '2024-05-01', 'full').location]"
+                      "value": "[reference('privateEndpoint', '2024-10-01', 'full').location]"
                     },
                     "customDnsConfigs": {
                       "type": "array",
-                      "items": {
-                        "$ref": "#/definitions/customDnsConfigType"
-                      },
                       "metadata": {
+                        "__bicep_resource_derived_type!": {
+                          "source": "Microsoft.Network/privateEndpoints@2024-01-01#properties/properties/properties/customDnsConfigs",
+                          "output": true
+                        },
                         "description": "The custom DNS configurations of the private endpoint."
                       },
                       "value": "[reference('privateEndpoint').customDnsConfigs]"
@@ -33727,7 +33467,7 @@
                 "batchSize": 1
               },
               "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
+              "apiVersion": "2025-04-01",
               "name": "[format('{0}-searchService-SharedPrvLink-{1}', uniqueString(deployment().name, parameters('location')), copyIndex())]",
               "properties": {
                 "expressionEvaluationOptions": {
@@ -33761,8 +33501,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.37.4.10188",
-                      "templateHash": "557730297583881254"
+                      "version": "0.39.26.7824",
+                      "templateHash": "2115224445601868607"
                     },
                     "name": "Search Services Private Link Resources",
                     "description": "This module deploys a Search Service Private Link Resource."
@@ -33810,12 +33550,12 @@
                     "searchService": {
                       "existing": true,
                       "type": "Microsoft.Search/searchServices",
-                      "apiVersion": "2025-02-01-preview",
+                      "apiVersion": "2025-05-01",
                       "name": "[parameters('searchServiceName')]"
                     },
                     "sharedPrivateLinkResource": {
                       "type": "Microsoft.Search/searchServices/sharedPrivateLinkResources",
-                      "apiVersion": "2025-02-01-preview",
+                      "apiVersion": "2025-05-01",
                       "name": "[format('{0}/{1}', parameters('searchServiceName'), parameters('name'))]",
                       "properties": {
                         "privateLinkResourceId": "[parameters('privateLinkResourceId')]",
@@ -33857,7 +33597,7 @@
             "secretsExport": {
               "condition": "[not(equals(parameters('secretsExportConfiguration'), null()))]",
               "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
+              "apiVersion": "2025-04-01",
               "name": "[format('{0}-secrets-kv', uniqueString(deployment().name, parameters('location')))]",
               "subscriptionId": "[split(tryGet(parameters('secretsExportConfiguration'), 'keyVaultResourceId'), '/')[2]]",
               "resourceGroup": "[split(tryGet(parameters('secretsExportConfiguration'), 'keyVaultResourceId'), '/')[4]]",
@@ -33871,7 +33611,7 @@
                     "value": "[last(split(tryGet(parameters('secretsExportConfiguration'), 'keyVaultResourceId'), '/'))]"
                   },
                   "secretsToSet": {
-                    "value": "[union(createArray(), if(contains(parameters('secretsExportConfiguration'), 'primaryAdminKeyName'), createArray(createObject('name', tryGet(parameters('secretsExportConfiguration'), 'primaryAdminKeyName'), 'value', listAdminKeys('searchService', '2025-02-01-preview').primaryKey)), createArray()), if(contains(parameters('secretsExportConfiguration'), 'secondaryAdminKeyName'), createArray(createObject('name', tryGet(parameters('secretsExportConfiguration'), 'secondaryAdminKeyName'), 'value', listAdminKeys('searchService', '2025-02-01-preview').secondaryKey)), createArray()))]"
+                    "value": "[union(createArray(), if(contains(parameters('secretsExportConfiguration'), 'primaryAdminKeyName'), createArray(createObject('name', tryGet(parameters('secretsExportConfiguration'), 'primaryAdminKeyName'), 'value', listAdminKeys('searchService', '2025-05-01').primaryKey)), createArray()), if(contains(parameters('secretsExportConfiguration'), 'secondaryAdminKeyName'), createArray(createObject('name', tryGet(parameters('secretsExportConfiguration'), 'secondaryAdminKeyName'), 'value', listAdminKeys('searchService', '2025-05-01').secondaryKey)), createArray()))]"
                   }
                 },
                 "template": {
@@ -33881,8 +33621,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.37.4.10188",
-                      "templateHash": "7634110751636246703"
+                      "version": "0.39.26.7824",
+                      "templateHash": "696453183181258843"
                     }
                   },
                   "definitions": {
@@ -34014,14 +33754,14 @@
               "metadata": {
                 "description": "The principal ID of the system assigned identity."
               },
-              "value": "[tryGet(tryGet(reference('searchService', '2025-02-01-preview', 'full'), 'identity'), 'principalId')]"
+              "value": "[tryGet(tryGet(reference('searchService', '2025-05-01', 'full'), 'identity'), 'principalId')]"
             },
             "location": {
               "type": "string",
               "metadata": {
                 "description": "The location the resource was deployed into."
               },
-              "value": "[reference('searchService', '2025-02-01-preview', 'full').location]"
+              "value": "[reference('searchService', '2025-05-01', 'full').location]"
             },
             "endpoint": {
               "type": "string",
@@ -34061,14 +33801,14 @@
               "metadata": {
                 "description": "The primary admin API key of the search service."
               },
-              "value": "[listAdminKeys('searchService', '2025-02-01-preview').primaryKey]"
+              "value": "[listAdminKeys('searchService', '2025-05-01').primaryKey]"
             },
             "secondaryKey": {
               "type": "securestring",
               "metadata": {
                 "description": "The secondaryKey admin API key of the search service."
               },
-              "value": "[listAdminKeys('searchService', '2025-02-01-preview').secondaryKey]"
+              "value": "[listAdminKeys('searchService', '2025-05-01').secondaryKey]"
             }
           }
         }
@@ -34083,7 +33823,7 @@
     "aiSearchRoleAssignments": {
       "condition": "[parameters('azureAiSearchDeploy')]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "ai-search-role-assignments",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -34104,8 +33844,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.36.268.17113",
-              "templateHash": "11556664097475594638"
+              "version": "0.39.26.7824",
+              "templateHash": "9527362946316057502"
             },
             "name": "Azure AI Search Role Assignments",
             "description": "Creates role assignments on an Azure AI Search service."
@@ -34280,7 +34020,7 @@
     },
     "foundryService": {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "foundry-service-deployment",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -34359,8 +34099,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.36.268.17113",
-              "templateHash": "4647805671928123401"
+              "version": "0.39.26.7824",
+              "templateHash": "10102123543833824839"
             },
             "name": "Cognitive Services",
             "description": "This module deploys a Cognitive Service account.\nThis is a temporary module for deploying Azure Foundry Cognitive Services accounts.\nIt is intended to be replaced by the Azure Verified Module (AVM) for Microsoft.CognitiveServices accounts\nonce it supports Foundry V2 (projects, connections etc)\nhttps://github.com/Azure/bicep-registry-modules/issues/5390\n"
@@ -36601,7 +36341,7 @@
                 "batchSize": 1
               },
               "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
+              "apiVersion": "2025-04-01",
               "name": "[take(format('{0}-cognitiveService-PrivateEndpoint-{1}', uniqueString(deployment().name, parameters('location')), copyIndex()), 64)]",
               "subscriptionId": "[split(coalesce(tryGet(coalesce(parameters('privateEndpoints'), createArray())[copyIndex()], 'resourceGroupResourceId'), resourceGroup().id), '/')[2]]",
               "resourceGroup": "[split(coalesce(tryGet(coalesce(parameters('privateEndpoints'), createArray())[copyIndex()], 'resourceGroupResourceId'), resourceGroup().id), '/')[4]]",
@@ -37360,7 +37100,7 @@
                 "batchSize": 1
               },
               "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
+              "apiVersion": "2025-04-01",
               "name": "[format('{0}-cognitiveService-project-{1}', uniqueString(deployment().name, parameters('location')), copyIndex())]",
               "subscriptionId": "[split(coalesce(tryGet(coalesce(parameters('projects'), createArray())[copyIndex()], 'resourceGroupResourceId'), resourceGroup().id), '/')[2]]",
               "resourceGroup": "[split(coalesce(tryGet(coalesce(parameters('projects'), createArray())[copyIndex()], 'resourceGroupResourceId'), resourceGroup().id), '/')[4]]",
@@ -37402,8 +37142,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.36.268.17113",
-                      "templateHash": "7233639600812296195"
+                      "version": "0.39.26.7824",
+                      "templateHash": "17358705136242206000"
                     },
                     "name": "Cognitive Services Project",
                     "description": "This module deploys a Project within a Cognitive Services account.\nIt allows for the creation of a Foundry Project with optional managed identities and role assignments.\n"
@@ -38711,8 +38451,8 @@
                 "batchSize": 1
               },
               "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
-              "name": "[concat(take(format('{0}-{1}', parameters('name'), parameters('connections')[copyIndex()].name), 60), '-con')]",
+              "apiVersion": "2025-04-01",
+              "name": "[format('{0}-con', take(format('{0}-{1}', parameters('name'), parameters('connections')[copyIndex()].name), 60))]",
               "properties": {
                 "expressionEvaluationOptions": {
                   "scope": "inner"
@@ -38757,8 +38497,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.36.268.17113",
-                      "templateHash": "9578025451818724333"
+                      "version": "0.39.26.7824",
+                      "templateHash": "300966613024320802"
                     },
                     "name": "Machine Learning Services Workspaces Connections",
                     "description": "This module creates a connection in a Machine Learning Services workspace."
@@ -39631,7 +39371,7 @@
             "secretsExport": {
               "condition": "[not(equals(parameters('secretsExportConfiguration'), null()))]",
               "type": "Microsoft.Resources/deployments",
-              "apiVersion": "2022-09-01",
+              "apiVersion": "2025-04-01",
               "name": "[format('{0}-secrets-kv', uniqueString(deployment().name, parameters('location')))]",
               "subscriptionId": "[split(tryGet(parameters('secretsExportConfiguration'), 'keyVaultResourceId'), '/')[2]]",
               "resourceGroup": "[split(tryGet(parameters('secretsExportConfiguration'), 'keyVaultResourceId'), '/')[4]]",
@@ -39655,8 +39395,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.36.268.17113",
-                      "templateHash": "2336553046692823842"
+                      "version": "0.39.26.7824",
+                      "templateHash": "6185906018696066176"
                     }
                   },
                   "definitions": {
@@ -39886,7 +39626,7 @@
     },
     "foundryRoleAssignments": {
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "foundry-role-assignments",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -39909,8 +39649,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.36.268.17113",
-              "templateHash": "16453378230935758601"
+              "version": "0.39.26.7824",
+              "templateHash": "7895137289067627754"
             },
             "name": "Microsoft Foundry Role Assignments",
             "description": "Creates role assignments on a Microsoft Foundry account."
@@ -40113,7 +39853,7 @@
       },
       "condition": "[and(parameters('foundryProjectDeploy'), parameters('azureAiSearchDeploy'))]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "[take(format('fp-aisch-ra-{0}', variables('foundryServiceProjects')[copyIndex()].name), 64)]",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -40147,8 +39887,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.36.268.17113",
-              "templateHash": "11556664097475594638"
+              "version": "0.39.26.7824",
+              "templateHash": "9527362946316057502"
             },
             "name": "Azure AI Search Role Assignments",
             "description": "Creates role assignments on an Azure AI Search service."
@@ -40323,7 +40063,7 @@
     "bastionHost": {
       "condition": "[and(parameters('bastionHostDeploy'), parameters('azureNetworkIsolation'))]",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "bastion-host-deployment",
       "resourceGroup": "[variables('effectiveResourceGroupName')]",
       "properties": {
@@ -40356,7 +40096,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.39.26.7824",
-              "templateHash": "1210394124185833155"
+              "templateHash": "7741601918225805390"
             },
             "name": "Bastion Hosts",
             "description": "This module deploys a Bastion Host."
@@ -40550,7 +40290,7 @@
               },
               "metadata": {
                 "__bicep_imported_from!": {
-                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/res/network/public-ip-address:0.9.0"
+                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/res/network/public-ip-address:0.10.0"
                 }
               }
             },
@@ -40812,7 +40552,7 @@
               },
               "metadata": {
                 "__bicep_imported_from!": {
-                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/res/network/public-ip-address:0.9.0"
+                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/res/network/public-ip-address:0.10.0"
                 }
               }
             },
@@ -40834,7 +40574,7 @@
               },
               "metadata": {
                 "__bicep_imported_from!": {
-                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/res/network/public-ip-address:0.9.0"
+                  "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/res/network/public-ip-address:0.10.0"
                 }
               }
             },
@@ -41138,7 +40878,7 @@
               "condition": "[parameters('enableTelemetry')]",
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2024-03-01",
-              "name": "[format('46d3xbcp.res.network-bastionhost.{0}.{1}', replace('0.8.1', '.', '-'), substring(uniqueString(deployment().name, parameters('location')), 0, 4))]",
+              "name": "[format('46d3xbcp.res.network-bastionhost.{0}.{1}', replace('0.8.2', '.', '-'), substring(uniqueString(deployment().name, parameters('location')), 0, 4))]",
               "properties": {
                 "mode": "Incremental",
                 "template": {
@@ -41156,7 +40896,7 @@
             },
             "azureBastion": {
               "type": "Microsoft.Network/bastionHosts",
-              "apiVersion": "2024-07-01",
+              "apiVersion": "2025-01-01",
               "name": "[parameters('name')]",
               "location": "[parameters('location')]",
               "tags": "[coalesce(parameters('tags'), createObject())]",
@@ -41307,8 +41047,8 @@
                   "metadata": {
                     "_generator": {
                       "name": "bicep",
-                      "version": "0.36.177.2456",
-                      "templateHash": "14921988046704902194"
+                      "version": "0.39.26.7824",
+                      "templateHash": "16564959277054027786"
                     },
                     "name": "Public IP Addresses",
                     "description": "This module deploys a Public IP Address."
@@ -41525,7 +41265,7 @@
                       "metadata": {
                         "description": "An AVM-aligned type for a diagnostic setting. To be used if both logs & metrics are supported by the resource provider.",
                         "__bicep_imported_from!": {
-                          "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.2.1"
+                          "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.1"
                         }
                       }
                     },
@@ -41550,12 +41290,19 @@
                           "metadata": {
                             "description": "Optional. Specify the type of lock."
                           }
+                        },
+                        "notes": {
+                          "type": "string",
+                          "nullable": true,
+                          "metadata": {
+                            "description": "Optional. Specify the notes of the lock."
+                          }
                         }
                       },
                       "metadata": {
                         "description": "An AVM-aligned type for a lock.",
                         "__bicep_imported_from!": {
-                          "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.2.1"
+                          "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.1"
                         }
                       }
                     },
@@ -41630,7 +41377,7 @@
                       "metadata": {
                         "description": "An AVM-aligned type for a role assignment.",
                         "__bicep_imported_from!": {
-                          "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.2.1"
+                          "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.1"
                         }
                       }
                     }
@@ -41743,6 +41490,17 @@
                         "description": "Optional. The DDoS protection plan configuration associated with the public IP address."
                       }
                     },
+                    "deleteOption": {
+                      "type": "string",
+                      "nullable": true,
+                      "allowedValues": [
+                        "Delete",
+                        "Detach"
+                      ],
+                      "metadata": {
+                        "description": "Optional. The delete option for the public IP address."
+                      }
+                    },
                     "location": {
                       "type": "string",
                       "defaultValue": "[resourceGroup().location]",
@@ -41776,10 +41534,13 @@
                     },
                     "tags": {
                       "type": "object",
-                      "nullable": true,
                       "metadata": {
+                        "__bicep_resource_derived_type!": {
+                          "source": "Microsoft.Network/publicIPAddresses@2025-01-01#properties/tags"
+                        },
                         "description": "Optional. Tags of the resource."
-                      }
+                      },
+                      "nullable": true
                     },
                     "diagnosticSettings": {
                       "type": "array",
@@ -41818,7 +41579,7 @@
                       "condition": "[parameters('enableTelemetry')]",
                       "type": "Microsoft.Resources/deployments",
                       "apiVersion": "2024-03-01",
-                      "name": "[format('46d3xbcp.res.network-publicipaddress.{0}.{1}', replace('0.9.0', '.', '-'), substring(uniqueString(deployment().name, parameters('location')), 0, 4))]",
+                      "name": "[format('46d3xbcp.res.network-publicipaddress.{0}.{1}', replace('0.10.0', '.', '-'), substring(uniqueString(deployment().name, parameters('location')), 0, 4))]",
                       "properties": {
                         "mode": "Incremental",
                         "template": {
@@ -41836,7 +41597,7 @@
                     },
                     "publicIpAddress": {
                       "type": "Microsoft.Network/publicIPAddresses",
-                      "apiVersion": "2024-05-01",
+                      "apiVersion": "2025-01-01",
                       "name": "[parameters('name')]",
                       "location": "[parameters('location')]",
                       "tags": "[parameters('tags')]",
@@ -41852,7 +41613,8 @@
                         "publicIPAllocationMethod": "[parameters('publicIPAllocationMethod')]",
                         "publicIPPrefix": "[if(not(empty(parameters('publicIpPrefixResourceId'))), createObject('id', parameters('publicIpPrefixResourceId')), null())]",
                         "idleTimeoutInMinutes": "[parameters('idleTimeoutInMinutes')]",
-                        "ipTags": "[parameters('ipTags')]"
+                        "ipTags": "[parameters('ipTags')]",
+                        "deleteOption": "[parameters('deleteOption')]"
                       }
                     },
                     "publicIpAddress_lock": {
@@ -41863,7 +41625,7 @@
                       "name": "[coalesce(tryGet(parameters('lock'), 'name'), format('lock-{0}', parameters('name')))]",
                       "properties": {
                         "level": "[coalesce(tryGet(parameters('lock'), 'kind'), '')]",
-                        "notes": "[if(equals(tryGet(parameters('lock'), 'kind'), 'CanNotDelete'), 'Cannot delete resource or child resources.', 'Cannot delete or modify the resource or child resources.')]"
+                        "notes": "[coalesce(tryGet(parameters('lock'), 'notes'), if(equals(tryGet(parameters('lock'), 'kind'), 'CanNotDelete'), 'Cannot delete resource or child resources.', 'Cannot delete or modify the resource or child resources.'))]"
                       },
                       "dependsOn": [
                         "publicIpAddress"
@@ -41967,7 +41729,7 @@
                       "metadata": {
                         "description": "The location the resource was deployed into."
                       },
-                      "value": "[reference('publicIpAddress', '2024-05-01', 'full').location]"
+                      "value": "[reference('publicIpAddress', '2025-01-01', 'full').location]"
                     }
                   }
                 }
@@ -42001,7 +41763,7 @@
               "metadata": {
                 "description": "The location the resource was deployed into."
               },
-              "value": "[reference('azureBastion', '2024-07-01', 'full').location]"
+              "value": "[reference('azureBastion', '2025-01-01', 'full').location]"
             },
             "ipConfAzureBastionSubnet": {
               "type": "object",

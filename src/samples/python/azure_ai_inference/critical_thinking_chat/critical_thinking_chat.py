@@ -406,17 +406,20 @@ def get_ai_response(
                             "id": tc.id,
                             "type": tc.type,
                             "function": {
-                                "name": tc.function.name,
-                                "arguments": tc.function.arguments
+                                "name": tc.function.name if hasattr(tc, 'function') else "",
+                                "arguments": tc.function.arguments if hasattr(tc, 'function') else ""
                             }
                         }
                         for tc in response.choices[0].message.tool_calls
+                        if hasattr(tc, 'function')
                     ]
                 }
                 conversation.append(assistant_message)
 
                 # Process each tool call with user permission
                 for tool_call in response.choices[0].message.tool_calls:
+                    if not hasattr(tool_call, 'function'):
+                        continue
                     if tool_call.function.name == "evaluate_syllogism":
                         logger.info("Processing syllogism evaluation tool call permission")
 
@@ -487,7 +490,7 @@ def get_ai_response(
                             }
                             conversation.append(tool_message)
 
-                    elif tool_call.function.name == "detect_fallacies":
+                    elif hasattr(tool_call, 'function') and tool_call.function.name == "detect_fallacies":
                         logger.info("Processing fallacy detection tool call permission")
 
                         try:

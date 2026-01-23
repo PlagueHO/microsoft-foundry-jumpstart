@@ -67,13 +67,11 @@ async def main():
         model_deployment_name=MODEL_DEPLOYMENT_NAME,
     )
 
-    async with (
-        DefaultAzureCredential() as creds,
-        AzureAIAgent.create_client(
-            credential=creds,
-            conn_str=ai_agent_settings.project_connection_string.get_secret_value(),
-        ) as client,
-    ):
+    creds = DefaultAzureCredential()
+    async with creds, AzureAIAgent.create_client(
+        credential=creds,
+        conn_str=ai_agent_settings.project_connection_string.get_secret_value(),
+    ) as client:
         # Retrieve an existing agent by ID from the environment variable
         agent_definition = await client.agents.get_agent(AGENT_ID)
         agent = AzureAIAgent(client=client, definition=agent_definition)
