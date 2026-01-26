@@ -4,9 +4,9 @@ on:
   workflow_call:
     inputs:
       app_names:
-        description: 'List of python app names (folders in /src and /tests) to test'
+        description: 'List of python app names (folders in tools/python/src and samples/python/src) to test'
         type: string
-        default: '["tools/python/data_generator"]'
+        default: '["data_generator", "create_ai_search_index"]'
   pull_request:
     branches:
       - main
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        app: ${{ fromJSON(inputs.app_names || '["tools/python/data_generator"]') }}
+        app: ${{ fromJSON(inputs.app_names || '["data_generator", "create_ai_search_index"]') }}
       fail-fast: false
 
     name: Test ${{ matrix.app }}
@@ -41,29 +41,27 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd src/${{ matrix.app }}
+          cd tools/python
           python -m pip install --upgrade pip
           python -m pip install -e .[dev]
 
       - name: Lint with ruff
         run: |
-          cd src/${{ matrix.app }}
-          python -m ruff check .
+          cd tools/python
+          python -m ruff check src/${{ matrix.app }}
 
       - name: Type check with mypy
         run: |
-          cd src/${{ matrix.app }}
-          python -m mypy .
+          cd tools/python
+          python -m mypy src/${{ matrix.app }}
 
       - name: Test with pytest
         run: |
-          cd src/${{ matrix.app }}
-          # Run tests from the repo-level tests directory (not under src/)
-          # Use the absolute workspace path to avoid fragile relative paths
-          python -m pytest "$GITHUB_WORKSPACE/tests/${{ matrix.app }}" --cov --cov-report=xml --cov-fail-under=10
+          cd tools/python
+          python -m pytest tests/${{ matrix.app }} --cov --cov-report=xml --cov-fail-under=10
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v4
         with:
-          file: ./src/${{ matrix.app }}/coverage.xml
+          file: ./tools/python/coverage.xml
           name: ${{ steps.path-vars.outputs.app_name }}-coverage

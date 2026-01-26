@@ -64,7 +64,7 @@ The application supports multiple authentication methods:
 ### Build the application
 
 ```bash
-cd src/samples/semantic_kernel_dotnet/home_loan_agent
+cd samples/dotnet/src/semantic-kernel/home-loan-agent
 dotnet build
 ```
 

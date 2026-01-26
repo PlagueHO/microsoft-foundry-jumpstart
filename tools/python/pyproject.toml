@@ -38,7 +38,7 @@ ignore = [
 
 [tool.ruff.lint.isort]
 # Configure import sorting
-known-first-party = ["azure_ai_inference", "tools", "samples"]
+known-first-party = ["create_ai_search_index", "data_generator"]
 force-single-line = false
 combine-as-imports = true
 
@@ -51,8 +51,9 @@ indent-style = "space"
 line-ending = "auto"
 
 [tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
 # Filter out warnings from dependencies
 filterwarnings = [
-    # Ignore Pydantic deprecation warnings from dependencies
     "ignore:The `__get_pydantic_core_schema__` method of the `BaseModel` class is deprecated:pydantic.warnings.PydanticDeprecatedSince211",
 ]

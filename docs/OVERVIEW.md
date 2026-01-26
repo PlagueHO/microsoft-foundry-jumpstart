@@ -28,22 +28,22 @@ For a full list of configuration options, see [CONFIGURATION_OPTIONS.md](../CONF
 
 ## Sample Data Sets
 
-The accelerator includes sample data sets to facilitate testing, demonstrating and learning of Microsoft Foundry capabilities. All data is synthetic and can be generated using the data_generator tool in the [../src/data_generator](../src/data_generator) directory.
+The accelerator includes sample data sets to facilitate testing, demonstrating and learning of Microsoft Foundry capabilities. All data is synthetic and can be generated using the data_generator tool in the [../tools/python/src/data_generator](../tools/python/src/data_generator) directory.
 
 | Data Set                       | Description                                                                                      | Data Generator Tool                                                                 |
 |--------------------------------|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| Technical Support Cases        | Synthetic support tickets, resolutions, and customer feedback for various products.              | [tools/tech_support.py](../src/data_generator/tools/tech_support.py)                         |
-| Retail Products                | Synthetic retail product descriptions and attributes.                                            | [tools/retail_product.py](../src/data_generator/tools/retail_product.py)                     |
-| Healthcare Patient Records     | Synthetic anonymized patient visit summaries, diagnoses, treatment plans, and other medical notes. | [tools/healthcare_record.py](../src/data_generator/tools/healthcare_record.py)       |
-| Financial Transactions         | Simulated bank transactions, account statements, and fraud detection cases.                      | [tools/financial_transaction.py](../src/data_generator/tools/financial_transaction.py) |
-| Insurance Claims               | Example auto, health, or property insurance claim forms and adjuster notes.                      | [tools/insurance_claim.py](../src/data_generator/tools/insurance_claim.py)       |
-| Legal Contracts                | Sample NDAs, service agreements, and contract negotiation histories.                             | [tools/legal_contract.py](../src/data_generator/tools/legal_contract.py) |
-| Customer Support Chat Logs     | Multi-turn chat transcripts for various industries (e.g., telecom, utilities).                   | [tools/customer_support_chat_log.py](../src/tools/python/data_generator/tools/customer_support_chat_log.py) |
-| IT Service Desk Tickets        | Incident, change, and request tickets with resolution notes.                                     | [tools/it_service_desk_ticket.py](../src/tools/python/data_generator/tools/it_service_desk_ticket.py) |
-| HR Employee Records            | Onboarding documents, performance reviews, and leave requests.                                   | [tools/hr_employee_record.py](../src/tools/python/data_generator/tools/hr_employee_record.py) |
-| Manufacturing Maintenance Logs | Equipment maintenance records, sensor readings, and failure reports.                             | [tools/manufacturing_maintenance_log.py](../src/tools/python/data_generator/tools/manufacturing_maintenance_log.py) |
-| Travel Bookings                | Itineraries, booking confirmations, and customer feedback for flights/hotels.                    | [tools/travel_booking.py](../src/tools/python/data_generator/tools/travel_booking.py) |
-| E-commerce Order Histories     | Orders, returns, product reviews, and customer service interactions.                             | [tools/ecommerce_order_history.py](../src/tools/python/data_generator/tools/ecommerce_order_history.py) |
+| Technical Support Cases        | Synthetic support tickets, resolutions, and customer feedback for various products.              | [tools/tech_support.py](../tools/python/src/data_generator/tools/tech_support.py)                         |
+| Retail Products                | Synthetic retail product descriptions and attributes.                                            | [tools/retail_product.py](../tools/python/src/data_generator/tools/retail_product.py)                     |
+| Healthcare Patient Records     | Synthetic anonymized patient visit summaries, diagnoses, treatment plans, and other medical notes. | [tools/healthcare_record.py](../tools/python/src/data_generator/tools/healthcare_record.py)       |
+| Financial Transactions         | Simulated bank transactions, account statements, and fraud detection cases.                      | [tools/financial_transaction.py](../tools/python/src/data_generator/tools/financial_transaction.py) |
+| Insurance Claims               | Example auto, health, or property insurance claim forms and adjuster notes.                      | [tools/insurance_claim.py](../tools/python/src/data_generator/tools/insurance_claim.py)       |
+| Legal Contracts                | Sample NDAs, service agreements, and contract negotiation histories.                             | [tools/legal_contract.py](../tools/python/src/data_generator/tools/legal_contract.py) |
+| Customer Support Chat Logs     | Multi-turn chat transcripts for various industries (e.g., telecom, utilities).                   | [tools/customer_support_chat_log.py](../tools/python/src/data_generator/tools/customer_support_chat_log.py) |
+| IT Service Desk Tickets        | Incident, change, and request tickets with resolution notes.                                     | [tools/it_service_desk_ticket.py](../tools/python/src/data_generator/tools/it_service_desk_ticket.py) |
+| HR Employee Records            | Onboarding documents, performance reviews, and leave requests.                                   | [tools/hr_employee_record.py](../tools/python/src/data_generator/tools/hr_employee_record.py) |
+| Manufacturing Maintenance Logs | Equipment maintenance records, sensor readings, and failure reports.                             | [tools/manufacturing_maintenance_log.py](../tools/python/src/data_generator/tools/manufacturing_maintenance_log.py) |
+| Travel Bookings                | Itineraries, booking confirmations, and customer feedback for flights/hotels.                    | [tools/travel_booking.py](../tools/python/src/data_generator/tools/travel_booking.py) |
+| E-commerce Order Histories     | Orders, returns, product reviews, and customer service interactions.                             | [tools/ecommerce_order_history.py](../tools/python/src/data_generator/tools/ecommerce_order_history.py) |
 
 These data sets enable comprehensive evaluation of LLM and agent capabilities across document understanding, summarization, Q&A, classification, and workflow automation tasks.
 

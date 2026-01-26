@@ -25,7 +25,7 @@ This sample demonstrates how to use the Azure AI Projects SDK to create an intel
 1. Navigate to the critical thinking chat directory:
 
    ```bash
-   cd src/samples/python/azure_ai_inference/critical_thinking_chat
+   cd samples/python/src/azure_ai_inference/critical_thinking_chat
    ```
 
 1. Install the required dependencies:

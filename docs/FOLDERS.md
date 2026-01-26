@@ -32,14 +32,27 @@ This document describes the folder structure of the Microsoft Foundry Jumpstart 
   - Example datasets for testing and demonstration:
     - **retail-product/**: Sample product data in various formats (YAML, JSON, TXT).
     - **tech-support/**: Example tech support data (JSON, TXT).
+- **samples/**
+  - Sample applications and demonstrations:
+    - **dotnet/**: .NET samples demonstrating Microsoft Agent Framework and Semantic Kernel
+      - **src/**: Sample source code
+      - **tests/**: Tests for samples
+      - `microsoft-foundry-jumpstart-samples.slnx`: .NET solution file
+    - **python/**: Python samples demonstrating Azure AI Inference, Foundry Agent Service SDK, and Semantic Kernel
+      - **src/**: Sample source code
+      - **tests/**: Tests for samples
+      - `pyproject.toml`: Python configuration for samples
 - **scripts/**
   - Automation and utility scripts:
     - `upload_sample_data.ps1`, `upload_sample_data.sh`: Scripts to upload sample data.
     - **generators/**: Scripts for generating sample data.
     - **quickdeploy/**: Quick deployment scripts and helpers.
-- **src/**
-  - Source code for solution samples and reference implementations:
-    - **samples/**: Example source code and sample projects.
+- **tools/**
+  - Development and deployment tools:
+    - **python/**: Python command-line tools
+      - **src/**: Tool source code (create_ai_search_index, data_generator)
+      - **tests/**: Tests for tools
+      - `pyproject.toml`: Python configuration for tools
 
 ---
 

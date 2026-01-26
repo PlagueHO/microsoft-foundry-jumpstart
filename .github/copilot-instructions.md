@@ -99,7 +99,7 @@ az deployment sub what-if --location eastus --template-file infra/main.bicep
 ```
 
 ### Python Development
-Tool projects in `src/tools/python/` follow this structure:
+Tool projects in `tools/python/src/` follow this structure:
 - `__main__.py` - entry point enabling `python -m <tool>`
 - `cli.py` - Click-based CLI interface
 - `engine.py` - core business logic
@@ -107,7 +107,7 @@ Tool projects in `src/tools/python/` follow this structure:
 
 Example tools: `create_ai_search_index`, `data_generator`
 
-Run linting/tests:
+Run linting/tests (from `tools/python/` directory):
 ```bash
 python -m ruff check src/ --fix
 python -m mypy src/

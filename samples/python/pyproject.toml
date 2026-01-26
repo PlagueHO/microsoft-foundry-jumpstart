@@ -1,0 +1,59 @@
+[tool.ruff]
+# Set line length to match common Python standards
+line-length = 88
+
+# Target Python 3.8+ compatibility
+target-version = "py38"
+
+# Exclude specific directories
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".vscode",
+    "__pycache__",
+    "build",
+    "dist",
+    "venv",
+]
+
+[tool.ruff.lint]
+# Enable specific rule categories
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+]
+
+# Ignore specific rules that may not be appropriate for this project
+ignore = [
+    "E501",   # line too long - handled by formatter
+    "B904",   # raise-without-from-inside-except - sometimes acceptable
+]
+
+[tool.ruff.lint.isort]
+# Configure import sorting
+known-first-party = ["azure_ai_inference", "foundry_agent_service_sdk", "semantic_kernel"]
+force-single-line = false
+combine-as-imports = true
+
+[tool.ruff.format]
+# Use double quotes for strings
+quote-style = "double"
+# Use 4 spaces for indentation
+indent-style = "space"
+# Respect existing line endings
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+# Filter out warnings from dependencies
+filterwarnings = [
+    "ignore:The `__get_pydantic_core_schema__` method of the `BaseModel` class is deprecated:pydantic.warnings.PydanticDeprecatedSince211",
+]

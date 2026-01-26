@@ -11,7 +11,7 @@ Analyzes CSV backlog items against organizational initiatives using Microsoft Fo
 ## Installation
 
 ```bash
-cd src/samples/python/azure_ai_inference/initiative_analyzer
+cd samples/python/src/azure_ai_inference/initiative_analyzer
 pip install -r requirements.txt
 ```
 

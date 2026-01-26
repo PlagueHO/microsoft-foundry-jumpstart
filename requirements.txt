@@ -1,9 +1,0 @@
-semantic-kernel[azure]==1.29.0
-azure-core==1.34.0
-azure-search-documents==11.6.0b11
-azure-storage-blob==12.25.1
-azure-identity==1.23.0
-python-dotenv==1.1.0
-colorama==0.4.6
-PyYAML==6.0.2
-openai==1.79.0

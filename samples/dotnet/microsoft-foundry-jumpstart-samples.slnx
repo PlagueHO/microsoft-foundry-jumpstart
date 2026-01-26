@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/agent-framework/">
+    <Project Path="src/agent-framework/AzureArchitect/AzureArchitect_Step01_Simple/AzureArchitect_Step01_Simple.csproj" />
+    <Project Path="src/agent-framework/AzureArchitect/AzureArchitect_Step02a_Foundry_Agent_SingleTurn/AzureArchitect_Step02a_Foundry_Agent_SingleTurn.csproj" />
+    <Project Path="src/agent-framework/AzureArchitect/AzureArchitect_Step02b_Foundry_Agent_MultiturnConversation/AzureArchitect_Step02b_Foundry_Agent_MultiturnConversation.csproj" />
+    <Project Path="src/agent-framework/AzureArchitect/AzureArchitect_Step03_UsingFunctionTools/AzureArchitect_Step03_UsingFunctionTools.csproj" />
+    <Project Path="src/agent-framework/AzureArchitect/AzureArchitect_Step04_UsingFunctionToolsWithApprovals/AzureArchitect_Step04_UsingFunctionToolsWithApprovals.csproj" />
+    <Project Path="src/agent-framework/AzureArchitect/AzureArchitect_Step05_MCPServer/AzureArchitect_Step05_MCPServer.csproj" />
+    <Project Path="src/agent-framework/AzureArchitect/AzureArchitect_Step06_UsingImages/AzureArchitect_Step06_UsingImages.csproj" />
+    <Project Path="src/agent-framework/AzureArchitect/AzureArchitect_Step07_Workflows/AzureArchitect_Step07_WorkflowConcurrent.csproj" />
+    <Project Path="src/agent-framework/AgentPersistence/AgentPersistence_Step01_UnpublishedAgent/AgentPersistence_Step01_UnpublishedAgent.csproj" />
+    <Project Path="src/agent-framework/AgentPersistence/AgentPersistence_Step02_PublishedWithCosmosDB/AgentPersistence_Step02_PublishedWithCosmosDB.csproj" />
+  </Folder>
+  <Folder Name="/semantic-kernel/">
+    <Project Path="src/semantic-kernel/home-loan-agent/HomeLoanAgent.csproj" />
+  </Folder>
+</Solution>

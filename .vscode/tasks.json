@@ -6,10 +6,10 @@
             "label": "Run Ruff Check",
             "type": "shell",
             "command": "${command:python.interpreterPath}",
-            "args": ["-m", "ruff", "check", "src/"],
+            "args": ["-m", "ruff", "check", "tools/python/src/", "samples/python/src/"],
             "windows": {
                 "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-                "args": ["-m", "ruff", "check", "src/"]
+                "args": ["-m", "ruff", "check", "tools/python/src/", "samples/python/src/"]
             },
             "group": {
                 "kind": "build",
@@ -23,10 +23,10 @@
             "label": "Run Flake8 Linting",
             "type": "shell",
             "command": "${command:python.interpreterPath}",
-            "args": ["-m", "flake8", "src/"],
+            "args": ["-m", "flake8", "tools/python/src/", "samples/python/src/"],
             "windows": {
                 "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-                "args": ["-m", "flake8", "src/"]
+                "args": ["-m", "flake8", "tools/python/src/", "samples/python/src/"]
             },
             "group": {
                 "kind": "build",
@@ -40,10 +40,10 @@
             "label": "Run Python Linting",
             "type": "shell",
             "command": "${command:python.interpreterPath}",
-            "args": ["-m", "pylint", "src/"],
+            "args": ["-m", "pylint", "tools/python/src/", "samples/python/src/"],
             "windows": {
                 "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-                "args": ["-m", "pylint", "src/"]
+                "args": ["-m", "pylint", "tools/python/src/", "samples/python/src/"]
             },
             "group": {
                 "kind": "build",
@@ -56,10 +56,10 @@
             "label": "Run Mypy Type Checks",
             "type": "shell",
             "command": "${command:python.interpreterPath}",
-            "args": ["-m", "mypy", "src/"],
+            "args": ["-m", "mypy", "tools/python/src/", "samples/python/src/"],
             "windows": {
                 "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-                "args": ["-m", "mypy", "src/"]
+                "args": ["-m", "mypy", "tools/python/src/", "samples/python/src/"]
             },
             "group": {
                 "kind": "build",
@@ -74,10 +74,10 @@
             "label": "Run Unit Tests",
             "type": "shell",
             "command": "${command:python.interpreterPath}",
-            "args": ["-m", "pytest", "tests/"],
+            "args": ["-m", "pytest", "tools/python/tests/", "samples/python/tests/"],
             "windows": {
                 "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-                "args": ["-m", "pytest", "tests/"]
+                "args": ["-m", "pytest", "tools/python/tests/", "samples/python/tests/"]
             },
             "group": {
                 "kind": "test",
