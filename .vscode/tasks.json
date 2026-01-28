@@ -7,10 +7,6 @@
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": ["-m", "ruff", "check", "tools/python/src/", "samples/python/src/"],
-            "windows": {
-                "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-                "args": ["-m", "ruff", "check", "tools/python/src/", "samples/python/src/"]
-            },
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -24,10 +20,6 @@
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": ["-m", "flake8", "tools/python/src/", "samples/python/src/"],
-            "windows": {
-                "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-                "args": ["-m", "flake8", "tools/python/src/", "samples/python/src/"]
-            },
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -41,10 +33,6 @@
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": ["-m", "pylint", "tools/python/src/", "samples/python/src/"],
-            "windows": {
-                "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-                "args": ["-m", "pylint", "tools/python/src/", "samples/python/src/"]
-            },
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -57,10 +45,6 @@
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": ["-m", "mypy", "tools/python/src/", "samples/python/src/"],
-            "windows": {
-                "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-                "args": ["-m", "mypy", "tools/python/src/", "samples/python/src/"]
-            },
             "group": {
                 "kind": "build",
                 "isDefault": false
@@ -75,10 +59,6 @@
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": ["-m", "pytest", "tools/python/tests/", "samples/python/tests/"],
-            "windows": {
-                "command": "${workspaceFolder}\\.venv\\Scripts\\python.exe",
-                "args": ["-m", "pytest", "tools/python/tests/", "samples/python/tests/"]
-            },
             "group": {
                 "kind": "test",
                 "isDefault": true
