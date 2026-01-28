@@ -46,9 +46,11 @@ jobs:
             --filter "TestCategory=Unit" \
             --configuration Release \
             --no-restore \
+            --ignore-exit-code 8 \
             --results-directory ./TestResults \
-            --collect:"XPlat Code Coverage" \
-            --logger "trx;LogFileName=test-results.trx"
+            --coverage \
+            --coverage-output-format cobertura \
+            --report-trx
 
       - name: Install ReportGenerator
         if: always()
