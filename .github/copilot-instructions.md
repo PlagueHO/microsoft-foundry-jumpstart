@@ -14,6 +14,7 @@ Key architectural files: [infra/main.bicep](infra/main.bicep), [docs/ARCHITECTUR
 ## Infrastructure as Code Patterns
 
 ### Azure Verified Modules (AVM)
+
 All infrastructure uses AVM modules from `br/public:avm/res/*`. **Never** create raw resource declarations:
 
 ```bicep
@@ -28,12 +29,15 @@ resource aiSearch 'Microsoft.Search/searchServices@2024-03-01' = { }
 ```
 
 ### Custom Cognitive Services Module
+
 AI Foundry requires a custom module at `infra/cognitive-services/accounts/main.bicep` because AVM doesn't yet support AI Foundry V2 projects/connections ([tracked issue](https://github.com/Azure/bicep-registry-modules/issues/5390)). This module:
+
 - Deploys projects as child resources via `infra/cognitive-services/accounts/project/main.bicep`
 - Creates connections via `infra/cognitive-services/accounts/connection/main.bicep`
 - Uses AVM common types for consistency (`diagnosticSettingFullType`, `privateEndpointSingleServiceType`)
 
 ### Role Assignment Pattern
+
 Role assignments use dedicated modules in `infra/core/security/role_*.bicep` to avoid circular dependencies:
 
 ```bicep
@@ -51,6 +55,7 @@ module roles './core/security/role_aifoundry.bicep' = {
 ```
 
 ### Conditional Deployment
+
 Use `if` conditions and ternary operators for optional resources:
 
 ```bicep
@@ -65,6 +70,7 @@ var connections = concat(
 ## Developer Workflows
 
 ### Deployment Commands
+
 ```bash
 # Standard deployment
 azd up
@@ -79,17 +85,21 @@ azd down --force --purge
 ```
 
 ### Post-Provision Hooks
+
 `azure.yaml` defines hooks that run after `azd provision`:
+
 - **Windows**: `scripts/Upload-SampleData.ps1` (requires `RemoteSigned` execution policy)
 - **POSIX**: `scripts/Upload-SampleData.sh`
 
 These scripts:
+
 1. Check `DEPLOY_SAMPLE_DATA` env var
 2. Add temporary IP rules to storage if network isolated
 3. Upload sample data from `sample-data/` to containers
 4. Clean up temporary firewall rules
 
 ### Bicep Validation
+
 ```bash
 # Lint and build
 az bicep build --file infra/main.bicep
@@ -99,7 +109,9 @@ az deployment sub what-if --location eastus --template-file infra/main.bicep
 ```
 
 ### Python Development
+
 Tool projects in `tools/python/src/` follow this structure:
+
 - `__main__.py` - entry point enabling `python -m <tool>`
 - `cli.py` - Click-based CLI interface
 - `engine.py` - core business logic
@@ -108,6 +120,7 @@ Tool projects in `tools/python/src/` follow this structure:
 Example tools: `create_ai_search_index`, `data_generator`
 
 Run linting/tests (from `tools/python/` directory):
+
 ```bash
 python -m ruff check src/ --fix
 python -m mypy src/
@@ -131,6 +144,7 @@ See [docs/CONFIGURATION_OPTIONS.md](docs/CONFIGURATION_OPTIONS.md) for complete 
 ## CI/CD Pipeline
 
 GitHub Actions workflows in `.github/workflows/`:
+
 - **continuous-integration.yml**: PR validation (lint Bicep)
 - **continuous-delivery.yml**: Main branch deployment orchestration
 - **e2e-test.yml**: Full deploy → test → teardown cycle

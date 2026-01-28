@@ -60,10 +60,12 @@
 ## Summary
 
 Successfully upgraded all 8 projects in the solution to .NET 10.0 (Long Term Support):
+
 - 1 project upgraded from .NET 8.0
 - 7 projects upgraded from .NET 9.0
 
 Key changes made:
+
 - Updated target framework to `net10.0` for all projects
 - Upgraded `Azure.Identity` package to version 1.17.1 (addresses deprecated MSAL .NET dependency)
 - Upgraded Microsoft.Extensions packages (Configuration, DependencyInjection, Hosting, Logging.Console) from 9.0.9 to 10.0.0 in HomeLoanAgent project

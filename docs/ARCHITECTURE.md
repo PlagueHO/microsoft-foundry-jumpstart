@@ -7,7 +7,6 @@ The solution accelerator supports two primary architectural approaches:
 1. **With Network Isolation**: All resources deployed with private endpoints and network isolation
 2. **Without Network Isolation**: All resources deployed with public endpoints
 
-
 ## Core Architecture Components
 
 ### Always Deployed Resources
@@ -106,7 +105,6 @@ The virtual network is segmented into multiple subnets to enable granular networ
 | `Data`              | 10.0.2.0/24      | Sample Data Storage and Cosmos DB private endpoints         |
 | `Management`        | 10.0.3.0/24      | Reserved for future management endpoints (currently unused) |
 | `AzureBastionSubnet`| 10.0.255.0/27    | Bastion gateway (optional)                                  |
-
 
 All private endpoints are placed in their dedicated subnets, isolating traffic and enabling granular NSG rules if required.
 
@@ -212,4 +210,3 @@ To enable capability hosts, deploy the required resources and set the correspond
 | Thread Storage | Cosmos DB (`COSMOS_DB_DEPLOY=true`) | `COSMOS_DB_CAPABILITY_HOST=true` |
 | Vector Stores | AI Search (`AZURE_AI_SEARCH_DEPLOY=true`) | `AZURE_AI_SEARCH_CAPABILITY_HOST=true` |
 | File Storage | Storage Account (`DEPLOY_SAMPLE_DATA=true`) | `AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST=true` |
-

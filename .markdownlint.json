@@ -1,0 +1,16 @@
+{
+  "default": true,
+  "MD013": false,
+  "MD024": {
+    "siblings_only": true
+  },
+  "MD033": {
+    "allowed_elements": ["br", "example-generation", "example", "commentary", "example-spec", "T"]
+  },
+  "MD034": true,
+  "MD036": false,
+  "MD040": false,
+  "MD041": false,
+  "MD060": false,
+  "no-hard-tabs": true
+}

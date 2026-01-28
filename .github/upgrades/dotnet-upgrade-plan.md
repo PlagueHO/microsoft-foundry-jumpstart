@@ -40,9 +40,11 @@ This section contains details about each project upgrade and modifications that 
 #### semantic-kernel\home-loan-agent\HomeLoanAgent.csproj modifications
 
 Project properties changes:
+
 - Target framework should be changed from `net8.0` to `net10.0`
 
 NuGet packages changes:
+
 - Azure.Identity should be updated from `1.16.0` to `1.17.1` (*deprecated - depends on deprecated version of MSAL .NET*)
 - Microsoft.Extensions.Configuration should be updated from `9.0.9` to `10.0.0` (*recommended for .NET 10.0*)
 - Microsoft.Extensions.Configuration.EnvironmentVariables should be updated from `9.0.9` to `10.0.0` (*recommended for .NET 10.0*)
@@ -54,55 +56,69 @@ NuGet packages changes:
 #### agent-framework\AzureArchitect\AzureArchitect_Step07_Workflows\AzureArchitect_Step07_WorkflowConcurrent.csproj modifications
 
 Project properties changes:
+
 - Target framework should be changed from `net9.0` to `net10.0`
 
 NuGet packages changes:
+
 - Azure.Identity should be updated from `1.17.0` to `1.17.1` (*deprecated - depends on deprecated version of MSAL .NET*)
 
 #### agent-framework\AzureArchitect\AzureArchitect_Step06_UsingImages\AzureArchitect_Step06_UsingImages.csproj modifications
 
 Project properties changes:
+
 - Target framework should be changed from `net9.0` to `net10.0`
 
 NuGet packages changes:
+
 - Azure.Identity should be updated from `1.17.0` to `1.17.1` (*deprecated - depends on deprecated version of MSAL .NET*)
 
 #### agent-framework\AzureArchitect\AzureArchitect_Step05_MCPServer\AzureArchitect_Step05_MCPServer.csproj modifications
 
 Project properties changes:
+
 - Target framework should be changed from `net9.0` to `net10.0`
 
 NuGet packages changes:
+
 - Azure.Identity should be updated from `1.17.0` to `1.17.1` (*deprecated - depends on deprecated version of MSAL .NET*)
 
 #### agent-framework\AzureArchitect\AzureArchitect_Step04_UsingFunctionToolsWithApprovals\AzureArchitect_Step04_UsingFunctionToolsWithApprovals.csproj modifications
 
 Project properties changes:
+
 - Target framework should be changed from `net9.0` to `net10.0`
 
 NuGet packages changes:
+
 - Azure.Identity should be updated from `1.17.0` to `1.17.1` (*deprecated - depends on deprecated version of MSAL .NET*)
 
 #### agent-framework\AzureArchitect\AzureArchitect_Step03_UsingFunctionTools\AzureArchitect_Step03_UsingFunctionTools.csproj modifications
 
 Project properties changes:
+
 - Target framework should be changed from `net9.0` to `net10.0`
 
 NuGet packages changes:
+
 - Azure.Identity should be updated from `1.17.0` to `1.17.1` (*deprecated - depends on deprecated version of MSAL .NET*)
 
 #### agent-framework\AzureArchitect\AzureArchitect_Step02_Foundry_AgentService\AzureArchitect_Step02_Foundry_AgentService.csproj modifications
 
 Project properties changes:
+
 - Target framework should be changed from `net9.0` to `net10.0`
 
 NuGet packages changes:
+
 - Azure.Identity should be updated from `1.17.0` to `1.17.1` (*deprecated - depends on deprecated version of MSAL .NET*)
 
 #### agent-framework\AzureArchitect\AzureArchitect_Step01_Simple\AzureArchitect_Step01_Simple.csproj modifications
 
 Project properties changes:
+
 - Target framework should be changed from `net9.0` to `net10.0`
 
 NuGet packages changes:
+
 - Azure.Identity should be updated from `1.17.0` to `1.17.1` (*deprecated - depends on deprecated version of MSAL .NET*)

@@ -54,6 +54,7 @@ azd env set DEPLOY_SAMPLE_MODELS false
 Override the sample model deployments with a custom array. When empty, the deployment uses models defined in [infra/sample-model-deployments.json](../infra/sample-model-deployments.json). When provided, uses the custom array instead.
 
 This parameter is useful when you want to:
+
 - Deploy a different set of models than the defaults
 - Test with specific model versions
 - Use a custom JSON file with model definitions

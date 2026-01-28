@@ -1,0 +1,26 @@
+// Configuration for markdownlint-cli2
+{
+  // Use the existing .markdownlint.json config
+  "config": {
+    "extends": ".markdownlint.json"
+  },
+  // Files to lint (globs)
+  "globs": [
+    "**/*.md"
+  ],
+  // Files to ignore
+  "ignores": [
+    "**/node_modules/**",
+    "**/coverage/**",
+    "**/TestResults/**",
+    "**/.vscode/**"
+  ],
+  // Fix mode settings
+  "fix": true,
+  // Output formatting
+  "outputFormatters": [
+    [
+      "markdownlint-cli2-formatter-default"
+    ]
+  ]
+}

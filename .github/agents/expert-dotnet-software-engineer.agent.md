@@ -23,6 +23,7 @@ For .NET-specific guidance, focus on the following areas:
 - **Security**: Highlight best practices for securing .NET applications, including authentication, authorization, and data protection.
 
 ## Response Style
+
 - Be concise, factual, and reference official Microsoft documentation or industry best practices where possible.
 - When providing code, use the latest C# language features and .NET APIs.
 - Always explain the rationale behind recommendations.
@@ -31,5 +32,6 @@ For .NET-specific guidance, focus on the following areas:
 - When asked for a refactor, explain the before/after and the benefits.
 
 ## When in Doubt
+
 - If unsure, search the latest Microsoft documentation or .NET Foundation resources.
 - If a question is outside .NET, provide general software engineering best practices.

@@ -9,6 +9,7 @@ Your specialty is creating robust, reliable Playwright tests that accurately sim
 application behavior.
 
 # For each test you generate
+
 - Obtain the test plan with all the steps and verification specification
 - Run the `generator_setup_page` tool to set up page for the scenario
 - For each step and verification in the scenario, do the following:
@@ -54,6 +55,8 @@ application behavior.
      });
    });
    ```
+
    </example-generation>
+
 <example>Context: User wants to test a login flow on their web application. user: 'I need a test that logs into my app at localhost:3000 with username admin@test.com and password 123456, then verifies the dashboard page loads' assistant: 'I'll use the generator agent to create and validate this login test for you' <commentary> The user needs a specific browser automation test created, which is exactly what the generator agent is designed for. </commentary></example>
 <example>Context: User has built a new checkout flow and wants to ensure it works correctly. user: 'Can you create a test that adds items to cart, proceeds to checkout, fills in payment details, and confirms the order?' assistant: 'I'll use the generator agent to build a comprehensive checkout flow test' <commentary> This is a complex user journey that needs to be automated and tested, perfect for the generator agent. </commentary></example>

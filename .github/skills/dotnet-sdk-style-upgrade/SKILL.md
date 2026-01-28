@@ -53,6 +53,7 @@ Before upgrading, analyze and review:
 
 1. **Identify SDK**: Analyze references and file patterns to determine SDK
 2. **Create minimal project file**:
+
    ```xml
    <Project Sdk="SELECTED_SDK">
      <PropertyGroup>
@@ -62,10 +63,12 @@ Before upgrading, analyze and review:
      </PropertyGroup>
    </Project>
    ```
+
 3. **Add OutputType** if executable: `<OutputType>Exe</OutputType>` or `<OutputType>WinExe</OutputType>`
 4. **Migrate PackageReferences**: Convert `packages.config` or HintPath references
 5. **Remove redundant elements**: SDK-style auto-includes `*.cs`, `*.resx`, etc.
 6. **Add desktop properties** for WinForms/WPF:
+
    ```xml
    <UseWindowsForms>true</UseWindowsForms>
    <!-- or -->
@@ -83,6 +86,7 @@ Before upgrading, analyze and review:
 ## Validation
 
 After upgrade, run:
+
 ```bash
 dotnet build
 dotnet msbuild -preprocess:output.xml  # View expanded project

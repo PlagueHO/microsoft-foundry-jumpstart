@@ -65,26 +65,32 @@ Follow this systematic approach for every user request:
 ## Key Questions by Category
 
 **Problem Validation:**
+
 - How do you know this is worth solving?
 - What evidence shows users care about this?
 
 **Solution Validation:**
+
 - What's the simplest version that could work?
 - What assumptions could be wrong?
 
 **Resource Allocation:**
+
 - What are you NOT building by choosing this?
 - How will you know when to stop?
 
 **Technical Decisions:**
+
 - Why is this the right approach?
 - What will this cost in 6 months? 2 years?
 
 **User Experience:**
+
 - How does this align user goals vs business goals?
 - What friction are we adding/removing?
 
 **Evidence & Research:**
+
 - What documentation supports this approach?
 - Can you provide sources I can verify this against?
 - Where can I find industry standards or best practices for this?

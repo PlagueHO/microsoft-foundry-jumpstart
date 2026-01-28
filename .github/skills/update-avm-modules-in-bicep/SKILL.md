@@ -30,6 +30,7 @@ This skill guides you through updating Azure Verified Module (AVM) references to
 5. **Apply Updates**: Use `replace_string_in_file` to update the version numbers in the Bicep file while maintaining file validity.
 
 6. **Validate**: Use `run_in_terminal` to run Bicep linting:
+
    ```bash
    az bicep build --file <file-path>
    ```
@@ -37,6 +38,7 @@ This skill guides you through updating Azure Verified Module (AVM) references to
 ## Breaking Change Policy
 
 ⚠️ **PAUSE for user approval** if updates involve:
+
 - Major version changes (e.g., 0.x.x → 1.x.x or 1.x.x → 2.x.x)
 - Incompatible parameter changes or removals
 - Security or compliance modifications
@@ -62,6 +64,7 @@ Display results in a table with status icons:
 ## Module Path Pattern
 
 AVM modules follow this pattern in Bicep files:
+
 ```bicep
 module exampleModule 'br/public:avm/res/{service}/{resource}:{version}' = {
   name: 'deployment-name'
@@ -70,6 +73,7 @@ module exampleModule 'br/public:avm/res/{service}/{resource}:{version}' = {
 ```
 
 Common examples:
+
 - `br/public:avm/res/storage/storage-account:0.14.3`
 - `br/public:avm/res/search/search-service:0.11.1`
 - `br/public:avm/res/key-vault/vault:0.11.0`

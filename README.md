@@ -49,7 +49,6 @@ There are several features of the solution accelerator that are worth highlighti
 > [!WARNING]
 > **Hub Mode Deprecated** - As of December 2025, Microsoft Foundry Hub mode support has been removed from this solution accelerator. The solution now deploys only AI Services-based projects (Microsoft.CognitiveServices/accounts), which is the recommended approach. The Hub mode (Microsoft.MachineLearningServices/workspaces) required additional supporting resources (Key Vault, Storage Account, Container Registry) and is no longer necessary for Microsoft Foundry deployments. If you need Hub mode support, please use a previous version of this repository.
 
-
 ## Deploying
 
 You can deploy the application using one of the following methods:
