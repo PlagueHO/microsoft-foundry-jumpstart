@@ -30,8 +30,8 @@ jobs:
     name: Lint and Test Python Apps
     uses: ./.github/workflows/lint-and-test-python-apps.yml
     with:
-      # List all app names (folders) in /src and /tests that should be tested
-      app_names: '["tools/python/data_generator","tools/python/create_ai_search_index"]'
+      # List all app names (folders) in tools/python/src/ and tools/python/tests/ that should be tested
+      app_names: '["data_generator","create_ai_search_index"]'
 
   lint-and-test-dotnet-apps:
     name: Lint and Test .NET Apps

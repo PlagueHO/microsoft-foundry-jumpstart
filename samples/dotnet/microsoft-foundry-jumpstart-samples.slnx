@@ -1,4 +1,9 @@
 <Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
   <Folder Name="/agent-framework/">
     <Project Path="src/agent-framework/AzureArchitect/AzureArchitect_Step01_Simple/AzureArchitect_Step01_Simple.csproj" />
     <Project Path="src/agent-framework/AzureArchitect/AzureArchitect_Step02a_Foundry_Agent_SingleTurn/AzureArchitect_Step02a_Foundry_Agent_SingleTurn.csproj" />
@@ -11,8 +16,20 @@
     <Project Path="src/agent-framework/AgentPersistence/AgentPersistence_Step01_UnpublishedAgent/AgentPersistence_Step01_UnpublishedAgent.csproj" />
     <Project Path="src/agent-framework/AgentPersistence/AgentPersistence_Step02_PublishedWithCosmosDB/AgentPersistence_Step02_PublishedWithCosmosDB.csproj" />
     <Project Path="src/agent-framework/DocumentClassifierWorkflow/DocumentClassifierWorkflow.csproj" />
+    <Project Path="tests/unit/agent-framework/AzureArchitect/AzureArchitect_Step01_Simple/AzureArchitect_Step01_Simple.Tests.csproj" />
+    <Project Path="tests/unit/agent-framework/AzureArchitect/AzureArchitect_Step02a_Foundry_Agent_SingleTurn/AzureArchitect_Step02a_Foundry_Agent_SingleTurn.Tests.csproj" />
+    <Project Path="tests/unit/agent-framework/AzureArchitect/AzureArchitect_Step02b_Foundry_Agent_MultiturnConversation/AzureArchitect_Step02b_Foundry_Agent_MultiturnConversation.Tests.csproj" />
+    <Project Path="tests/unit/agent-framework/AzureArchitect/AzureArchitect_Step02c_Foundry_Agent_PrebuiltAgent/AzureArchitect_Step02c_Foundry_Agent_PrebuiltAgent.Tests.csproj" />
+    <Project Path="tests/unit/agent-framework/AzureArchitect/AzureArchitect_Step03_UsingFunctionTools/AzureArchitect_Step03_UsingFunctionTools.Tests.csproj" />
+    <Project Path="tests/unit/agent-framework/AzureArchitect/AzureArchitect_Step04_UsingFunctionToolsWithApprovals/AzureArchitect_Step04_UsingFunctionToolsWithApprovals.Tests.csproj" />
+    <Project Path="tests/unit/agent-framework/AzureArchitect/AzureArchitect_Step05_MCPServer/AzureArchitect_Step05_MCPServer.Tests.csproj" />
+    <Project Path="tests/unit/agent-framework/AzureArchitect/AzureArchitect_Step06_UsingImages/AzureArchitect_Step06_UsingImages.Tests.csproj" />
+    <Project Path="tests/unit/agent-framework/AzureArchitect/AzureArchitect_Step07_Workflows/AzureArchitect_Step07_WorkflowConcurrent.Tests.csproj" />
+    <Project Path="tests/unit/agent-framework/AgentPersistence/AgentPersistence_Step01_UnpublishedAgent/AgentPersistence_Step01_UnpublishedAgent.Tests.csproj" />
+    <Project Path="tests/unit/agent-framework/AgentPersistence/AgentPersistence_Step02_PublishedWithCosmosDB/AgentPersistence_Step02_PublishedWithCosmosDB.Tests.csproj" />
   </Folder>
   <Folder Name="/semantic-kernel/">
     <Project Path="src/semantic-kernel/home-loan-agent/HomeLoanAgent.csproj" />
+    <Project Path="tests/unit/semantic-kernel/home-loan-agent/HomeLoanAgent.Tests.csproj" />
   </Folder>
 </Solution>

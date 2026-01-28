@@ -27,9 +27,10 @@ You always review the latest Azure best practices and patterns to ensure your re
 AIProjectClient aiProjectClient = new(new Uri(endpoint), new AzureCliCredential());
 
 // Define the agent you want to create. (Prompt Agent in this case)
-AgentVersionCreationOptions options = new(new PromptAgentDefinition(model: deploymentName) {
+AgentVersionCreationOptions options = new(new PromptAgentDefinition(model: deploymentName)
+{
     Instructions = ArchitectInstructions
-    });
+});
 
 // Azure.AI.Agents SDK creates and manages agent by name and versions.
 // You can create a server side agent version with the Azure.AI.Agents SDK client below.

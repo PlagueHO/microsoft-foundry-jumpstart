@@ -143,6 +143,167 @@
                 "reveal": "always",
                 "panel": "shared"
             }
+        },
+
+        // .NET tasks
+        {
+            "label": "dotnet: build",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["build", "microsoft-foundry-jumpstart-samples.slnx"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "icon": {
+                "id": "tools",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+            "label": "dotnet: test",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["test", "microsoft-foundry-jumpstart-samples.slnx", "--no-build"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "test",
+                "isDefault": false
+            },
+            "dependsOn": ["dotnet: build"],
+            "icon": {
+                "id": "beaker",
+                "color": "terminal.ansiCyan"
+            }
+        },
+        {
+            "label": "dotnet: test (watch)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["watch", "test", "microsoft-foundry-jumpstart-samples.slnx"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "isBackground": true,
+            "icon": {
+                "id": "eye-watch",
+                "color": "terminal.ansiCyan"
+            }
+        },
+        {
+            "label": "dotnet: clean",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["clean", "microsoft-foundry-jumpstart-samples.slnx"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "icon": {
+                "id": "trash",
+                "color": "terminal.ansiRed"
+            }
+        },
+        {
+            "label": "dotnet: restore",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["restore", "microsoft-foundry-jumpstart-samples.slnx"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "icon": {
+                "id": "cloud-download",
+                "color": "terminal.ansiBlue"
+            }
+        },
+        {
+            "label": "dotnet: format",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["format", "microsoft-foundry-jumpstart-samples.slnx"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "code",
+                "color": "terminal.ansiMagenta"
+            }
+        },
+        {
+            "label": "dotnet: format (verify)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["format", "microsoft-foundry-jumpstart-samples.slnx", "--verify-no-changes"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": [],
+            "group": "test",
+            "icon": {
+                "id": "verified",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: test (unit)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "test",
+                "--solution",
+                "microsoft-foundry-jumpstart-samples.slnx",
+                "--filter",
+                "TestCategory=Unit",
+                "--configuration",
+                "Release",
+                "--no-restore",
+                "--results-directory",
+                "./TestResults",
+                "--coverage",
+                "--coverage-output-format",
+                "cobertura",
+                "--report-trx"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "beaker",
+                "color": "terminal.ansiCyan"
+            }
+        },
+        {
+            "label": "dotnet: code coverage (report)",
+            "type": "shell",
+            "command": "reportgenerator",
+            "args": [
+                "-reports:TestResults/**/*.cobertura.xml",
+                "-targetdir:TestResults/CoverageReport",
+                "-reporttypes:'Html;MarkdownSummaryGithub;'",
+                "-assemblyfilters:+MicrosoftFoundryJumpstart.*"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "graph",
+                "color": "terminal.ansiMagenta"
+            }
         }
     ]
 }

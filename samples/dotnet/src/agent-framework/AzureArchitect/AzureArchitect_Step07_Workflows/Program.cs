@@ -26,6 +26,7 @@ namespace WorkflowConcurrentSample;
 /// </remarks>
 public static class Program
 {
+    [Obsolete]
     private static async Task Main()
     {
         // Set up the Azure OpenAI client that each architect will invoke.

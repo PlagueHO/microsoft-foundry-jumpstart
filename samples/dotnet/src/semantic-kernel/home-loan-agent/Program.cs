@@ -41,7 +41,7 @@ public class Program
     {
         // Parse command line arguments
         var parseResult = Parser.Default.ParseArguments<Options>(args);
-        
+
         await parseResult.WithParsedAsync(async options =>
         {
             // Setup configuration and logging
@@ -183,8 +183,8 @@ public class Program
             })
         };
     }    /// <summary>
-    /// Processes a single question with the agent
-    /// </summary>
+         /// Processes a single question with the agent
+         /// </summary>
     private static async Task ProcessSingleQuestion(string question)
     {
         _logger?.LogInformation("Processing single question: {Question}", question);
@@ -212,8 +212,8 @@ public class Program
 
         Console.WriteLine("\n=== End of Response ===");
     }    /// <summary>
-    /// Runs the agent in interactive mode
-    /// </summary>
+         /// Runs the agent in interactive mode
+         /// </summary>
     private static async Task RunInteractiveMode()
     {
         _logger?.LogInformation("Starting interactive mode");
