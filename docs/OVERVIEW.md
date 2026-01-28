@@ -11,6 +11,7 @@ The Microsoft Foundry Jumpstart Solution Accelerator provides a secure, well-arc
 - **Comprehensive Logging**: Configures diagnostic settings for all resources, sending logs to Log Analytics for monitoring and compliance.
 - **Optional Bastion Host**: Enables secure RDP/SSH access via Azure Bastion when required.
 - **Extensible Model and Data Deployment**: Optionally deploys sample OpenAI models and uploads sample data to accelerate onboarding.
+- **AI Agent Capability Hosts**: Configures Cosmos DB, AI Search, and Storage Account as capability hosts for AI agent thread storage, vector stores, and file storage.
 - **Customizable Resource Attachments**: Supports attaching existing Azure Container Registries and configuring Azure AI Search service deployment.
 - **Role-Based Access Control**: Grants access to specified users or service principals.
 
@@ -23,6 +24,7 @@ Deployment behavior can be tailored using environment variables, including:
 - **API Key Management**: Optionally disable API keys for Azure AI services.
 - **Resource Sizing and Selection**: Choose SKUs for Azure AI Search and control deployment of optional infrastructure like Bastion.
 - **Access Control**: Specify principal IDs and types for Microsoft Foundry access.
+- **Capability Hosts**: Configure Cosmos DB, AI Search, and Storage Account as capability hosts for AI agents.
 
 For a full list of configuration options, see [CONFIGURATION_OPTIONS.md](../CONFIGURATION_OPTIONS.md).
 

@@ -8,10 +8,13 @@ This solution accelerator leverages a range of Azure services and technologies t
   Provides access to Azure AI Services and Foundry based projects.
 
 - **Azure AI Search** *(Optional, but recommended)*
-  Enterprise-grade search service for AI-powered indexing and retrieval. Can be excluded from deployment if not required.
+  Enterprise-grade search service for AI-powered indexing and retrieval. Can be used as a capability host for vector stores in AI agents.
+
+- **Azure Cosmos DB** *(Optional - when AI Agents are deployed)*
+  NoSQL database for storing agent conversation threads. Configured as a capability host for thread storage in AI agents.
 
 - **Azure Storage Account for Samples** *(Optional - when Samples are deployed)*
-  Secure storage for sample datasets.
+  Secure storage for sample datasets. Can be used as a capability host for file storage in AI agents.
 
 - **Azure Virtual Network (VNet) & Subnets** *(Optional - when Network Isolation is enabled)*
   Provides network isolation and secure communication between resources.
@@ -40,6 +43,17 @@ This solution accelerator leverages a range of Azure services and technologies t
 
 - **Role-Based Access Control (RBAC)**
   Fine-grained access management for users and service principals.
+
+## Capability Hosts (AI Agents)
+
+- **Thread Storage (Cosmos DB)**
+  Stores agent conversation threads and state for multi-turn interactions.
+
+- **Vector Stores (AI Search)**
+  Provides vector search capabilities for agent knowledge bases and retrieval-augmented generation (RAG).
+
+- **File Storage (Storage Account)**
+  Stores agent files, attachments, and artifacts.
 
 ---
 

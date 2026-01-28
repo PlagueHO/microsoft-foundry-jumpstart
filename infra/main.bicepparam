@@ -17,9 +17,15 @@ param azureAiSearchSku = toLower(readEnvironmentVariable('AZURE_AI_SEARCH_SKU', 
 param azureAiSearchDeploy = toLower(readEnvironmentVariable('AZURE_AI_SEARCH_DEPLOY', 'true')) == 'true'
 param azureAiSearchReplicaCount = int(readEnvironmentVariable('AZURE_AI_SEARCH_REPLICA_COUNT', '1'))
 param azureAiSearchPartitionCount = int(readEnvironmentVariable('AZURE_AI_SEARCH_PARTITION_COUNT', '1'))
+param azureAiSearchCapabilityHost = toLower(readEnvironmentVariable('AZURE_AI_SEARCH_CAPABILITY_HOST', 'false')) == 'true'
 
-// Storage account override (use 'default' to keep the generated name)
+// Cosmos DB parameters (for thread storage capability host)
+param cosmosDbDeploy = toLower(readEnvironmentVariable('COSMOS_DB_DEPLOY', 'false')) == 'true'
+param cosmosDbCapabilityHost = toLower(readEnvironmentVariable('COSMOS_DB_CAPABILITY_HOST', 'false')) == 'true'
+
+// Storage account parameters
 param azureStorageAccountName = readEnvironmentVariable('AZURE_STORAGE_ACCOUNT_NAME', '') == '' ? 'default' : readEnvironmentVariable('AZURE_STORAGE_ACCOUNT_NAME', '')
+param azureStorageAccountCapabilityHost = toLower(readEnvironmentVariable('AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST', 'false')) == 'true'
 
 // Foundry project parameters
 param foundryProjectDeploy = toLower(readEnvironmentVariable('MICROSOFT_FOUNDRY_PROJECT_DEPLOY', 'true')) == 'true'

@@ -10,6 +10,7 @@
     <Project Path="src/agent-framework/AzureArchitect/AzureArchitect_Step07_Workflows/AzureArchitect_Step07_WorkflowConcurrent.csproj" />
     <Project Path="src/agent-framework/AgentPersistence/AgentPersistence_Step01_UnpublishedAgent/AgentPersistence_Step01_UnpublishedAgent.csproj" />
     <Project Path="src/agent-framework/AgentPersistence/AgentPersistence_Step02_PublishedWithCosmosDB/AgentPersistence_Step02_PublishedWithCosmosDB.csproj" />
+    <Project Path="src/agent-framework/DocumentClassifierWorkflow/DocumentClassifierWorkflow.csproj" />
   </Folder>
   <Folder Name="/semantic-kernel/">
     <Project Path="src/semantic-kernel/home-loan-agent/HomeLoanAgent.csproj" />

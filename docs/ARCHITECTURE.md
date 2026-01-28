@@ -27,6 +27,7 @@ These resources are deployed based on configuration:
 | Resource | When Deployed | Purpose | AVM Reference |
 |----------|---------------|---------|---------------|
 | Azure AI Search | `AZURE_AI_SEARCH_DEPLOY=true` | Search and indexing capabilities | [avm/res/search/search-service](https://github.com/Azure/bicep-registry-modules/tree/main/modules/search/search-service) |
+| Azure Cosmos DB | `COSMOS_DB_DEPLOY=true` | Thread storage for AI agents | [avm/res/document-db/database-account](https://github.com/Azure/bicep-registry-modules/tree/main/modules/document-db/database-account) |
 | Sample Data Storage | `DEPLOY_SAMPLE_DATA=true` | Dedicated storage for sample data | [avm/res/storage/storage-account](https://github.com/Azure/bicep-registry-modules/tree/main/modules/storage/storage-account) |
 
 ## Architecture with Network Isolation
@@ -56,6 +57,7 @@ The following diagram illustrates the architecture when network isolation is ena
 | Resource | Condition | Deployment Details | AVM Reference |
 |----------|-----------|-------------------|---------------|
 | Azure AI Search | `AZURE_AI_SEARCH_DEPLOY=true` | Deployed with private endpoint (PE) | [avm/res/search/search-service](https://github.com/Azure/bicep-registry-modules/tree/main/modules/search/search-service) |
+| Azure Cosmos DB | `COSMOS_DB_DEPLOY=true` | Deployed with private endpoint (PE) | [avm/res/document-db/database-account](https://github.com/Azure/bicep-registry-modules/tree/main/modules/document-db/database-account) |
 | Sample Data Storage | `DEPLOY_SAMPLE_DATA=true` | Deployed with private endpoint (PE) | [avm/res/storage/storage-account](https://github.com/Azure/bicep-registry-modules/tree/main/modules/storage/storage-account) |
 | Azure Bastion Host | `AZURE_BASTION_HOST_DEPLOY=true` | Required for private endpoint access | [avm/res/network/bastion-host](https://github.com/Azure/bicep-registry-modules/tree/main/modules/network/bastion-host) |
 
@@ -86,6 +88,7 @@ The following diagram illustrates the architecture when network isolation is dis
 | Resource | Condition | Deployment Details | AVM Reference |
 |----------|-----------|-------------------|---------------|
 | Azure AI Search | `AZURE_AI_SEARCH_DEPLOY=true` | Public endpoint enabled | [avm/res/search/search-service](https://github.com/Azure/bicep-registry-modules/tree/main/modules/search/search-service) |
+| Azure Cosmos DB | `COSMOS_DB_DEPLOY=true` | Public endpoint enabled | [avm/res/document-db/database-account](https://github.com/Azure/bicep-registry-modules/tree/main/modules/document-db/database-account) |
 | Sample Data Storage | `DEPLOY_SAMPLE_DATA=true` | Public endpoint enabled | [avm/res/storage/storage-account](https://github.com/Azure/bicep-registry-modules/tree/main/modules/storage/storage-account) |
 
 ## Network Topology (Network Isolation Mode)
@@ -100,7 +103,7 @@ The virtual network is segmented into multiple subnets to enable granular networ
 |---------------------|------------------|-------------------------------------------------------------|
 | `Default`           | 10.0.0.0/24      | Reserved for future use (not used)                          |
 | `AiServices`        | 10.0.1.0/24      | AI Search & AI Services private endpoints   |
-| `Data`              | 10.0.2.0/24      | Sample Data Storage private endpoints (when sample data is enabled) |
+| `Data`              | 10.0.2.0/24      | Sample Data Storage and Cosmos DB private endpoints         |
 | `Management`        | 10.0.3.0/24      | Reserved for future management endpoints (currently unused) |
 | `AzureBastionSubnet`| 10.0.255.0/27    | Bastion gateway (optional)                                  |
 
@@ -122,6 +125,7 @@ flowchart RL
             end
             subgraph S2["Data (10.0.2.0/24)"]
                 PE_SampleStorage["PE: Sample Storage (Optional)"]
+                PE_CosmosDB["PE: Cosmos DB (Optional)"]
             end
             subgraph S3["Management (10.0.3.0/24)"]
                 EmptyMgmt["(reserved for future use)"]
@@ -137,6 +141,7 @@ flowchart RL
     LA ---|Diagnostic Settings| PE_Search
     LA ---|Diagnostic Settings| PE_Services
     LA ---|Diagnostic Settings| PE_SampleStorage
+    LA ---|Diagnostic Settings| PE_CosmosDB
     LA ---|Diagnostic Settings| Bastion
     AI --- LA
 ```
@@ -159,12 +164,29 @@ azd env set AZURE_NETWORK_ISOLATION false
 ```bash
 azd env set MICROSOFT_FOUNDRY_PROJECT_DEPLOY true
 azd env set AZURE_AI_SEARCH_DEPLOY true
+azd env set COSMOS_DB_DEPLOY true
 azd env set DEPLOY_SAMPLE_DATA true
 azd env set AZURE_NETWORK_ISOLATION true
 azd env set AZURE_BASTION_HOST_DEPLOY true
 ```
 
-**Result**: AI Services + AI Search + Sample Data, private endpoints, Bastion access.
+**Result**: AI Services + AI Search + Cosmos DB + Sample Data, private endpoints, Bastion access.
+
+### Full Deployment with Capability Hosts (AI Agents)
+
+```bash
+azd env set MICROSOFT_FOUNDRY_PROJECT_DEPLOY true
+azd env set AZURE_AI_SEARCH_DEPLOY true
+azd env set AZURE_AI_SEARCH_CAPABILITY_HOST true
+azd env set COSMOS_DB_DEPLOY true
+azd env set COSMOS_DB_CAPABILITY_HOST true
+azd env set DEPLOY_SAMPLE_DATA true
+azd env set AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST true
+azd env set AZURE_NETWORK_ISOLATION true
+azd env set AZURE_BASTION_HOST_DEPLOY true
+```
+
+**Result**: AI Services + AI Search + Cosmos DB + Sample Data with capability hosts configured for AI agents, private endpoints, Bastion access.
 
 ## Security & Best Practices
 
@@ -174,4 +196,20 @@ azd env set AZURE_BASTION_HOST_DEPLOY true
 4. **Azure Verified Modules** – All resources are deployed using [Azure Verified Modules (AVM)](https://aka.ms/avm).
 5. **Network Isolation** – When enabled, all PaaS services use private endpoints and disable public access.
 6. **Zero Trust** – Network isolation deployment follows Microsoft's Zero Trust security model and Secure Future Initiative.
+
+## Capability Hosts (AI Agents)
+
+[Capability Hosts](https://learn.microsoft.com/azure/ai-foundry/agents/concepts/capability-hosts) enable AI agent functionality in Microsoft Foundry projects. When configured, capability hosts provide:
+
+- **Thread Storage** – Cosmos DB stores agent conversation threads
+- **Vector Stores** – AI Search provides vector search for agent knowledge bases
+- **File Storage** – Storage Account stores agent files and attachments
+
+To enable capability hosts, deploy the required resources and set the corresponding capability host parameters:
+
+| Capability | Resource Required | Capability Host Parameter |
+|------------|-------------------|---------------------------|
+| Thread Storage | Cosmos DB (`COSMOS_DB_DEPLOY=true`) | `COSMOS_DB_CAPABILITY_HOST=true` |
+| Vector Stores | AI Search (`AZURE_AI_SEARCH_DEPLOY=true`) | `AZURE_AI_SEARCH_CAPABILITY_HOST=true` |
+| File Storage | Storage Account (`DEPLOY_SAMPLE_DATA=true`) | `AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST=true` |
 

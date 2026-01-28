@@ -8,6 +8,8 @@ The configuration options are grouped into the following categories:
 - [Networking & Isolation](#networking--isolation)
 - [Microsoft Foundry Project](#microsoft-foundry-project)
 - [Azure AI Search Service](#azure-ai-search-service)
+- [Azure Cosmos DB](#azure-cosmos-db)
+- [Capability Hosts](#capability-hosts)
 - [Identity & Access](#identity--access)
 - [Optional Infrastructure](#optional-infrastructure)
 - [Security](#security)
@@ -275,6 +277,66 @@ Default: `1`.
 
 ```powershell
 azd env set AZURE_AI_SEARCH_PARTITION_COUNT 2
+```
+
+## Azure Cosmos DB
+
+Azure Cosmos DB can be deployed to provide thread storage for AI agents. This is used by capability hosts to persist conversation threads.
+
+### COSMOS_DB_DEPLOY
+
+Deploy an Azure Cosmos DB account for thread storage (`true`).
+When enabled, a serverless Cosmos DB account with a SQL API database named `AgentThreads` is created.
+
+Default: `false`.
+
+```powershell
+azd env set COSMOS_DB_DEPLOY true
+```
+
+### COSMOS_DB_CAPABILITY_HOST
+
+Use the deployed Cosmos DB account as a thread storage capability host for AI agents (`true`).
+Requires `COSMOS_DB_DEPLOY` to be set to `true`.
+
+When enabled, a connection to the Cosmos DB account is created in the Foundry resource and configured as the thread storage for the default capability host.
+
+Default: `false`.
+
+```powershell
+azd env set COSMOS_DB_CAPABILITY_HOST true
+```
+
+## Capability Hosts
+
+Capability hosts enable AI agent functionality by configuring storage backends for threads, vectors, and files. These settings control which deployed resources are automatically configured as capability hosts.
+
+For more information about capability hosts, see [Azure AI Foundry Capability Hosts](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/concepts/capability-hosts).
+
+### AZURE_AI_SEARCH_CAPABILITY_HOST
+
+Use Azure AI Search as a vector store capability host for AI agents (`true`).
+Requires `AZURE_AI_SEARCH_DEPLOY` to be set to `true`.
+
+When enabled, a connection to the AI Search service is configured as the vector store for the default capability host.
+
+Default: `false`.
+
+```powershell
+azd env set AZURE_AI_SEARCH_CAPABILITY_HOST true
+```
+
+### AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST
+
+Use the sample data Azure Storage Account as a file storage capability host for AI agents (`true`).
+Requires `DEPLOY_SAMPLE_DATA` to be set to `true`.
+
+When enabled, a connection to the storage account is configured as the file storage for the default capability host.
+
+Default: `false`.
+
+```powershell
+azd env set AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST true
 ```
 
 ## Identity & Access

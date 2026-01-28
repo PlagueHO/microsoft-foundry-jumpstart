@@ -1,0 +1,110 @@
+name: Lint and Test .NET Apps
+
+on:
+  workflow_call:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'samples/dotnet/**'
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  lint-and-test-dotnet-apps:
+    name: Lint and Test .NET Apps
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: samples/dotnet
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore microsoft-foundry-jumpstart-samples.slnx
+
+      - name: Build solution
+        run: dotnet build microsoft-foundry-jumpstart-samples.slnx --no-restore --configuration Release
+
+      - name: Run linting (format check)
+        run: dotnet format microsoft-foundry-jumpstart-samples.slnx --verify-no-changes --severity error
+
+      - name: Run unit tests
+        run: |
+          dotnet test microsoft-foundry-jumpstart-samples.slnx \
+            --filter "TestCategory=Unit" \
+            --configuration Release \
+            --no-restore \
+            --results-directory ./TestResults \
+            --collect:"XPlat Code Coverage" \
+            --logger "trx;LogFileName=test-results.trx"
+
+      - name: Install ReportGenerator
+        if: always()
+        run: dotnet tool install -g dotnet-reportgenerator-globaltool
+
+      - name: Generate Coverage Report
+        if: always()
+        run: |
+          reportgenerator \
+            -reports:TestResults/**/coverage.cobertura.xml \
+            -targetdir:TestResults/CoverageReport \
+            -reporttypes:"Html;MarkdownSummaryGithub"
+
+      - name: Add Coverage to Job Summary
+        if: always()
+        run: |
+          if [ -f TestResults/CoverageReport/SummaryGithub.md ]; then
+            cat TestResults/CoverageReport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Add Coverage PR Comment
+        if: github.event_name == 'pull_request' && always()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          path: samples/dotnet/TestResults/CoverageReport/SummaryGithub.md
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          check_name: Unit Test Results (.NET Samples)
+          files: |
+            samples/dotnet/TestResults/**/*.trx
+          comment_title: Unit Test Results (.NET Samples)
+
+      - name: Upload Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-test-results
+          path: |
+            samples/dotnet/TestResults/**/*.trx
+          retention-days: 7
+
+      - name: Upload Coverage Report (HTML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-html
+          path: samples/dotnet/TestResults/CoverageReport/
+          retention-days: 30
+
+      - name: Upload Code Coverage (Cobertura)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-cobertura
+          path: samples/dotnet/TestResults/**/coverage.cobertura.xml
+          retention-days: 7

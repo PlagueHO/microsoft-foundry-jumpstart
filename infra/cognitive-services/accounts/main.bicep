@@ -148,6 +148,10 @@ import { connectionType } from 'connection/main.bicep'
 @sys.description('Optional. Connections to create in the Cognitive Services account.')
 param connections connectionType[] = []
 
+import { capabilityHostType } from 'capabilityHost/main.bicep'
+@sys.description('Optional. Capability hosts to create in the Cognitive Services account. These enable AI agent functionality.')
+param capabilityHosts capabilityHostType[] = []
+
 @sys.description('Optional. The flag to disable stored completions. When true, Azure OpenAI will not store prompts and completions for content filtering and abuse monitoring.')
 param storedCompletionsDisabled bool?
 
@@ -564,6 +568,33 @@ module cognitiveServices_connections 'connection/main.bicep' = [
   }
 ]
 
+// Helper function to build connection resource ID from connection name
+func buildConnectionResourceId(accountId string, connectionName string) string =>
+  '${accountId}/connections/${connectionName}'
+
+@batchSize(1)
+module cognitiveServices_capabilityHosts 'capabilityHost/main.bicep' = [
+  for capabilityHost in capabilityHosts: {
+    name: '${take('${cognitiveService.name}-${capabilityHost.name}', 60)}-cph'
+    dependsOn: [
+      cognitiveServices_connections
+    ]
+    params: {
+      accountName: cognitiveService.name
+      name: capabilityHost.name
+      capabilityHostKind: capabilityHost.capabilityHostKind
+      threadStorageConnections: capabilityHost.?threadStorageConnectionNames != null
+        ? map(capabilityHost.threadStorageConnectionNames!, connName => buildConnectionResourceId(cognitiveService.id, connName))
+        : null
+      vectorStoreConnections: capabilityHost.?vectorStoreConnectionNames != null
+        ? map(capabilityHost.vectorStoreConnectionNames!, connName => buildConnectionResourceId(cognitiveService.id, connName))
+        : null
+      storageConnections: capabilityHost.?storageConnectionNames != null
+        ? map(capabilityHost.storageConnectionNames!, connName => buildConnectionResourceId(cognitiveService.id, connName))
+        : null
+    }
+  }
+]
 
 resource cognitiveService_roleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
   for (roleAssignment, index) in (formattedRoleAssignments ?? []): {
@@ -658,6 +689,14 @@ output projects projectOutputType[] = [
   }
 ]
 
+@description('The Capability Hosts created in the Cognitive Services account.')
+output capabilityHostsOutput capabilityHostOutputType[] = [
+  for (capabilityHost, index) in (capabilityHosts ?? []): {
+    name: cognitiveServices_capabilityHosts[index].outputs.name
+    resourceId: cognitiveServices_capabilityHosts[index].outputs.resourceId
+  }
+]
+
 // ================ //
 // Definitions      //
 // ================ //
@@ -698,6 +737,16 @@ type projectOutputType = {
 
   @description('The principal ID of the system assigned identity.')
   systemAssignedMIPrincipalId: string?
+}
+
+@export()
+@description('The type for the capability host output.')
+type capabilityHostOutputType = {
+  @description('The name of the capability host.')
+  name: string
+
+  @description('The resource ID of the capability host.')
+  resourceId: string
 }
 
 

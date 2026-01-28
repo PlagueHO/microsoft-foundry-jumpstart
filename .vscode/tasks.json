@@ -3,7 +3,7 @@
     "tasks": [
         // Build/Lint tasks
         {
-            "label": "Run Ruff Check",
+            "label": "python: ruff check",
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": ["-m", "ruff", "check", "tools/python/src/", "samples/python/src/"],
@@ -20,7 +20,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Run Flake8 Linting",
+            "label": "python: flake8",
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": ["-m", "flake8", "tools/python/src/", "samples/python/src/"],
@@ -37,7 +37,7 @@
             "presentation": { "reveal": "always" }
         },
         {
-            "label": "Run Python Linting",
+            "label": "python: pylint",
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": ["-m", "pylint", "tools/python/src/", "samples/python/src/"],
@@ -53,7 +53,7 @@
             "problemMatcher": ["$python"]
         },
         {
-            "label": "Run Mypy Type Checks",
+            "label": "python: mypy",
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": ["-m", "mypy", "tools/python/src/", "samples/python/src/"],
@@ -71,7 +71,7 @@
 
         // Test tasks
         {
-            "label": "Run Unit Tests",
+            "label": "python: test",
             "type": "shell",
             "command": "${command:python.interpreterPath}",
             "args": ["-m", "pytest", "tools/python/tests/", "samples/python/tests/"],
@@ -89,7 +89,7 @@
 
         // Bicep tasks
         {
-            "label": "Build Bicep",
+            "label": "bicep: build",
             "type": "shell",
             "command": "pwsh",
             "args": [
@@ -104,6 +104,45 @@
             "presentation": { "reveal": "always" },
             "icon": { "id": "azure" },
             "problemMatcher": []
+        },
+
+        // Markdown tasks
+        {
+            "label": "markdown: lint",
+            "type": "shell",
+            "command": "pnpm",
+            "args": ["lint:md"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "group": "test",
+            "icon": {
+                "id": "checklist",
+                "color": "terminal.ansiMagenta"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "markdown: fix",
+            "type": "shell",
+            "command": "pnpm",
+            "args": ["lint:md:fix"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "icon": {
+                "id": "wrench",
+                "color": "terminal.ansiGreen"
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
         }
     ]
 }

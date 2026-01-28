@@ -2,6 +2,7 @@ targetScope = 'subscription'
 extension microsoftGraphV1
 
 import { deploymentType } from './cognitive-services/accounts/main.bicep'
+import { capabilityHostType } from './cognitive-services/accounts/capabilityHost/main.bicep'
 
 @sys.description('Name of the the environment which is used to generate a short unique hash used in all resources.')
 @minLength(1)
@@ -93,6 +94,21 @@ param foundryProjectsFromJson bool = false
 @sys.description('Deploy Azure AI Search and all dependent configuration. Set to false to skip its deployment.')
 param azureAiSearchDeploy bool = true
 
+@sys.description('Use Azure AI Search as a vector store capability host for AI agents. Requires azureAiSearchDeploy to be true.')
+param azureAiSearchCapabilityHost bool = false
+
+@sys.description('Deploy Azure Cosmos DB for thread storage. Set to false to skip its deployment.')
+param cosmosDbDeploy bool = false
+
+@sys.description('Use Azure Cosmos DB as a thread storage capability host for AI agents. Requires cosmosDbDeploy to be true.')
+param cosmosDbCapabilityHost bool = false
+
+@sys.description('Use Azure Storage Account as a file storage capability host for AI agents. Requires deploySampleData to be true.')
+param azureStorageAccountCapabilityHost bool = false
+
+@sys.description('Capability hosts to deploy in the Foundry account. These enable AI agent functionality with thread, vector, and file storage.')
+param foundryCapabilityHosts capabilityHostType[] = []
+
 @sys.description('Override the default storage account name. Use the magic string `default` to fall back to the generated name.')
 @minLength(3)
 @maxLength(24)
@@ -124,6 +140,7 @@ var aiSearchServiceName = '${abbrs.aiSearchSearchServices}${environmentName}'
 var foundryServiceName = '${abbrs.foundryAccounts}${environmentName}'
 var foundryCustomSubDomainName = toLower(replace(environmentName, '-', ''))
 var bastionHostName = '${abbrs.networkBastionHosts}${environmentName}'
+var cosmosDbAccountName = '${abbrs.cosmosDBAccounts}${replace(environmentName, '-', '')}'
 var networkDefaultAction = azureNetworkIsolation ? 'Deny' : 'Allow'
 
 // Assemble list of sample data containers
@@ -364,6 +381,24 @@ module aiServicesAiDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0' = 
   }
 }
 
+// Private DNS zones for Cosmos DB (for thread storage)
+module cosmosDbPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0' = if (azureNetworkIsolation && cosmosDbDeploy) {
+  name: 'cosmos-db-private-dns-zone'
+  scope: az.resourceGroup(effectiveResourceGroupName)
+  dependsOn: [resourceGroup]
+  params: {
+    name: 'privatelink.documents.azure.com'
+    location: 'global'
+    tags: tags
+    virtualNetworkLinks: [
+      {
+        virtualNetworkResourceId: virtualNetwork.outputs.resourceId
+        registrationEnabled: false
+      }
+    ]
+  }
+}
+
 // ---------- STORAGE ACCOUNT SAMPLE DATA (OPTIONAL) ----------
 module sampleDataStorageAccount 'br/public:avm/res/storage/storage-account:0.31.0' = if (deploySampleData) {
   name: 'sample-data-storage-account-deployment'
@@ -558,6 +593,69 @@ module aiSearchRoleAssignments './core/security/role_aisearch.bicep' = if (azure
   }
 }
 
+// ---------- COSMOS DB (OPTIONAL - FOR THREAD STORAGE) ----------
+module cosmosDbAccount 'br/public:avm/res/document-db/database-account:0.18.0' = if (cosmosDbDeploy) {
+  name: 'cosmos-db-account-deployment'
+  scope: az.resourceGroup(effectiveResourceGroupName)
+  dependsOn: [resourceGroup]
+  params: {
+    name: cosmosDbAccountName
+    location: location
+    capabilitiesToAdd: [
+      'EnableServerless'
+    ]
+    diagnosticSettings: [
+      {
+        metricCategories: [
+          {
+            category: 'AllMetrics'
+          }
+        ]
+        name: sendTologAnalyticsCustomSettingName
+        workspaceResourceId: logAnalyticsWorkspace.outputs.resourceId
+      }
+    ]
+    disableLocalAuthentication: disableApiKeys
+    managedIdentities: {
+      systemAssigned: true
+    }
+    networkRestrictions: {
+      publicNetworkAccess: azureNetworkIsolation ? 'Disabled' : 'Enabled'
+      networkAclBypass: 'AzureServices'
+      ipRules: []
+      virtualNetworkRules: []
+    }
+    privateEndpoints: azureNetworkIsolation ? [
+      {
+        privateDnsZoneGroup: {
+          privateDnsZoneGroupConfigs: [
+            {
+              privateDnsZoneResourceId: cosmosDbPrivateDnsZone.outputs.resourceId
+            }
+          ]
+        }
+        service: 'Sql'
+        subnetResourceId: virtualNetwork.outputs.subnetResourceIds[2] // Capability Hosts subnet
+        tags: tags
+      }
+    ] : []
+    sqlDatabases: [
+      {
+        name: 'AgentThreads'
+        containers: [
+          {
+            name: 'threads'
+            paths: [
+              '/threadId'
+            ]
+          }
+        ]
+      }
+    ]
+    tags: tags
+  }
+}
+
 // ---------- FOUNDRY/AI SERVICES ----------
 // Deploy Foundry (Cognitive Services) resource with projects (Stage 2)
 // Projects are deployed directly into the AI Services resource
@@ -603,7 +701,49 @@ var foundryServiceConnections = concat(azureAiSearchDeploy ? [
     target: sampleDataStorageAccount.outputs.primaryBlobEndpoint
     isSharedToAll: true
   }
+] : [], cosmosDbDeploy ? [
+  {
+    // CosmosDB connection for thread storage
+    category: 'CosmosDb'
+    connectionProperties: {
+      authType: 'AAD'
+    }
+    metadata: {
+      Type: 'azure_cosmos_db'
+      ApiType: 'Azure'
+      ApiVersion: '2024-05-15'
+      DeploymentApiVersion: '2024-05-15'
+      Location: location
+      ResourceId: cosmosDbAccount.outputs.resourceId
+      AccountName: cosmosDbAccountName
+      DatabaseName: 'AgentThreads'
+    }
+    name: replace(cosmosDbAccountName,'-','')
+    target: cosmosDbAccount.outputs.endpoint
+    isSharedToAll: true
+  }
 ] : [])
+
+// ---------- CAPABILITY HOSTS CONFIGURATION ----------
+// Build the capability host connection names based on the boolean flags
+var aiSearchConnectionName = replace(aiSearchServiceName,'-','')
+var storageConnectionName = replace(sampleDataStorageAccountName,'-','')
+var cosmosDbConnectionName = replace(cosmosDbAccountName,'-','')
+
+// Compute effective capability hosts by combining explicit foundryCapabilityHosts param with auto-configured ones
+var autoCapabilityHost capabilityHostType = {
+  name: 'default'
+  capabilityHostKind: 'Agents'
+  threadStorageConnectionNames: cosmosDbDeploy && cosmosDbCapabilityHost ? [cosmosDbConnectionName] : null
+  vectorStoreConnectionNames: azureAiSearchDeploy && azureAiSearchCapabilityHost ? [aiSearchConnectionName] : null
+  storageConnectionNames: deploySampleData && azureStorageAccountCapabilityHost ? [storageConnectionName] : null
+}
+
+// Determine if we should add the auto-configured capability host
+var hasAutoCapabilityHost = (cosmosDbDeploy && cosmosDbCapabilityHost) || (azureAiSearchDeploy && azureAiSearchCapabilityHost) || (deploySampleData && azureStorageAccountCapabilityHost)
+
+// Combine explicit and auto-configured capability hosts
+var effectiveCapabilityHosts = concat(foundryCapabilityHosts, hasAutoCapabilityHost ? [autoCapabilityHost] : [])
 
 module foundryService './cognitive-services/accounts/main.bicep' = {
   name: 'foundry-service-deployment'
@@ -670,6 +810,7 @@ module foundryService './cognitive-services/accounts/main.bicep' = {
     sku: 'S0'
     deployments: deploySampleModels ? sampleModelDeployments : []
     connections: foundryServiceConnections
+    capabilityHosts: effectiveCapabilityHosts
     projects: foundryServiceProjects
     tags: tags
   }
@@ -797,6 +938,18 @@ output MICROSOFT_FOUNDRY_PROJECTS_FROM_JSON bool = foundryProjectsFromJson
 output MICROSOFT_FOUNDRY_PROJECT_NAME string = foundryProjectDeploy ? foundryProjectName : ''
 output MICROSOFT_FOUNDRY_PROJECT_DESCRIPTION string = foundryProjectDeploy ? foundryProjectDescription : ''
 output MICROSOFT_FOUNDRY_PROJECT_FRIENDLY_NAME string = foundryProjectDeploy ? foundryProjectFriendlyName : ''
+output MICROSOFT_FOUNDRY_CAPABILITY_HOSTS array = foundryService.outputs.capabilityHostsOutput
+
+// Output the Cosmos DB resources
+output COSMOS_DB_DEPLOY bool = cosmosDbDeploy
+output COSMOS_DB_CAPABILITY_HOST bool = cosmosDbCapabilityHost
+output COSMOS_DB_NAME string = cosmosDbDeploy ? cosmosDbAccount.outputs.name : ''
+output COSMOS_DB_ID string = cosmosDbDeploy ? cosmosDbAccount.outputs.resourceId : ''
+output COSMOS_DB_ENDPOINT string = cosmosDbDeploy ? cosmosDbAccount.outputs.endpoint : ''
+
+// Output the capability host configuration
+output AZURE_AI_SEARCH_CAPABILITY_HOST bool = azureAiSearchCapabilityHost
+output AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST bool = azureStorageAccountCapabilityHost
 
 // Output the Bastion Host resources
 output AZURE_BASTION_HOST_DEPLOY bool = bastionHostDeploy
