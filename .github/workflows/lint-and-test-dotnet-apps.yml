@@ -60,7 +60,7 @@ jobs:
         if: always()
         run: |
           reportgenerator \
-            -reports:TestResults/**/coverage.cobertura.xml \
+            -reports:TestResults/**/*.cobertura.xml \
             -targetdir:TestResults/CoverageReport \
             -reporttypes:"Html;MarkdownSummaryGithub"
 
@@ -109,5 +109,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: code-coverage-cobertura
-          path: samples/dotnet/TestResults/**/coverage.cobertura.xml
+          path: samples/dotnet/TestResults/**/*.cobertura.xml
           retention-days: 7
