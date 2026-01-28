@@ -7,6 +7,7 @@ namespace AgentPersistence_Step01_UnpublishedAgent.Tests;
 public class ProgramTests
 {
     [TestMethod]
+    [TestCategory("Unit")]
     public void AgentName_ShouldBePersistentAgent()
     {
         // Arrange
@@ -17,6 +18,7 @@ public class ProgramTests
     }
 
     [TestMethod]
+    [TestCategory("Unit")]
     public void AgentInstructions_ShouldContainPersistence()
     {
         // Arrange

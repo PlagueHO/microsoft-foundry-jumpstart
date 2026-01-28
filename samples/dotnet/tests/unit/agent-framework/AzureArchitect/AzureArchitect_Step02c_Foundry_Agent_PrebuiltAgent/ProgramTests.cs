@@ -7,6 +7,7 @@ namespace AzureArchitect_Step02c_Foundry_Agent_PrebuiltAgent.Tests;
 public class ProgramTests
 {
     [TestMethod]
+    [TestCategory("Unit")]
     public void ArchitectName_ShouldBeAzureArchitect()
     {
         // Arrange
@@ -17,6 +18,7 @@ public class ProgramTests
     }
 
     [TestMethod]
+    [TestCategory("Unit")]
     public void EnvironmentVariableNames_ShouldBeCorrect()
     {
         // Arrange

@@ -8,6 +8,7 @@ namespace HomeLoanAgent.Tests;
 public class ProgramTests
 {
     [TestMethod]
+    [TestCategory("Unit")]
     public void Options_Question_ShouldBeInitializedAsEmpty()
     {
         // Arrange & Act
@@ -18,6 +19,7 @@ public class ProgramTests
     }
 
     [TestMethod]
+    [TestCategory("Unit")]
     public void Options_InteractiveMode_ShouldDefaultToFalse()
     {
         // Arrange & Act
@@ -28,6 +30,7 @@ public class ProgramTests
     }
 
     [TestMethod]
+    [TestCategory("Unit")]
     public void Options_Question_ShouldBeSettable()
     {
         // Arrange

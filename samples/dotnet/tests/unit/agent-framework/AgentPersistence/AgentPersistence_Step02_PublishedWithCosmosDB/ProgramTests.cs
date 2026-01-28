@@ -7,6 +7,7 @@ namespace AgentPersistence_Step02_PublishedWithCosmosDB.Tests;
 public class ProgramTests
 {
     [TestMethod]
+    [TestCategory("Unit")]
     public void AgentName_ShouldBePersistentAgent()
     {
         // Arrange
@@ -17,6 +18,7 @@ public class ProgramTests
     }
 
     [TestMethod]
+    [TestCategory("Unit")]
     public void EnvironmentVariableNames_ShouldBeCorrect()
     {
         // Arrange

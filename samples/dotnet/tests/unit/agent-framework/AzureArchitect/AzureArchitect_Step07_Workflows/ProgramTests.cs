@@ -7,6 +7,7 @@ namespace AzureArchitect_Step07_WorkflowConcurrent.Tests;
 public class ProgramTests
 {
     [TestMethod]
+    [TestCategory("Unit")]
     public void ArchitectName_ShouldBeAzureArchitect()
     {
         // Arrange
@@ -17,6 +18,7 @@ public class ProgramTests
     }
 
     [TestMethod]
+    [TestCategory("Unit")]
     public void ArchitectInstructions_ShouldContainAzureWellArchitectedFramework()
     {
         // Arrange
