@@ -41,7 +41,8 @@ jobs:
 
       - name: Run unit tests
         run: |
-          dotnet test microsoft-foundry-jumpstart-samples.slnx \
+          dotnet test \
+            --solution microsoft-foundry-jumpstart-samples.slnx \
             --filter "TestCategory=Unit" \
             --configuration Release \
             --no-restore \
