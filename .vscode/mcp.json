@@ -49,6 +49,14 @@
     "microsoft-aspire-docs": {
       "url": "https://gitmcp.io/dotnet/aspire",
       "type": "sse"
+    },
+    "workiq": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@microsoft/workiq",
+        "mcp"
+      ]
     }
   }
 }
