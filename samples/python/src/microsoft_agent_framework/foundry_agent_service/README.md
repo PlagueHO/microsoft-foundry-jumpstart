@@ -103,34 +103,20 @@ python published_agent.py --interactive
 
 ### Unpublished Agent Flow
 
-```text
-┌─────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   Client    │────▶│  Project Endpoint │────▶│  Agent Service  │
-│ Application │◀────│  (Full API)       │◀────│  (Server State) │
-└─────────────┘     └──────────────────┘     └─────────────────┘
-                           │
-                           ▼
-                    ┌───────────────┐
-                    │ Threads,      │
-                    │ Files,        │
-                    │ Vector Stores │
-                    └───────────────┘
+```mermaid
+flowchart LR
+    Client["Client<br/>Application"] <-->|Full API| Project["Project Endpoint<br/>(Full API)"]
+    Project <--> Agent["Agent Service<br/>(Server State)"]
+    Project --> Resources["Threads,<br/>Files,<br/>Vector Stores"]
 ```
 
 ### Published Agent Flow
 
-```text
-┌─────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   Client    │────▶│  Application     │────▶│  Agent Service  │
-│ Application │◀────│  Endpoint        │◀────│  (Stateless)    │
-└─────────────┘     │  (POST /responses│     └─────────────────┘
-       │            │   only)          │
-       ▼            └──────────────────┘
-┌──────────────┐
-│ Local State  │
-│ (Threads,    │
-│ Files, etc.) │
-└──────────────┘
+```mermaid
+flowchart LR
+    Client["Client<br/>Application"] <--> Application["Application<br/>Endpoint<br/>(POST /responses only)"]
+    Application <--> Agent["Agent Service<br/>(Stateless)"]
+    Client --> LocalState["Local State<br/>(Threads,<br/>Files, etc.)"]
 ```
 
 ## SDLC and DevOps Considerations
@@ -156,40 +142,31 @@ that can lead to production-only bugs.
 The framework's abstraction layer is the solution. By using framework components consistently,
 your code follows the **same logical path** regardless of backend capabilities:
 
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│                    Your Application Code                        │
-│  (Same code for dev and prod using Agent Framework abstractions)│
-└─────────────────────────────────────────────────────────────────┘
-                              │
-              ┌───────────────┴───────────────┐
-              ▼                               ▼
-┌─────────────────────────┐     ┌─────────────────────────┐
-│  Dev/Test Environment   │     │  Production Environment │
-│  (Project Endpoint)     │     │  (Application Endpoint) │
-│                         │     │                         │
-│  Framework uses:        │     │  Framework uses:        │
-│  • Server threads       │     │  • Client threads       │
-│  • Server file storage  │     │  • In-context files     │
-│  • Full API access      │     │  • POST /responses only │
-└─────────────────────────┘     └─────────────────────────┘
+```mermaid
+flowchart TD
+    App["Your Application Code<br/>(Same code for dev and prod using Agent Framework abstractions)"]
+    App --> Dev["Dev/Test Environment<br/>(Project Endpoint)<br/><br/>Framework uses:<br/>• Server threads<br/>• Server file storage<br/>• Full API access"]
+    App --> Prod["Production Environment<br/>(Application Endpoint)<br/><br/>Framework uses:<br/>• Client threads<br/>• In-context files<br/>• POST /responses only"]
 ```
 
 **Key principle**: Write to the framework's abstractions, not directly to the underlying APIs.
 
 ### Recommended SDLC Workflow
 
-```text
-┌───────────┐     ┌───────────┐    ┌──────────┐    ┌──────────┐
-│  Dev      │───▶│  Test     │───▶│  Staging │───▶│   Prod   │
-│           │     │           │    │          │    │          │
-│Unpublished│     │Unpublished│    │ Published│    │ Published│
-│  Agent    │     │  Agent    │    │  Agent   │    │  Agent   │
-└───────────┘     └───────────┘    └──────────┘    └──────────┘
-     │               │               │               │
-     └───────────────┴───────────────┴───────────────┘
-                     Use Agent Framework
-                     throughout all stages
+```mermaid
+flowchart LR
+    Dev["Dev<br/><br/>Unpublished<br/>Agent"]
+    Test["Test<br/><br/>Unpublished<br/>Agent"]
+    Staging["Staging<br/><br/>Published<br/>Agent"]
+    Prod["Prod<br/><br/>Published<br/>Agent"]
+    
+    Dev --> Test --> Staging --> Prod
+    
+    Framework["Use Agent Framework<br/>throughout all stages"]
+    Dev -.-> Framework
+    Test -.-> Framework
+    Staging -.-> Framework
+    Prod -.-> Framework
 ```
 
 **Stage-by-stage guidance:**
@@ -222,30 +199,17 @@ your code follows the **same logical path** regardless of backend capabilities:
 **Implication**: Your agent definition must be recreated in each environment's AI Services
 resource. The **agent definition becomes your deployable artifact**, not the published agent.
 
-```text
-┌─────────────────────────────────────────────────────────────────────────┐
-│                        Source Control (Git)                             │
-│         agent-definition.json / Bicep / Terraform / Pulumi              │
-│                                                                         │
-│  Contains: instructions, model config, tools, vector store refs, files  │
-└─────────────────────────────────────────────────────────────────────────┘
-                                    │
-           CI/CD Pipeline applies agent definition to each environment
-                                    │
-         ┌──────────────────────────┼──────────────────────────┐
-         ▼                          ▼                          ▼
-┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
-│  Dev Subscription│     │ Staging Sub     │      │  Prod Sub       │
-│  ───────────────│      │ ───────────────│      │  ───────────────│
-│  AI Services    │      │  AI Services    │      │  AI Services    │
-│  Resource       │      │  Resource       │      │  Resource       │
-│                 │      │                 │      │                 │
-│  Agent created  │      │  Agent created  │      │  Agent created  │
-│  (unpublished)  │      │  + Published    │      │  + Published    │
-│                 │      │  to App         │      │  to App         │
-└─────────────────┘      └─────────────────┘      └─────────────────┘
-         │                        │                        │
-    Full API for dev         Published API            Published API
+```mermaid
+flowchart TD
+    Git["Source Control (Git)<br/>agent-definition.json / Bicep / Terraform / Pulumi<br/><br/>Contains: instructions, model config, tools, vector store refs, files"]
+    
+    Pipeline["CI/CD Pipeline applies agent definition to each environment"]
+    
+    Git --> Pipeline
+    
+    Pipeline --> Dev["Dev Subscription<br/>───────────────<br/>AI Services Resource<br/><br/>Agent created<br/>(unpublished)<br/><br/>Full API for dev"]
+    Pipeline --> Staging["Staging Sub<br/>───────────────<br/>AI Services Resource<br/><br/>Agent created<br/>+ Published to App<br/><br/>Published API"]
+    Pipeline --> Prod["Prod Sub<br/>───────────────<br/>AI Services Resource<br/><br/>Agent created<br/>+ Published to App<br/><br/>Published API"]
 ```
 
 **Agent-as-Code Pattern** (recommended for enterprise):
