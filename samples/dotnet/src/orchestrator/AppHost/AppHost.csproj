@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.2.0" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>microsoft-foundry-jumpstart-apphost</UserSecretsId>
+    <!-- Suppress preview API warnings for Cosmos DB Linux emulator -->
+    <NoWarn>$(NoWarn);ASPIRECOSMOSDB001</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.2.0" />
+    <PackageReference Include="Aspire.Hosting.Azure.CosmosDB" Version="9.2.0" />
+  </ItemGroup>
+
+  <!-- Agent Framework Samples -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\agent-framework\AzureArchitect\AzureArchitect_Step01_Simple\AzureArchitect_Step01_Simple.csproj" />
+    <ProjectReference Include="..\..\agent-framework\AzureArchitect\AzureArchitect_Step02a_Foundry_Agent_SingleTurn\AzureArchitect_Step02a_Foundry_Agent_SingleTurn.csproj" />
+    <ProjectReference Include="..\..\agent-framework\AzureArchitect\AzureArchitect_Step02b_Foundry_Agent_MultiturnConversation\AzureArchitect_Step02b_Foundry_Agent_MultiturnConversation.csproj" />
+    <ProjectReference Include="..\..\agent-framework\AzureArchitect\AzureArchitect_Step02c_Foundry_Agent_PrebuiltAgent\AzureArchitect_Step02c_Foundry_Agent_PrebuiltAgent.csproj" />
+    <ProjectReference Include="..\..\agent-framework\AzureArchitect\AzureArchitect_Step03_UsingFunctionTools\AzureArchitect_Step03_UsingFunctionTools.csproj" />
+    <ProjectReference Include="..\..\agent-framework\AzureArchitect\AzureArchitect_Step04_UsingFunctionToolsWithApprovals\AzureArchitect_Step04_UsingFunctionToolsWithApprovals.csproj" />
+    <ProjectReference Include="..\..\agent-framework\AzureArchitect\AzureArchitect_Step05_MCPServer\AzureArchitect_Step05_MCPServer.csproj" />
+    <ProjectReference Include="..\..\agent-framework\AzureArchitect\AzureArchitect_Step06_UsingImages\AzureArchitect_Step06_UsingImages.csproj" />
+    <ProjectReference Include="..\..\agent-framework\AzureArchitect\AzureArchitect_Step07_Workflows\AzureArchitect_Step07_WorkflowConcurrent.csproj" />
+    <ProjectReference Include="..\..\agent-framework\AgentPersistence\AgentPersistence_Step01_UnpublishedAgent\AgentPersistence_Step01_UnpublishedAgent.csproj" />
+    <ProjectReference Include="..\..\agent-framework\AgentPersistence\AgentPersistence_Step02_PublishedWithCosmosDB\AgentPersistence_Step02_PublishedWithCosmosDB.csproj" />
+    <ProjectReference Include="..\..\agent-framework\DocumentClassifierWorkflow\DocumentClassifierWorkflow.csproj" />
+  </ItemGroup>
+
+  <!-- Semantic Kernel Samples -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\semantic-kernel\home-loan-agent\HomeLoanAgent.csproj" />
+  </ItemGroup>
+
+  <!-- ServiceDefaults is not an Aspire project resource - it's a shared library -->
+  <ItemGroup>
+    <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" IsAspireProjectResource="false" />
+  </ItemGroup>
+
+</Project>

@@ -6,12 +6,19 @@
 //
 // This sample uses CosmosChatMessageStore from Microsoft.Agents.AI.CosmosNoSql for persistence.
 // It demonstrates hierarchical partitioning for multi-tenant SaaS scenarios.
+//
+// When run via Aspire AppHost, Cosmos DB connection is automatically injected.
+// When run standalone, configure via environment variables.
 
 using System.Text.Json;
 using Azure.AI.OpenAI;
 using Azure.Identity;
 using Microsoft.Agents.AI;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace AgentPersistence.PublishedWithCosmosDB;
 
@@ -21,11 +28,11 @@ namespace AgentPersistence.PublishedWithCosmosDB;
 /// <remarks>
 /// <para>
 /// Published Agent Applications have LIMITED API access:
-/// - ❌ POST /conversations - INACCESSIBLE
-/// - ❌ GET /conversations/{id}/messages - INACCESSIBLE
-/// - ❌ POST /files - INACCESSIBLE
-/// - ❌ POST /vector_stores - INACCESSIBLE
-/// - ✅ POST /responses (store=false) - Only available endpoint
+/// - POST /conversations - INACCESSIBLE
+/// - GET /conversations/{id}/messages - INACCESSIBLE
+/// - POST /files - INACCESSIBLE
+/// - POST /vector_stores - INACCESSIBLE
+/// - POST /responses (store=false) - Only available endpoint
 /// </para>
 /// <para>
 /// This design is intentional for user data isolation. The client must manage:
@@ -54,34 +61,65 @@ internal static class Program
     {
         Console.WriteLine("=== Published Agent with Cosmos DB Persistence ===\n");
 
-        // Get configuration from environment
-        string openAiEndpoint = Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT")
+        // Build the host with Aspire service defaults
+        var builder = Host.CreateApplicationBuilder(args);
+
+        // Add Aspire service defaults (OpenTelemetry, health checks, service discovery)
+        builder.AddServiceDefaults();
+
+        // Add Azure Cosmos DB client - Aspire will inject the connection string
+        // from the AppHost when running under orchestration, or falls back to
+        // ConnectionStrings:cosmos configuration or AZURE_COSMOS_ENDPOINT env var
+        builder.AddAzureCosmosClient("cosmos");
+
+        // Build the host
+        using var host = builder.Build();
+
+        // Get configuration
+        var configuration = host.Services.GetRequiredService<IConfiguration>();
+
+        // Get Cosmos client from DI (injected by Aspire or configured manually)
+        var cosmosClient = host.Services.GetRequiredService<CosmosClient>();
+
+        // Get configuration values (Aspire-injected or environment variables)
+        string openAiEndpoint = configuration["AZURE_OPENAI_ENDPOINT"]
+            ?? Environment.GetEnvironmentVariable("AZURE_OPENAI_ENDPOINT")
             ?? throw new InvalidOperationException("AZURE_OPENAI_ENDPOINT is not set.");
-        string deploymentName = Environment.GetEnvironmentVariable("AZURE_OPENAI_DEPLOYMENT_NAME")
+        string deploymentName = configuration["AZURE_OPENAI_DEPLOYMENT_NAME"]
+            ?? Environment.GetEnvironmentVariable("AZURE_OPENAI_DEPLOYMENT_NAME")
             ?? "gpt-4.1";
-        string cosmosEndpoint = Environment.GetEnvironmentVariable("AZURE_COSMOS_ENDPOINT")
-            ?? throw new InvalidOperationException("AZURE_COSMOS_ENDPOINT is not set.");
-        string cosmosDatabaseId = Environment.GetEnvironmentVariable("AZURE_COSMOS_DATABASE_ID")
+        string cosmosDatabaseId = configuration["AZURE_COSMOS_DATABASE_ID"]
+            ?? Environment.GetEnvironmentVariable("AZURE_COSMOS_DATABASE_ID")
             ?? "AgentPersistence";
-        string cosmosContainerId = Environment.GetEnvironmentVariable("AZURE_COSMOS_CONTAINER_ID")
+        string cosmosContainerId = configuration["AZURE_COSMOS_CONTAINER_ID"]
+            ?? Environment.GetEnvironmentVariable("AZURE_COSMOS_CONTAINER_ID")
             ?? "ChatMessages";
 
         Console.WriteLine($"OpenAI Endpoint: {openAiEndpoint}");
         Console.WriteLine($"Model: {deploymentName}");
-        Console.WriteLine($"Cosmos DB: {cosmosEndpoint}");
+        Console.WriteLine($"Cosmos DB Endpoint: {cosmosClient.Endpoint}");
         Console.WriteLine($"Database: {cosmosDatabaseId}, Container: {cosmosContainerId}\n");
 
         // Create Azure credential (uses DefaultAzureCredential for flexibility)
         var credential = new DefaultAzureCredential();
 
         // Multi-tenant identifiers - in production, these come from your auth/session system
-        string tenantId = Environment.GetEnvironmentVariable("TENANT_ID") ?? "contoso";
-        string userId = Environment.GetEnvironmentVariable("USER_ID") ?? "user-123";
-        string sessionId = Environment.GetEnvironmentVariable("SESSION_ID") ?? Guid.NewGuid().ToString("N");
+        string tenantId = configuration["TENANT_ID"]
+            ?? Environment.GetEnvironmentVariable("TENANT_ID")
+            ?? "contoso";
+        string userId = configuration["USER_ID"]
+            ?? Environment.GetEnvironmentVariable("USER_ID")
+            ?? "user-123";
+        string sessionId = configuration["SESSION_ID"]
+            ?? Environment.GetEnvironmentVariable("SESSION_ID")
+            ?? Guid.NewGuid().ToString("N");
 
         Console.WriteLine($"Tenant: {tenantId}");
         Console.WriteLine($"User: {userId}");
         Console.WriteLine($"Session: {sessionId}\n");
+
+        // Ensure database and container exist (for emulator scenarios)
+        await EnsureDatabaseAndContainerAsync(cosmosClient, cosmosDatabaseId, cosmosContainerId);
 
         // Create the Azure OpenAI client and convert to IChatClient
         var chatClient = new AzureOpenAIClient(new Uri(openAiEndpoint), credential)
@@ -97,13 +135,13 @@ internal static class Program
             ChatMessageStoreFactory = (context, cancellationToken) =>
             {
                 // Create Cosmos DB message store with hierarchical partitioning
+                // Using the CosmosClient from DI (Aspire-provided or manually configured)
                 // This enables efficient multi-tenant data isolation:
                 // - Partition key: /tenantId/userId/sessionId
                 // - Each tenant's data is isolated at the storage level
                 // - Queries are scoped to the specific tenant/user/session
                 var store = new CosmosChatMessageStore(
-                    cosmosEndpoint,
-                    credential,
+                    cosmosClient,
                     cosmosDatabaseId,
                     cosmosContainerId,
                     tenantId,
@@ -135,7 +173,7 @@ internal static class Program
         // Demonstrate session serialization for resume capability
         Console.WriteLine("\n=== Session Serialization Demo ===\n");
         JsonElement serializedThread = thread.Serialize();
-        Console.WriteLine($"Serialized thread state (for session resume):");
+        Console.WriteLine("Serialized thread state (for session resume):");
         Console.WriteLine($"{serializedThread}\n");
 
         Console.WriteLine("To resume this session later, deserialize the thread:");
@@ -167,21 +205,52 @@ internal static class Program
                - Deserialize to resume with full history from Cosmos DB
             """);
 
-        Console.WriteLine("\n=== Cosmos DB Container Setup ===\n");
+        Console.WriteLine("\n=== Aspire Integration ===\n");
         Console.WriteLine("""
-            To create the container with hierarchical partition key:
+            This sample integrates with .NET Aspire for:
 
-            az cosmosdb sql container create \
-              --account-name <cosmos-account> \
-              --database-name AgentPersistence \
-              --name ChatMessages \
-              --partition-key-path "/tenantId" "/userId" "/sessionId" \
-              --default-ttl 604800
+            - Automatic Cosmos DB Linux Preview Emulator provisioning
+            - Connection string injection via IConfiguration
+            - OpenTelemetry tracing and metrics
+            - Health check endpoints
+            - Service discovery
 
-            Or via Bicep/ARM with ContainerProperties:
-              partitionKeyPaths: ['/tenantId', '/userId', '/sessionId']
-              defaultTtl: 604800
+            Run via AppHost:
+              cd samples/dotnet/src/orchestrator/AppHost
+              dotnet run
+
+            Or run standalone with environment variables:
+              export AZURE_OPENAI_ENDPOINT=https://your-openai.openai.azure.com/
+              export ConnectionStrings__cosmos=AccountEndpoint=https://your-cosmos.documents.azure.com:443/;AccountKey=...
+              dotnet run
             """);
+    }
+
+    /// <summary>
+    /// Ensures the database and container exist in Cosmos DB.
+    /// This is useful for emulator scenarios where the resources may not exist.
+    /// </summary>
+    private static async Task EnsureDatabaseAndContainerAsync(
+        CosmosClient cosmosClient,
+        string databaseId,
+        string containerId)
+    {
+        Console.WriteLine("Ensuring Cosmos DB database and container exist...");
+
+        // Create database if it doesn't exist
+        var databaseResponse = await cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
+        Console.WriteLine($"Database '{databaseId}' ready (Status: {databaseResponse.StatusCode})");
+
+        // Create container with partition key
+        // Note: The emulator may have limitations with hierarchical partition keys
+        // For production, ensure your container is created with the proper partition key paths
+        var containerProperties = new ContainerProperties(containerId, "/tenantId")
+        {
+            DefaultTimeToLive = 604800 // 7 days TTL
+        };
+
+        var containerResponse = await databaseResponse.Database.CreateContainerIfNotExistsAsync(containerProperties);
+        Console.WriteLine($"Container '{containerId}' ready (Status: {containerResponse.StatusCode})\n");
     }
 
     private static async Task AskQuestionAsync(AIAgent agent, AgentThread thread, string question)

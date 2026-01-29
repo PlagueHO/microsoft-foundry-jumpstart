@@ -4,6 +4,10 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
+  <Folder Name="/orchestrator/">
+    <Project Path="src/orchestrator/AppHost/AppHost.csproj" />
+    <Project Path="src/orchestrator/ServiceDefaults/ServiceDefaults.csproj" />
+  </Folder>
   <Folder Name="/agent-framework/">
     <Project Path="src/agent-framework/AzureArchitect/AzureArchitect_Step01_Simple/AzureArchitect_Step01_Simple.csproj" />
     <Project Path="src/agent-framework/AzureArchitect/AzureArchitect_Step02a_Foundry_Agent_SingleTurn/AzureArchitect_Step02a_Foundry_Agent_SingleTurn.csproj" />

@@ -1,0 +1,17 @@
+# Microsoft Agent Framework (Preview)
+# Install from PyPI - this includes all core components
+agent-framework>=0.1.0a1
+
+# Azure Identity for authentication
+azure-identity>=1.15.0
+
+# Azure AI Projects SDK (V2) for project client
+# Used for unpublished agent access with full API
+azure-ai-projects>=1.0.0b1
+
+# OpenAI client for published agent access
+# Published agents expose OpenAI-compatible Responses API
+openai>=1.40.0
+
+# Optional: Environment variable management
+python-dotenv>=1.0.0
