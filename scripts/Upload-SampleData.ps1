@@ -2,27 +2,19 @@ $ErrorActionPreference = "Stop"
 
 Write-Host "Starting sample data upload script..."
 
-# Get environment variables from azd (suppress errors for missing values)
-# Fall back to shell environment variables if azd env values are not set
+# azd hooks automatically preload environment variables from the .env file into shell environment.
+# However, variables set via 'azd env set' before provisioning may not be preloaded yet.
+# Use azd env get-value to reliably retrieve all values from the azd environment.
+
 $deploySampleData = azd env get-value DEPLOY_SAMPLE_DATA 2>$null
-if (-not $deploySampleData) {
-    $deploySampleData = $env:DEPLOY_SAMPLE_DATA
-}
-
 $storageAccountName = azd env get-value AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME 2>$null
-if (-not $storageAccountName) {
-    $storageAccountName = $env:AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME
-}
-
 $resourceGroupName = azd env get-value AZURE_RESOURCE_GROUP 2>$null
-if (-not $resourceGroupName) {
-    $resourceGroupName = $env:AZURE_RESOURCE_GROUP
-}
-
 $azureNetworkIsolation = azd env get-value AZURE_NETWORK_ISOLATION 2>$null
-if (-not $azureNetworkIsolation) {
-    $azureNetworkIsolation = $env:AZURE_NETWORK_ISOLATION
-}
+
+Write-Host "DEBUG: DEPLOY_SAMPLE_DATA='$deploySampleData'"
+Write-Host "DEBUG: AZURE_NETWORK_ISOLATION='$azureNetworkIsolation'"
+Write-Host "DEBUG: AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME='$storageAccountName'"
+Write-Host "DEBUG: AZURE_RESOURCE_GROUP='$resourceGroupName'"
 
 if ($deploySampleData -ne "true") {
     Write-Host "DEPLOY_SAMPLE_DATA is not 'true'. Skipping sample data upload."

@@ -76,6 +76,13 @@ jobs:
             --federated-credential-provider "github" \
             --tenant-id "$AZURE_TENANT_ID"
 
+      - name: Set azd environment variables
+        run: |
+          azd env set DEPLOY_SAMPLE_DATA "$DEPLOY_SAMPLE_DATA"
+          azd env set DEPLOY_SAMPLE_MODELS "$DEPLOY_SAMPLE_MODELS"
+          azd env set AZURE_NETWORK_ISOLATION "$AZURE_NETWORK_ISOLATION"
+          azd env set AZURE_PRINCIPAL_ID_TYPE "$AZURE_PRINCIPAL_ID_TYPE"
+
       - name: Provision Infrastructure
         id: provision
         continue-on-error: true
