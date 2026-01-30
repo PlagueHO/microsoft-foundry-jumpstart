@@ -76,8 +76,13 @@ jobs:
             --federated-credential-provider "github" \
             --tenant-id "$AZURE_TENANT_ID"
 
+      - name: Create azd environment
+        run: |
+          azd env new "$AZURE_ENV_NAME" --location "$AZURE_LOCATION"
+
       - name: Set azd environment variables
         run: |
+          azd env set BUILD_VERSION "$BUILD_VERSION"a  
           azd env set DEPLOY_SAMPLE_DATA "$DEPLOY_SAMPLE_DATA"
           azd env set DEPLOY_SAMPLE_MODELS "$DEPLOY_SAMPLE_MODELS"
           azd env set AZURE_NETWORK_ISOLATION "$AZURE_NETWORK_ISOLATION"
