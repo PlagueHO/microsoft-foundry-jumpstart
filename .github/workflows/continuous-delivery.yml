@@ -45,7 +45,7 @@ jobs:
     name: E2E Test (${{ matrix.name }})
     uses: ./.github/workflows/e2e-test.yml
     with:
-      ENVIRONMENT: Test
+      ENVIRONMENT: test
       BUILD_VERSION: ${{ needs.set-build-variables.outputs.BUILD_VERSION }}
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
       AZURE_ENV_NAME: ${{ format('aifj-{0}-{1}', matrix.name, github.run_id) }}
