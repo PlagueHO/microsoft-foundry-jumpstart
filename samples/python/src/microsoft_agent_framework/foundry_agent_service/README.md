@@ -1,5 +1,10 @@
 # Microsoft Agent Framework with Microsoft Foundry Agent Service
 
+> [!WARNING]
+> **Preview Features - Discussion Document Only**
+>
+> This document discusses multiple preview features and represents exploratory approaches to using Agent Service Project Agents and Agent Applications. It is intended for discussion and exploration purposes only and **should not be used to make strategic decisions**. The patterns, workflows, and architectural guidance described here are subject to change as these preview features evolve.
+
 This directory contains samples demonstrating how to use the
 [Microsoft Agent Framework](https://github.com/microsoft/agent-framework) with
 [Microsoft Foundry Agent Service](https://learn.microsoft.com/azure/ai-foundry/agents) for
@@ -212,42 +217,63 @@ flowchart TD
     Pipeline --> Prod["Prod Sub<br/>───────────────<br/>AI Services Resource<br/><br/>Agent created<br/>+ Published to App<br/><br/>Published API"]
 ```
 
-**Agent-as-Code Pattern** (recommended for enterprise):
+**Environment-Specific Agent Setup**:
 
-```jsonc
-// agent-definition.json - checked into source control
-{
-  "name": "customer-support-agent",
-  "model": "gpt-4o",
-  "instructions": "You are a helpful customer support agent...",
-  "tools": [
-    { "type": "function", "function": { "name": "lookup_order", ... } },
-    { "type": "file_search" }
-  ],
-  "tool_resources": {
-    "file_search": {
-      "vector_store_ids": ["${VECTOR_STORE_ID}"]  // Injected per environment
-    }
-  }
-}
+When using Microsoft Agent Framework, implement environment-specific agent configuration through code rather than static definition files. Use configuration-driven code paths to handle differences between environments:
+
+```python
+# Example: Environment-specific agent setup
+def create_agent(environment: str) -> Agent:
+    """Create agent with environment-specific configuration."""
+    
+    # Common configuration
+    base_instructions = "You are a helpful customer support agent..."
+    base_tools = [lookup_order_tool, file_search_tool]
+    
+    # Environment-specific setup
+    if environment == "production":
+        # Production: Use published agent endpoint
+        endpoint = os.getenv("AZURE_AI_APPLICATION_ENDPOINT")
+        # Pre-configured vector stores only
+        vector_store_id = os.getenv("PROD_VECTOR_STORE_ID")
+    elif environment == "staging":
+        # Staging: Use published agent endpoint (matches prod API surface)
+        endpoint = os.getenv("STAGING_APPLICATION_ENDPOINT")
+        vector_store_id = os.getenv("STAGING_VECTOR_STORE_ID")
+    else:
+        # Dev/Test: Use project endpoint with full API
+        endpoint = os.getenv("PROJECT_ENDPOINT")
+        # Can create/modify vector stores dynamically
+        vector_store_id = get_or_create_vector_store(environment)
+    
+    return Agent(
+        endpoint=endpoint,
+        instructions=base_instructions,
+        tools=base_tools,
+        vector_store_ids=[vector_store_id] if vector_store_id else []
+    )
 ```
+
+This approach allows the framework to handle API differences transparently while keeping your agent logic consistent across environments.
 
 **CI/CD Pipeline Steps**:
 
-1. **Build**: Validate agent definition schema, lint instructions
-2. **Deploy to Dev**: Create/update agent in Dev AI Services (unpublished)
-3. **Test in Dev**: Run integration tests against project endpoint
-4. **Deploy to Staging**: Create/update agent in Staging AI Services, then **publish**
-5. **Test in Staging**: Validate against application endpoint (published API surface)
-6. **Deploy to Prod**: Create/update agent in Prod AI Services, then **publish**
+1. **Build**: Run tests, lint code, validate configuration
+2. **Deploy to Dev**: Deploy application code pointing to Dev project endpoint (unpublished agent)
+3. **Test in Dev**: Run integration tests against project endpoint with full API access
+4. **Deploy to Staging**: Deploy application code pointing to Staging application endpoint (published agent)
+5. **Test in Staging**: Validate against application endpoint (published API surface - matches production)
+6. **Deploy to Prod**: Deploy application code pointing to Prod application endpoint (published agent)
 
 **What Must Be Environment-Specific**:
 
 | Component | Same Across Envs | Per-Environment |
 |-----------|------------------|-----------------|
-| Agent instructions | ✅ | |
-| Tool definitions | ✅ | |
+| Application code | ✅ | |
+| Agent instructions (in code) | ✅ | |
+| Tool definitions (in code) | ✅ | |
 | Model selection | ✅ (usually) | Sometimes different for cost |
+| Endpoint URL | | ✅ Configuration per environment |
 | Vector store IDs | | ✅ Created per resource |
 | File IDs | | ✅ Uploaded per resource |
 | Connection strings | | ✅ Point to env-specific backends |
@@ -255,30 +281,28 @@ flowchart TD
 
 **Vector Store and File Handling**:
 
-Since vector stores and files are resource-scoped, your pipeline must:
+Since vector stores and files are resource-scoped, your deployment process must:
 
 1. Upload source documents to each environment's AI Services
 2. Create vector stores in each environment
-3. Capture the resulting IDs and inject them into agent definition
-4. Create the agent with environment-specific resource references
+3. Store the resulting IDs in environment configuration (environment variables, Key Vault, etc.)
+4. Application code retrieves these IDs at runtime based on environment
 
-```yaml
-# Example Azure DevOps / GitHub Actions step
-- name: Create vector store and deploy agent
-  run: |
-    # Upload files and create vector store in target environment
-    VECTOR_STORE_ID=$(az ai foundry vector-store create --files ./knowledge-base/*.pdf)
+```python
+# Example: Runtime configuration retrieval
+def get_vector_store_config() -> str:
+    """Get vector store ID from environment-specific configuration."""
+    environment = os.getenv("ENVIRONMENT", "dev")
     
-    # Substitute into agent definition
-    envsubst < agent-definition.template.json > agent-definition.json
-    
-    # Create/update agent
-    az ai foundry agent create --definition agent-definition.json
-    
-    # Publish (staging/prod only)
-    if [[ "$ENVIRONMENT" != "dev" ]]; then
-      az ai foundry agent publish --name customer-support-agent
-    fi
+    if environment == "dev":
+        # Dev can create dynamically or use a dev-specific store
+        return os.getenv("DEV_VECTOR_STORE_ID", "")
+    elif environment == "staging":
+        return os.getenv("STAGING_VECTOR_STORE_ID")
+    elif environment == "production":
+        return os.getenv("PROD_VECTOR_STORE_ID")
+    else:
+        raise ValueError(f"Unknown environment: {environment}")
 ```
 
 ### Trade-offs and Limitations of This Model
@@ -287,31 +311,33 @@ This enterprise pattern works, but it's important to acknowledge the friction po
 
 | Concern | Traditional DevOps | Agent Service Reality |
 |---------|-------------------|----------------------|
-| Artifact promotion | Build once, deploy everywhere | Recreate in each environment |
-| Environment drift | Identical artifacts prevent it | Agent definitions could diverge |
-| Rollback | Redeploy previous artifact | Republish previous definition |
-| Audit trail | Artifact registry has history | Must rely on source control |
+| Artifact promotion | Build once, deploy everywhere | Deploy same code, different config per environment |
+| Environment drift | Identical artifacts prevent it | Configuration differences require careful management |
+| Rollback | Redeploy previous artifact | Redeploy previous code version |
+| Audit trail | Artifact registry has history | Source control tracks code + config changes |
 
 **Mitigations**:
 
-- **Treat source control as your artifact registry** for agent definitions
-- **Use infrastructure-as-code** (Bicep/Terraform) to ensure consistent resource setup
-- **Automate everything**—manual agent creation invites environment drift
+- **Use source control** for all application code and configuration
+- **Separate configuration from code** using environment variables or configuration services
+- **Automate deployments** to prevent manual configuration errors
 - **Tag releases** in Git; correlate deployments to commits
-- **Consider GitOps** patterns where environments sync from source control
+- **Use configuration validation** to ensure required settings are present per environment
+- **Store secrets in Key Vault** or similar services, not in source control
 
-**Why Microsoft Agent Framework Still Helps**:
+**Why Microsoft Agent Framework Helps**:
 
-Even with the multi-resource complexity, the framework provides value:
+The framework provides critical value for this multi-environment approach:
 
-1. **Your application code stays the same** across all environments
-2. **Endpoint type becomes configuration**, not code branches
-3. **Client-side thread handling** works regardless of publish state
-4. **Testing your integration code** is valid even if agent definitions differ slightly
+1. **Same application code** runs across all environments without modification
+2. **Endpoint type becomes configuration**, not different code branches
+3. **Transparent API abstraction** - framework handles differences between project and application endpoints
+4. **Client-side thread handling** works consistently regardless of backend publish state
+5. **Consistent testing approach** - integration tests validate your code, not environment-specific implementations
 
-The framework doesn't solve the agent definition promotion problem, but it ensures your
-*application code* follows DevOps best practices even when the *agent infrastructure*
-requires per-environment recreation.
+The framework doesn't solve the multi-environment resource setup problem, but it ensures your
+*application code* follows DevOps best practices and remains environment-agnostic through
+configuration.
 
 ### Best Practices for Environment Parity
 
