@@ -52,6 +52,7 @@ jobs:
       AZURE_LOCATION: ${{ inputs.AZURE_LOCATION }}
       AZURE_NETWORK_ISOLATION: ${{ inputs.AZURE_NETWORK_ISOLATION }}
       DEPLOY_SAMPLE_MODELS: ${{ inputs.DEPLOY_SAMPLE_MODELS }}
+      DEPLOY_SAMPLE_DATA: true
       AZURE_PRINCIPAL_ID_TYPE: 'ServicePrincipal'
 
     environment: ${{ inputs.ENVIRONMENT }}

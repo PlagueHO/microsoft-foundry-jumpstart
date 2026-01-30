@@ -74,5 +74,6 @@ jobs:
               "location": "${{ inputs.AZURE_LOCATION }}",
               "environmentName": "${{ inputs.AZURE_ENV_NAME }}",
               "azureNetworkIsolation": "${{ inputs.AZURE_NETWORK_ISOLATION }}",
-              "deploySampleModels": "${{ inputs.DEPLOY_SAMPLE_MODELS }}"
+              "deploySampleModels": "${{ inputs.DEPLOY_SAMPLE_MODELS }}",
+              "deploySampleData": "true"
             }

@@ -40,7 +40,7 @@ jobs:
             DEPLOY_SAMPLE_MODELS: 'true'
           - name: project-isolated
             AZURE_NETWORK_ISOLATION: 'true'
-            DEPLOY_SAMPLE_MODELS: 'false'
+            DEPLOY_SAMPLE_MODELS: 'true'
 
     name: E2E Test (${{ matrix.name }})
     uses: ./.github/workflows/e2e-test.yml
