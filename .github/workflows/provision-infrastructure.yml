@@ -76,7 +76,22 @@ jobs:
             --tenant-id "$AZURE_TENANT_ID"
 
       - name: Provision Infrastructure
+        id: provision
+        continue-on-error: true
         run: azd provision --no-prompt
+
+      - name: Cleanup on Provision Failure
+        if: steps.provision.outcome == 'failure'
+        run: |
+          echo "Provisioning failed. Cleaning up partially deployed infrastructure..."
+          azd down --no-prompt --purge --force
+          echo "Cleanup completed."
+
+      - name: Fail if Provision Failed
+        if: steps.provision.outcome == 'failure'
+        run: |
+          echo "::error::Infrastructure provisioning failed. Partial deployment has been cleaned up."
+          exit 1
 
       - name: Get Output Endpoints
         id: get_endpoints

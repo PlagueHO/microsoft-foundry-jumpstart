@@ -2,18 +2,6 @@
   {
     "model": {
       "format": "OpenAI",
-      "name": "gpt-5.2-chat",
-      "version": "2025-12-11"
-    },
-    "name": "gpt-5-chat",
-    "sku": {
-      "name": "GlobalStandard",
-      "capacity": 50
-    }
-  },
-  {
-    "model": {
-      "format": "OpenAI",
       "name": "gpt-5-mini",
       "version": "2025-08-07"
     },
@@ -42,18 +30,6 @@
       "version": "1"
     },
     "name": "text-embedding-3-large",
-    "sku": {
-      "name": "GlobalStandard",
-      "capacity": 150
-    }
-  },  
-  {
-    "model": {
-      "format": "OpenAI",
-      "name": "text-embedding-3-small",
-      "version": "1"
-    },
-    "name": "text-embedding-3-small",
     "sku": {
       "name": "GlobalStandard",
       "capacity": 150
