@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.39.26.7824",
-      "templateHash": "6972770239249945892"
+      "templateHash": "14275439749404706675"
     }
   },
   "definitions": {
@@ -570,30 +570,6 @@
       {
         "model": {
           "format": "OpenAI",
-          "name": "model-router",
-          "version": "2025-05-19"
-        },
-        "name": "model-router",
-        "sku": {
-          "name": "GlobalStandard",
-          "capacity": 100
-        }
-      },
-      {
-        "model": {
-          "format": "OpenAI",
-          "name": "gpt-5-chat",
-          "version": "2025-08-07"
-        },
-        "name": "gpt-5-chat",
-        "sku": {
-          "name": "GlobalStandard",
-          "capacity": 50
-        }
-      },
-      {
-        "model": {
-          "format": "OpenAI",
           "name": "gpt-5-mini",
           "version": "2025-08-07"
         },
@@ -622,18 +598,6 @@
           "version": "1"
         },
         "name": "text-embedding-3-large",
-        "sku": {
-          "name": "GlobalStandard",
-          "capacity": 150
-        }
-      },
-      {
-        "model": {
-          "format": "OpenAI",
-          "name": "text-embedding-3-small",
-          "version": "1"
-        },
-        "name": "text-embedding-3-small",
         "sku": {
           "name": "GlobalStandard",
           "capacity": 150
@@ -6782,7 +6746,7 @@
           "virtualNetworkLinks": {
             "value": [
               {
-                "virtualNetworkResourceId": "[reference('virtualNetwork').outputs.resourceId.value]",
+                "virtualNetworkResourceId": "[tryGet(if(parameters('azureNetworkIsolation'), reference('virtualNetwork'), null()), 'outputs', 'resourceId', 'value')]",
                 "registrationEnabled": false
               }
             ]
@@ -10157,7 +10121,7 @@
           "virtualNetworkLinks": {
             "value": [
               {
-                "virtualNetworkResourceId": "[reference('virtualNetwork').outputs.resourceId.value]",
+                "virtualNetworkResourceId": "[tryGet(if(parameters('azureNetworkIsolation'), reference('virtualNetwork'), null()), 'outputs', 'resourceId', 'value')]",
                 "registrationEnabled": false
               }
             ]
@@ -13532,7 +13496,7 @@
           "virtualNetworkLinks": {
             "value": [
               {
-                "virtualNetworkResourceId": "[reference('virtualNetwork').outputs.resourceId.value]",
+                "virtualNetworkResourceId": "[tryGet(if(parameters('azureNetworkIsolation'), reference('virtualNetwork'), null()), 'outputs', 'resourceId', 'value')]",
                 "registrationEnabled": false
               }
             ]
@@ -16907,7 +16871,7 @@
           "virtualNetworkLinks": {
             "value": [
               {
-                "virtualNetworkResourceId": "[reference('virtualNetwork').outputs.resourceId.value]",
+                "virtualNetworkResourceId": "[tryGet(if(parameters('azureNetworkIsolation'), reference('virtualNetwork'), null()), 'outputs', 'resourceId', 'value')]",
                 "registrationEnabled": false
               }
             ]
@@ -20282,7 +20246,7 @@
           "virtualNetworkLinks": {
             "value": [
               {
-                "virtualNetworkResourceId": "[reference('virtualNetwork').outputs.resourceId.value]",
+                "virtualNetworkResourceId": "[tryGet(if(parameters('azureNetworkIsolation'), reference('virtualNetwork'), null()), 'outputs', 'resourceId', 'value')]",
                 "registrationEnabled": false
               }
             ]
@@ -23657,7 +23621,7 @@
           "virtualNetworkLinks": {
             "value": [
               {
-                "virtualNetworkResourceId": "[reference('virtualNetwork').outputs.resourceId.value]",
+                "virtualNetworkResourceId": "[tryGet(if(parameters('azureNetworkIsolation'), reference('virtualNetwork'), null()), 'outputs', 'resourceId', 'value')]",
                 "registrationEnabled": false
               }
             ]
@@ -27074,7 +27038,7 @@
               "defaultAction": "[variables('networkDefaultAction')]"
             }
           },
-          "privateEndpoints": "[if(parameters('azureNetworkIsolation'), createObject('value', createArray(createObject('privateDnsZoneGroup', createObject('privateDnsZoneGroupConfigs', createArray(createObject('privateDnsZoneResourceId', reference('storageBlobPrivateDnsZone').outputs.resourceId.value))), 'service', 'blob', 'subnetResourceId', reference('virtualNetwork').outputs.subnetResourceIds.value[3], 'tags', variables('tags')))), createObject('value', createArray()))]",
+          "privateEndpoints": "[if(parameters('azureNetworkIsolation'), createObject('value', createArray(createObject('privateDnsZoneGroup', createObject('privateDnsZoneGroupConfigs', createArray(createObject('privateDnsZoneResourceId', tryGet(if(and(parameters('deploySampleData'), parameters('azureNetworkIsolation')), reference('storageBlobPrivateDnsZone'), null()), 'outputs', 'resourceId', 'value')))), 'service', 'blob', 'subnetResourceId', tryGet(if(parameters('azureNetworkIsolation'), reference('virtualNetwork'), null()), 'outputs', 'subnetResourceIds', 'value', 3), 'tags', variables('tags')))), createObject('value', createArray()))]",
           "sasExpirationPeriod": {
             "value": "180.00:00:00"
           },
@@ -35000,7 +34964,7 @@
             "value": "[variables('sampleDataStorageAccountName')]"
           },
           "roleAssignments": {
-            "value": "[flatten(createArray(createArray(createObject('roleDefinitionIdOrName', 'Storage Blob Data Contributor', 'principalType', 'ServicePrincipal', 'principalId', coalesce(tryGet(tryGet(reference('foundryService').outputs, 'systemAssignedMIPrincipalId'), 'value'), ''))), if(parameters('azureAiSearchDeploy'), createArray(createObject('roleDefinitionIdOrName', 'Storage Blob Data Contributor', 'principalType', 'ServicePrincipal', 'principalId', coalesce(tryGet(tryGet(reference('aiSearchService').outputs, 'systemAssignedMIPrincipalId'), 'value'), ''))), createArray()), if(not(empty(parameters('principalId'))), createArray(createObject('roleDefinitionIdOrName', 'Storage Blob Data Contributor', 'principalType', parameters('principalIdType'), 'principalId', parameters('principalId')), createObject('roleDefinitionIdOrName', 'Storage Blob Data Reader', 'principalType', parameters('principalIdType'), 'principalId', parameters('principalId')), createObject('roleDefinitionIdOrName', 'Storage Account Contributor', 'principalType', parameters('principalIdType'), 'principalId', parameters('principalId'))), createArray())))]"
+            "value": "[flatten(createArray(createArray(createObject('roleDefinitionIdOrName', 'Storage Blob Data Contributor', 'principalType', 'ServicePrincipal', 'principalId', coalesce(tryGet(tryGet(reference('foundryService').outputs, 'systemAssignedMIPrincipalId'), 'value'), ''))), if(parameters('azureAiSearchDeploy'), createArray(createObject('roleDefinitionIdOrName', 'Storage Blob Data Contributor', 'principalType', 'ServicePrincipal', 'principalId', coalesce(tryGet(tryGet(tryGet(if(parameters('azureAiSearchDeploy'), reference('aiSearchService'), null()), 'outputs'), 'systemAssignedMIPrincipalId'), 'value'), ''))), createArray()), if(not(empty(parameters('principalId'))), createArray(createObject('roleDefinitionIdOrName', 'Storage Blob Data Contributor', 'principalType', parameters('principalIdType'), 'principalId', parameters('principalId')), createObject('roleDefinitionIdOrName', 'Storage Blob Data Reader', 'principalType', parameters('principalIdType'), 'principalId', parameters('principalId')), createObject('roleDefinitionIdOrName', 'Storage Account Contributor', 'principalType', parameters('principalIdType'), 'principalId', parameters('principalId'))), createArray())))]"
           }
         },
         "template": {
@@ -35254,7 +35218,7 @@
               }
             }
           },
-          "privateEndpoints": "[if(parameters('azureNetworkIsolation'), createObject('value', createArray(createObject('privateDnsZoneGroup', createObject('privateDnsZoneGroupConfigs', createArray(createObject('privateDnsZoneResourceId', reference('aiSearchPrivateDnsZone').outputs.resourceId.value))), 'subnetResourceId', reference('virtualNetwork').outputs.subnetResourceIds.value[2], 'tags', variables('tags')))), createObject('value', createArray()))]",
+          "privateEndpoints": "[if(parameters('azureNetworkIsolation'), createObject('value', createArray(createObject('privateDnsZoneGroup', createObject('privateDnsZoneGroupConfigs', createArray(createObject('privateDnsZoneResourceId', tryGet(if(and(parameters('azureNetworkIsolation'), parameters('azureAiSearchDeploy')), reference('aiSearchPrivateDnsZone'), null()), 'outputs', 'resourceId', 'value')))), 'subnetResourceId', tryGet(if(parameters('azureNetworkIsolation'), reference('virtualNetwork'), null()), 'outputs', 'subnetResourceIds', 'value', 2), 'tags', variables('tags')))), createObject('value', createArray()))]",
           "publicNetworkAccess": "[if(parameters('azureNetworkIsolation'), createObject('value', 'Disabled'), createObject('value', 'Enabled'))]",
           "semanticSearch": {
             "value": "standard"
@@ -37552,7 +37516,7 @@
               "virtualNetworkRules": []
             }
           },
-          "privateEndpoints": "[if(parameters('azureNetworkIsolation'), createObject('value', createArray(createObject('privateDnsZoneGroup', createObject('privateDnsZoneGroupConfigs', createArray(createObject('privateDnsZoneResourceId', reference('cosmosDbPrivateDnsZone').outputs.resourceId.value))), 'service', 'Sql', 'subnetResourceId', reference('virtualNetwork').outputs.subnetResourceIds.value[2], 'tags', variables('tags')))), createObject('value', createArray()))]",
+          "privateEndpoints": "[if(parameters('azureNetworkIsolation'), createObject('value', createArray(createObject('privateDnsZoneGroup', createObject('privateDnsZoneGroupConfigs', createArray(createObject('privateDnsZoneResourceId', tryGet(if(and(parameters('azureNetworkIsolation'), parameters('cosmosDbDeploy')), reference('cosmosDbPrivateDnsZone'), null()), 'outputs', 'resourceId', 'value')))), 'service', 'Sql', 'subnetResourceId', tryGet(if(parameters('azureNetworkIsolation'), reference('virtualNetwork'), null()), 'outputs', 'subnetResourceIds', 'value', 2), 'tags', variables('tags')))), createObject('value', createArray()))]",
           "sqlDatabases": {
             "value": [
               {
@@ -43491,7 +43455,7 @@
             }
           },
           "networkAcls": "[if(parameters('azureNetworkIsolation'), createObject('value', createObject('defaultAction', 'Deny', 'ipRules', variables('foundryIpRules'), 'virtualNetworkRules', createArray())), createObject('value', createObject('defaultAction', 'Allow', 'ipRules', createArray(), 'virtualNetworkRules', createArray())))]",
-          "privateEndpoints": "[if(parameters('azureNetworkIsolation'), createObject('value', createArray(createObject('privateDnsZoneGroup', createObject('privateDnsZoneGroupConfigs', createArray(createObject('privateDnsZoneResourceId', reference('aiServicesPrivateDnsZone').outputs.resourceId.value), createObject('privateDnsZoneResourceId', reference('aiServicesOpenAiDnsZone').outputs.resourceId.value), createObject('privateDnsZoneResourceId', reference('aiServicesAiDnsZone').outputs.resourceId.value))), 'service', 'account', 'subnetResourceId', reference('virtualNetwork').outputs.subnetResourceIds.value[1]))), createObject('value', createArray()))]",
+          "privateEndpoints": "[if(parameters('azureNetworkIsolation'), createObject('value', createArray(createObject('privateDnsZoneGroup', createObject('privateDnsZoneGroupConfigs', createArray(createObject('privateDnsZoneResourceId', tryGet(if(parameters('azureNetworkIsolation'), reference('aiServicesPrivateDnsZone'), null()), 'outputs', 'resourceId', 'value')), createObject('privateDnsZoneResourceId', tryGet(if(parameters('azureNetworkIsolation'), reference('aiServicesOpenAiDnsZone'), null()), 'outputs', 'resourceId', 'value')), createObject('privateDnsZoneResourceId', tryGet(if(parameters('azureNetworkIsolation'), reference('aiServicesAiDnsZone'), null()), 'outputs', 'resourceId', 'value')))), 'service', 'account', 'subnetResourceId', tryGet(if(parameters('azureNetworkIsolation'), reference('virtualNetwork'), null()), 'outputs', 'subnetResourceIds', 'value', 1)))), createObject('value', createArray()))]",
           "restrictOutboundNetworkAccess": {
             "value": "[parameters('azureNetworkIsolation')]"
           },
@@ -43501,7 +43465,7 @@
           },
           "deployments": "[if(parameters('deploySampleModels'), createObject('value', variables('sampleModelDeployments')), createObject('value', createArray()))]",
           "connections": {
-            "value": "[concat(if(parameters('azureAiSearchDeploy'), createArray(createObject('category', 'CognitiveSearch', 'connectionProperties', createObject('authType', 'AAD'), 'metadata', createObject('Type', 'azure_ai_search', 'ApiType', 'Azure', 'ApiVersion', '2024-05-01-preview', 'DeploymentApiVersion', '2023-11-01', 'Location', parameters('location'), 'ResourceId', reference('aiSearchService').outputs.resourceId.value), 'name', replace(variables('aiSearchServiceName'), '-', ''), 'target', reference('aiSearchService').outputs.endpoint.value, 'isSharedToAll', true())), createArray()), if(parameters('deploySampleData'), createArray(createObject('category', 'AzureBlob', 'connectionProperties', createObject('authType', 'AAD'), 'metadata', createObject('Type', 'azure_storage_account', 'ApiType', 'Azure', 'ApiVersion', '2023-10-01', 'DeploymentApiVersion', '2023-10-01', 'Location', parameters('location'), 'ResourceId', reference('sampleDataStorageAccount').outputs.resourceId.value, 'AccountName', variables('sampleDataStorageAccountName'), 'ContainerName', 'default'), 'name', replace(variables('sampleDataStorageAccountName'), '-', ''), 'target', reference('sampleDataStorageAccount').outputs.primaryBlobEndpoint.value, 'isSharedToAll', true())), createArray()), if(parameters('cosmosDbDeploy'), createArray(createObject('category', 'CosmosDb', 'connectionProperties', createObject('authType', 'AAD'), 'metadata', createObject('Type', 'azure_cosmos_db', 'ApiType', 'Azure', 'ApiVersion', '2024-05-15', 'DeploymentApiVersion', '2024-05-15', 'Location', parameters('location'), 'ResourceId', reference('cosmosDbAccount').outputs.resourceId.value, 'AccountName', variables('cosmosDbAccountName'), 'DatabaseName', 'AgentThreads'), 'name', replace(variables('cosmosDbAccountName'), '-', ''), 'target', reference('cosmosDbAccount').outputs.endpoint.value, 'isSharedToAll', true())), createArray()))]"
+            "value": "[concat(if(parameters('azureAiSearchDeploy'), createArray(createObject('category', 'CognitiveSearch', 'connectionProperties', createObject('authType', 'AAD'), 'metadata', createObject('Type', 'azure_ai_search', 'ApiType', 'Azure', 'ApiVersion', '2024-05-01-preview', 'DeploymentApiVersion', '2023-11-01', 'Location', parameters('location'), 'ResourceId', tryGet(if(parameters('azureAiSearchDeploy'), reference('aiSearchService'), null()), 'outputs', 'resourceId', 'value')), 'name', replace(variables('aiSearchServiceName'), '-', ''), 'target', tryGet(if(parameters('azureAiSearchDeploy'), reference('aiSearchService'), null()), 'outputs', 'endpoint', 'value'), 'isSharedToAll', true())), createArray()), if(parameters('deploySampleData'), createArray(createObject('category', 'AzureBlob', 'connectionProperties', createObject('authType', 'AAD'), 'metadata', createObject('Type', 'azure_storage_account', 'ApiType', 'Azure', 'ApiVersion', '2023-10-01', 'DeploymentApiVersion', '2023-10-01', 'Location', parameters('location'), 'ResourceId', tryGet(if(parameters('deploySampleData'), reference('sampleDataStorageAccount'), null()), 'outputs', 'resourceId', 'value'), 'AccountName', variables('sampleDataStorageAccountName'), 'ContainerName', 'default'), 'name', replace(variables('sampleDataStorageAccountName'), '-', ''), 'target', tryGet(if(parameters('deploySampleData'), reference('sampleDataStorageAccount'), null()), 'outputs', 'primaryBlobEndpoint', 'value'), 'isSharedToAll', true())), createArray()), if(parameters('cosmosDbDeploy'), createArray(createObject('category', 'CosmosDb', 'connectionProperties', createObject('authType', 'AAD'), 'metadata', createObject('Type', 'azure_cosmos_db', 'ApiType', 'Azure', 'ApiVersion', '2024-05-15', 'DeploymentApiVersion', '2024-05-15', 'Location', parameters('location'), 'ResourceId', tryGet(if(parameters('cosmosDbDeploy'), reference('cosmosDbAccount'), null()), 'outputs', 'resourceId', 'value'), 'AccountName', variables('cosmosDbAccountName'), 'DatabaseName', 'AgentThreads'), 'name', replace(variables('cosmosDbAccountName'), '-', ''), 'target', tryGet(if(parameters('cosmosDbDeploy'), reference('cosmosDbAccount'), null()), 'outputs', 'endpoint', 'value'), 'isSharedToAll', true())), createArray()))]"
           },
           "capabilityHosts": {
             "value": "[variables('effectiveCapabilityHosts')]"
@@ -43521,7 +43485,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.39.26.7824",
-              "templateHash": "16814933458434939927"
+              "templateHash": "10956327944995831610"
             },
             "name": "Cognitive Services",
             "description": "This module deploys a Cognitive Service account.\nThis is a temporary module for deploying Azure Foundry Cognitive Services accounts.\nIt is intended to be replaced by the Azure Verified Module (AVM) for Microsoft.CognitiveServices accounts\nonce it supports Foundry V2 (projects, connections etc)\nhttps://github.com/Azure/bicep-registry-modules/issues/5390\n"
@@ -45752,7 +45716,7 @@
                 "allowedFqdnList": "[parameters('allowedFqdnList')]",
                 "apiProperties": "[parameters('apiProperties')]",
                 "disableLocalAuth": "[parameters('disableLocalAuth')]",
-                "encryption": "[if(not(empty(parameters('customerManagedKey'))), createObject('keySource', 'Microsoft.KeyVault', 'keyVaultProperties', createObject('identityClientId', if(not(empty(coalesce(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'), ''))), reference('cMKUserAssignedIdentity').clientId, null()), 'keyVaultUri', reference('cMKKeyVault').vaultUri, 'keyName', parameters('customerManagedKey').keyName, 'keyVersion', if(not(empty(coalesce(tryGet(parameters('customerManagedKey'), 'keyVersion'), ''))), tryGet(parameters('customerManagedKey'), 'keyVersion'), last(split(reference('cMKKeyVault::cMKKey').keyUriWithVersion, '/'))))), null())]",
+                "encryption": "[if(not(empty(parameters('customerManagedKey'))), createObject('keySource', 'Microsoft.KeyVault', 'keyVaultProperties', createObject('identityClientId', if(not(empty(coalesce(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'), ''))), tryGet(if(not(empty(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'))), reference('cMKUserAssignedIdentity', '2023-01-31', 'full'), null()), 'properties', 'clientId'), null()), 'keyVaultUri', tryGet(if(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), reference('cMKKeyVault', '2023-07-01', 'full'), null()), 'properties', 'vaultUri'), 'keyName', parameters('customerManagedKey').keyName, 'keyVersion', if(not(empty(coalesce(tryGet(parameters('customerManagedKey'), 'keyVersion'), ''))), tryGet(parameters('customerManagedKey'), 'keyVersion'), last(split(tryGet(if(and(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), and(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), not(empty(tryGet(parameters('customerManagedKey'), 'keyName'))))), reference('cMKKeyVault::cMKKey', '2023-07-01', 'full'), null()), 'properties', 'keyUriWithVersion'), '/'))))), null())]",
                 "migrationToken": "[parameters('migrationToken')]",
                 "restore": "[parameters('restore')]",
                 "restrictOutboundNetworkAccess": "[parameters('restrictOutboundNetworkAccess')]",
@@ -49207,7 +49171,7 @@
               "metadata": {
                 "description": "A hashtable of references to the secrets exported to the provided Key Vault. The key of each reference is each secret's name."
               },
-              "value": "[if(not(equals(parameters('secretsExportConfiguration'), null())), toObject(reference('secretsExport').outputs.secretsSet.value, lambda('secret', last(split(lambdaVariables('secret').secretResourceId, '/'))), lambda('secret', lambdaVariables('secret'))), createObject())]"
+              "value": "[if(not(equals(parameters('secretsExportConfiguration'), null())), toObject(tryGet(if(not(equals(parameters('secretsExportConfiguration'), null())), reference('secretsExport'), null()), 'outputs', 'secretsSet', 'value'), lambda('secret', last(split(lambdaVariables('secret').secretResourceId, '/'))), lambda('secret', lambdaVariables('secret'))), createObject())]"
             },
             "privateEndpoints": {
               "type": "array",
@@ -49291,7 +49255,7 @@
             "value": "[variables('foundryServiceName')]"
           },
           "roleAssignments": {
-            "value": "[flatten(createArray(if(parameters('azureAiSearchDeploy'), createArray(createObject('roleDefinitionIdOrName', 'Cognitive Services Contributor', 'principalType', 'ServicePrincipal', 'principalId', tryGet(tryGet(reference('aiSearchService').outputs, 'systemAssignedMIPrincipalId'), 'value')), createObject('roleDefinitionIdOrName', 'Cognitive Services OpenAI Contributor', 'principalType', 'ServicePrincipal', 'principalId', tryGet(tryGet(reference('aiSearchService').outputs, 'systemAssignedMIPrincipalId'), 'value'))), createArray()), if(not(empty(parameters('principalId'))), createArray(createObject('roleDefinitionIdOrName', 'Contributor', 'principalType', parameters('principalIdType'), 'principalId', parameters('principalId')), createObject('roleDefinitionIdOrName', 'Cognitive Services OpenAI Contributor', 'principalType', parameters('principalIdType'), 'principalId', parameters('principalId'))), createArray())))]"
+            "value": "[flatten(createArray(if(parameters('azureAiSearchDeploy'), createArray(createObject('roleDefinitionIdOrName', 'Cognitive Services Contributor', 'principalType', 'ServicePrincipal', 'principalId', tryGet(tryGet(tryGet(if(parameters('azureAiSearchDeploy'), reference('aiSearchService'), null()), 'outputs'), 'systemAssignedMIPrincipalId'), 'value')), createObject('roleDefinitionIdOrName', 'Cognitive Services OpenAI Contributor', 'principalType', 'ServicePrincipal', 'principalId', tryGet(tryGet(tryGet(if(parameters('azureAiSearchDeploy'), reference('aiSearchService'), null()), 'outputs'), 'systemAssignedMIPrincipalId'), 'value'))), createArray()), if(not(empty(parameters('principalId'))), createArray(createObject('roleDefinitionIdOrName', 'Contributor', 'principalType', parameters('principalIdType'), 'principalId', parameters('principalId')), createObject('roleDefinitionIdOrName', 'Cognitive Services OpenAI Contributor', 'principalType', parameters('principalIdType'), 'principalId', parameters('principalId'))), createArray())))]"
           }
         },
         "template": {
@@ -49731,7 +49695,7 @@
             "value": "[parameters('location')]"
           },
           "virtualNetworkResourceId": {
-            "value": "[reference('virtualNetwork').outputs.resourceId.value]"
+            "value": "[tryGet(if(parameters('azureNetworkIsolation'), reference('virtualNetwork'), null()), 'outputs', 'resourceId', 'value')]"
           },
           "skuName": {
             "value": "Developer"
@@ -51476,23 +51440,23 @@
     },
     "AZURE_VIRTUAL_NETWORK_NAME": {
       "type": "string",
-      "value": "[if(parameters('azureNetworkIsolation'), reference('virtualNetwork').outputs.name.value, '')]"
+      "value": "[if(parameters('azureNetworkIsolation'), tryGet(if(parameters('azureNetworkIsolation'), reference('virtualNetwork'), null()), 'outputs', 'name', 'value'), '')]"
     },
     "AZURE_VIRTUAL_NETWORK_RESOURCE_ID": {
       "type": "string",
-      "value": "[if(parameters('azureNetworkIsolation'), reference('virtualNetwork').outputs.resourceId.value, '')]"
+      "value": "[if(parameters('azureNetworkIsolation'), tryGet(if(parameters('azureNetworkIsolation'), reference('virtualNetwork'), null()), 'outputs', 'resourceId', 'value'), '')]"
     },
     "AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME": {
       "type": "string",
-      "value": "[if(parameters('deploySampleData'), reference('sampleDataStorageAccount').outputs.name.value, '')]"
+      "value": "[if(parameters('deploySampleData'), tryGet(if(parameters('deploySampleData'), reference('sampleDataStorageAccount'), null()), 'outputs', 'name', 'value'), '')]"
     },
     "AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_RESOURCE_ID": {
       "type": "string",
-      "value": "[if(parameters('deploySampleData'), reference('sampleDataStorageAccount').outputs.resourceId.value, '')]"
+      "value": "[if(parameters('deploySampleData'), tryGet(if(parameters('deploySampleData'), reference('sampleDataStorageAccount'), null()), 'outputs', 'resourceId', 'value'), '')]"
     },
     "AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_BLOB_ENDPOINT": {
       "type": "string",
-      "value": "[if(parameters('deploySampleData'), reference('sampleDataStorageAccount').outputs.primaryBlobEndpoint.value, '')]"
+      "value": "[if(parameters('deploySampleData'), tryGet(if(parameters('deploySampleData'), reference('sampleDataStorageAccount'), null()), 'outputs', 'primaryBlobEndpoint', 'value'), '')]"
     },
     "AZURE_DISABLE_API_KEYS": {
       "type": "bool",
@@ -51500,11 +51464,11 @@
     },
     "AZURE_AI_SEARCH_NAME": {
       "type": "string",
-      "value": "[if(parameters('azureAiSearchDeploy'), reference('aiSearchService').outputs.name.value, '')]"
+      "value": "[if(parameters('azureAiSearchDeploy'), tryGet(if(parameters('azureAiSearchDeploy'), reference('aiSearchService'), null()), 'outputs', 'name', 'value'), '')]"
     },
     "AZURE_AI_SEARCH_ID": {
       "type": "string",
-      "value": "[if(parameters('azureAiSearchDeploy'), reference('aiSearchService').outputs.resourceId.value, '')]"
+      "value": "[if(parameters('azureAiSearchDeploy'), tryGet(if(parameters('azureAiSearchDeploy'), reference('aiSearchService'), null()), 'outputs', 'resourceId', 'value'), '')]"
     },
     "MICROSOFT_FOUNDRY_NAME": {
       "type": "string",
@@ -51556,15 +51520,15 @@
     },
     "COSMOS_DB_NAME": {
       "type": "string",
-      "value": "[if(parameters('cosmosDbDeploy'), reference('cosmosDbAccount').outputs.name.value, '')]"
+      "value": "[if(parameters('cosmosDbDeploy'), tryGet(if(parameters('cosmosDbDeploy'), reference('cosmosDbAccount'), null()), 'outputs', 'name', 'value'), '')]"
     },
     "COSMOS_DB_ID": {
       "type": "string",
-      "value": "[if(parameters('cosmosDbDeploy'), reference('cosmosDbAccount').outputs.resourceId.value, '')]"
+      "value": "[if(parameters('cosmosDbDeploy'), tryGet(if(parameters('cosmosDbDeploy'), reference('cosmosDbAccount'), null()), 'outputs', 'resourceId', 'value'), '')]"
     },
     "COSMOS_DB_ENDPOINT": {
       "type": "string",
-      "value": "[if(parameters('cosmosDbDeploy'), reference('cosmosDbAccount').outputs.endpoint.value, '')]"
+      "value": "[if(parameters('cosmosDbDeploy'), tryGet(if(parameters('cosmosDbDeploy'), reference('cosmosDbAccount'), null()), 'outputs', 'endpoint', 'value'), '')]"
     },
     "AZURE_AI_SEARCH_CAPABILITY_HOST": {
       "type": "bool",
@@ -51580,11 +51544,11 @@
     },
     "AZURE_BASTION_HOST_NAME": {
       "type": "string",
-      "value": "[if(and(parameters('bastionHostDeploy'), parameters('azureNetworkIsolation')), reference('bastionHost').outputs.name.value, '')]"
+      "value": "[if(and(parameters('bastionHostDeploy'), parameters('azureNetworkIsolation')), tryGet(if(and(parameters('bastionHostDeploy'), parameters('azureNetworkIsolation')), reference('bastionHost'), null()), 'outputs', 'name', 'value'), '')]"
     },
     "AZURE_BASTION_HOST_RESOURCE_ID": {
       "type": "string",
-      "value": "[if(and(parameters('bastionHostDeploy'), parameters('azureNetworkIsolation')), reference('bastionHost').outputs.resourceId.value, '')]"
+      "value": "[if(and(parameters('bastionHostDeploy'), parameters('azureNetworkIsolation')), tryGet(if(and(parameters('bastionHostDeploy'), parameters('azureNetworkIsolation')), reference('bastionHost'), null()), 'outputs', 'resourceId', 'value'), '')]"
     }
   }
 }

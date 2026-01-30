@@ -304,7 +304,7 @@ module storageBlobPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8
     tags: tags
     virtualNetworkLinks: [
       {
-        virtualNetworkResourceId: virtualNetwork.outputs.resourceId
+        virtualNetworkResourceId: virtualNetwork.?outputs.resourceId!
         registrationEnabled: false
       }
     ]
@@ -322,7 +322,7 @@ module aiSearchPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0'
     tags: tags
     virtualNetworkLinks: [
       {
-        virtualNetworkResourceId: virtualNetwork.outputs.resourceId
+        virtualNetworkResourceId: virtualNetwork.?outputs.resourceId!
         registrationEnabled: false
       }
     ]
@@ -340,7 +340,7 @@ module aiServicesPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.
     tags: tags
     virtualNetworkLinks: [
       {
-        virtualNetworkResourceId: virtualNetwork.outputs.resourceId
+        virtualNetworkResourceId: virtualNetwork.?outputs.resourceId!
         registrationEnabled: false
       }
     ]
@@ -357,7 +357,7 @@ module aiServicesOpenAiDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0
     tags: tags
     virtualNetworkLinks: [
       {
-        virtualNetworkResourceId: virtualNetwork.outputs.resourceId
+        virtualNetworkResourceId: virtualNetwork.?outputs.resourceId!
         registrationEnabled: false
       }
     ]
@@ -374,7 +374,7 @@ module aiServicesAiDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0' = 
     tags: tags
     virtualNetworkLinks: [
       {
-        virtualNetworkResourceId: virtualNetwork.outputs.resourceId
+        virtualNetworkResourceId: virtualNetwork.?outputs.resourceId!
         registrationEnabled: false
       }
     ]
@@ -392,7 +392,7 @@ module cosmosDbPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0'
     tags: tags
     virtualNetworkLinks: [
       {
-        virtualNetworkResourceId: virtualNetwork.outputs.resourceId
+        virtualNetworkResourceId: virtualNetwork.?outputs.resourceId!
         registrationEnabled: false
       }
     ]
@@ -442,12 +442,12 @@ module sampleDataStorageAccount 'br/public:avm/res/storage/storage-account:0.31.
         privateDnsZoneGroup: {
           privateDnsZoneGroupConfigs: [
             {
-              privateDnsZoneResourceId: storageBlobPrivateDnsZone.outputs.resourceId
+              privateDnsZoneResourceId: storageBlobPrivateDnsZone.?outputs.resourceId!
             }
           ]
         }
         service: 'blob'
-        subnetResourceId: virtualNetwork.outputs.subnetResourceIds[3] // Data subnet
+        subnetResourceId: virtualNetwork.?outputs.subnetResourceIds[3]! // Data subnet
         tags: tags
       }
     ] : []
@@ -476,7 +476,7 @@ module sampleDataStorageAccountRoles './core/security/role_storageaccount.bicep'
         {
           roleDefinitionIdOrName: 'Storage Blob Data Contributor'
           principalType: 'ServicePrincipal'
-          principalId: aiSearchService.outputs.?systemAssignedMIPrincipalId ?? ''
+          principalId: aiSearchService.?outputs.?systemAssignedMIPrincipalId ?? ''
         }
       ] : [])
       // Developer role assignments
@@ -537,11 +537,11 @@ module aiSearchService 'br/public:avm/res/search/search-service:0.12.0' = if (az
         privateDnsZoneGroup: {
           privateDnsZoneGroupConfigs: [
             {
-              privateDnsZoneResourceId: aiSearchPrivateDnsZone.outputs.resourceId
+              privateDnsZoneResourceId: aiSearchPrivateDnsZone.?outputs.resourceId!
             }
           ]
         }
-        subnetResourceId: virtualNetwork.outputs.subnetResourceIds[2] // Capability Hosts
+        subnetResourceId: virtualNetwork.?outputs.subnetResourceIds[2]! // Capability Hosts
         tags: tags
       }
     ] : []
@@ -630,12 +630,12 @@ module cosmosDbAccount 'br/public:avm/res/document-db/database-account:0.18.0' =
         privateDnsZoneGroup: {
           privateDnsZoneGroupConfigs: [
             {
-              privateDnsZoneResourceId: cosmosDbPrivateDnsZone.outputs.resourceId
+              privateDnsZoneResourceId: cosmosDbPrivateDnsZone.?outputs.resourceId!
             }
           ]
         }
         service: 'Sql'
-        subnetResourceId: virtualNetwork.outputs.subnetResourceIds[2] // Capability Hosts subnet
+        subnetResourceId: virtualNetwork.?outputs.subnetResourceIds[2]! // Capability Hosts subnet
         tags: tags
       }
     ] : []
@@ -673,11 +673,11 @@ var foundryServiceConnections = concat(azureAiSearchDeploy ? [
       ApiVersion: '2024-05-01-preview'
       DeploymentApiVersion: '2023-11-01'
       Location: location
-      ResourceId: aiSearchService.outputs.resourceId
+      ResourceId: aiSearchService.?outputs.resourceId!
     }
     // Full aiSearchServiceName can't be used because may cause deployment name to be too long
     name: replace(aiSearchServiceName,'-','')
-    target: aiSearchService.outputs.endpoint
+    target: aiSearchService.?outputs.endpoint!
     isSharedToAll: true
   }
 ] : [], (deploySampleData) ? [
@@ -693,12 +693,12 @@ var foundryServiceConnections = concat(azureAiSearchDeploy ? [
       ApiVersion: '2023-10-01'
       DeploymentApiVersion: '2023-10-01'
       Location: location
-      ResourceId: sampleDataStorageAccount.outputs.resourceId
+      ResourceId: sampleDataStorageAccount.?outputs.resourceId!
       AccountName: sampleDataStorageAccountName
       ContainerName: 'default'
     }
     name: replace(sampleDataStorageAccountName,'-','')
-    target: sampleDataStorageAccount.outputs.primaryBlobEndpoint
+    target: sampleDataStorageAccount.?outputs.primaryBlobEndpoint!
     isSharedToAll: true
   }
 ] : [], cosmosDbDeploy ? [
@@ -714,12 +714,12 @@ var foundryServiceConnections = concat(azureAiSearchDeploy ? [
       ApiVersion: '2024-05-15'
       DeploymentApiVersion: '2024-05-15'
       Location: location
-      ResourceId: cosmosDbAccount.outputs.resourceId
+      ResourceId: cosmosDbAccount.?outputs.resourceId!
       AccountName: cosmosDbAccountName
       DatabaseName: 'AgentThreads'
     }
     name: replace(cosmosDbAccountName,'-','')
-    target: cosmosDbAccount.outputs.endpoint
+    target: cosmosDbAccount.?outputs.endpoint!
     isSharedToAll: true
   }
 ] : [])
@@ -791,18 +791,18 @@ module foundryService './cognitive-services/accounts/main.bicep' = {
         privateDnsZoneGroup: {
           privateDnsZoneGroupConfigs: [
             {
-              privateDnsZoneResourceId: aiServicesPrivateDnsZone.outputs.resourceId
+              privateDnsZoneResourceId: aiServicesPrivateDnsZone.?outputs.resourceId!
             }
             {
-              privateDnsZoneResourceId: aiServicesOpenAiDnsZone.outputs.resourceId
+              privateDnsZoneResourceId: aiServicesOpenAiDnsZone.?outputs.resourceId!
             }
             {
-              privateDnsZoneResourceId: aiServicesAiDnsZone.outputs.resourceId
+              privateDnsZoneResourceId: aiServicesAiDnsZone.?outputs.resourceId!
             }
           ]
         }
         service: 'account'
-        subnetResourceId: virtualNetwork.outputs.subnetResourceIds[1] // AiServices Subnet
+        subnetResourceId: virtualNetwork.?outputs.subnetResourceIds[1]! // AiServices Subnet
       }
     ] : []
     restrictOutboundNetworkAccess: azureNetworkIsolation
@@ -825,12 +825,12 @@ var foundryRoleAssignmentsArray = [
     {
       roleDefinitionIdOrName: 'Cognitive Services Contributor'
       principalType: 'ServicePrincipal'
-      principalId: aiSearchService.outputs.?systemAssignedMIPrincipalId
+      principalId: aiSearchService.?outputs.?systemAssignedMIPrincipalId
     }
     {
       roleDefinitionIdOrName: 'Cognitive Services OpenAI Contributor'
       principalType: 'ServicePrincipal'
-      principalId: aiSearchService.outputs.?systemAssignedMIPrincipalId
+      principalId: aiSearchService.?outputs.?systemAssignedMIPrincipalId
     }
   ] : [])
   // Developer role assignments
@@ -895,7 +895,7 @@ module bastionHost 'br/public:avm/res/network/bastion-host:0.8.2' = if (bastionH
   params: {
     name: bastionHostName
     location: location
-    virtualNetworkResourceId: virtualNetwork.outputs.resourceId
+    virtualNetworkResourceId: virtualNetwork.?outputs.resourceId!
     skuName: 'Developer'
     tags: tags
   }
@@ -915,18 +915,18 @@ output APPLICATION_INSIGHTS_INSTRUMENTATION_KEY string = applicationInsights.out
 
 // Output the network isolation resources
 output AZURE_NETWORK_ISOLATION bool = azureNetworkIsolation
-output AZURE_VIRTUAL_NETWORK_NAME string = azureNetworkIsolation ? virtualNetwork.outputs.name : ''
-output AZURE_VIRTUAL_NETWORK_RESOURCE_ID string = azureNetworkIsolation ? virtualNetwork.outputs.resourceId : ''
+output AZURE_VIRTUAL_NETWORK_NAME string = azureNetworkIsolation ? virtualNetwork.?outputs.name! : ''
+output AZURE_VIRTUAL_NETWORK_RESOURCE_ID string = azureNetworkIsolation ? virtualNetwork.?outputs.resourceId! : ''
 
 // Output the supporting resources
-output AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME string = deploySampleData ? sampleDataStorageAccount.outputs.name : ''
-output AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_RESOURCE_ID string = deploySampleData ? sampleDataStorageAccount.outputs.resourceId : ''
-output AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_BLOB_ENDPOINT string = deploySampleData ? sampleDataStorageAccount.outputs.primaryBlobEndpoint : ''
+output AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME string = deploySampleData ? sampleDataStorageAccount.?outputs.name! : ''
+output AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_RESOURCE_ID string = deploySampleData ? sampleDataStorageAccount.?outputs.resourceId! : ''
+output AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_BLOB_ENDPOINT string = deploySampleData ? sampleDataStorageAccount.?outputs.primaryBlobEndpoint! : ''
 
 // Output the AI resources
 output AZURE_DISABLE_API_KEYS bool = disableApiKeys
-output AZURE_AI_SEARCH_NAME string = azureAiSearchDeploy ? aiSearchService.outputs.name : ''
-output AZURE_AI_SEARCH_ID   string = azureAiSearchDeploy ? aiSearchService.outputs.resourceId : ''
+output AZURE_AI_SEARCH_NAME string = azureAiSearchDeploy ? aiSearchService.?outputs.name! : ''
+output AZURE_AI_SEARCH_ID   string = azureAiSearchDeploy ? aiSearchService.?outputs.resourceId! : ''
 output MICROSOFT_FOUNDRY_NAME string = foundryService.outputs.name
 output MICROSOFT_FOUNDRY_ID string = foundryService.outputs.resourceId
 output MICROSOFT_FOUNDRY_ENDPOINT string = foundryService.outputs.endpoint
@@ -943,9 +943,9 @@ output MICROSOFT_FOUNDRY_CAPABILITY_HOSTS array = foundryService.outputs.capabil
 // Output the Cosmos DB resources
 output COSMOS_DB_DEPLOY bool = cosmosDbDeploy
 output COSMOS_DB_CAPABILITY_HOST bool = cosmosDbCapabilityHost
-output COSMOS_DB_NAME string = cosmosDbDeploy ? cosmosDbAccount.outputs.name : ''
-output COSMOS_DB_ID string = cosmosDbDeploy ? cosmosDbAccount.outputs.resourceId : ''
-output COSMOS_DB_ENDPOINT string = cosmosDbDeploy ? cosmosDbAccount.outputs.endpoint : ''
+output COSMOS_DB_NAME string = cosmosDbDeploy ? cosmosDbAccount.?outputs.name! : ''
+output COSMOS_DB_ID string = cosmosDbDeploy ? cosmosDbAccount.?outputs.resourceId! : ''
+output COSMOS_DB_ENDPOINT string = cosmosDbDeploy ? cosmosDbAccount.?outputs.endpoint! : ''
 
 // Output the capability host configuration
 output AZURE_AI_SEARCH_CAPABILITY_HOST bool = azureAiSearchCapabilityHost
@@ -953,5 +953,5 @@ output AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST bool = azureStorageAccountCapabilit
 
 // Output the Bastion Host resources
 output AZURE_BASTION_HOST_DEPLOY bool = bastionHostDeploy
-output AZURE_BASTION_HOST_NAME string = bastionHostDeploy && azureNetworkIsolation ? bastionHost.outputs.name : ''
-output AZURE_BASTION_HOST_RESOURCE_ID string = bastionHostDeploy && azureNetworkIsolation ? bastionHost.outputs.resourceId : ''
+output AZURE_BASTION_HOST_NAME string = bastionHostDeploy && azureNetworkIsolation ? bastionHost.?outputs.name! : ''
+output AZURE_BASTION_HOST_RESOURCE_ID string = bastionHostDeploy && azureNetworkIsolation ? bastionHost.?outputs.resourceId! : ''

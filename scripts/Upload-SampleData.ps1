@@ -2,11 +2,27 @@ $ErrorActionPreference = "Stop"
 
 Write-Host "Starting sample data upload script..."
 
-# Get environment variables from azd
-$deploySampleData = azd env get-value DEPLOY_SAMPLE_DATA
-$storageAccountName = azd env get-value AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME
-$resourceGroupName = azd env get-value AZURE_RESOURCE_GROUP
-$azureNetworkIsolation = azd env get-value AZURE_NETWORK_ISOLATION
+# Get environment variables from azd (suppress errors for missing values)
+# Fall back to shell environment variables if azd env values are not set
+$deploySampleData = azd env get-value DEPLOY_SAMPLE_DATA 2>$null
+if (-not $deploySampleData) {
+    $deploySampleData = $env:DEPLOY_SAMPLE_DATA
+}
+
+$storageAccountName = azd env get-value AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME 2>$null
+if (-not $storageAccountName) {
+    $storageAccountName = $env:AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME
+}
+
+$resourceGroupName = azd env get-value AZURE_RESOURCE_GROUP 2>$null
+if (-not $resourceGroupName) {
+    $resourceGroupName = $env:AZURE_RESOURCE_GROUP
+}
+
+$azureNetworkIsolation = azd env get-value AZURE_NETWORK_ISOLATION 2>$null
+if (-not $azureNetworkIsolation) {
+    $azureNetworkIsolation = $env:AZURE_NETWORK_ISOLATION
+}
 
 if ($deploySampleData -ne "true") {
     Write-Host "DEPLOY_SAMPLE_DATA is not 'true'. Skipping sample data upload."

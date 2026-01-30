@@ -5,11 +5,27 @@ set -e # Exit immediately if a command exits with a non-zero status.
 
 echo "Starting sample data upload script..."
 
-# Get environment variables from azd
-deploy_sample_data=$(azd env get-value DEPLOY_SAMPLE_DATA)
-storage_account_name=$(azd env get-value AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME)
-resource_group_name=$(azd env get-value AZURE_RESOURCE_GROUP)
-azure_network_isolation=$(azd env get-value AZURE_NETWORK_ISOLATION)
+# Get environment variables from azd (use || true to prevent exit on missing values)
+# Fall back to shell environment variables if azd env values are not set
+deploy_sample_data=$(azd env get-value DEPLOY_SAMPLE_DATA 2>/dev/null || echo "")
+if [ -z "$deploy_sample_data" ]; then
+    deploy_sample_data="${DEPLOY_SAMPLE_DATA:-}"
+fi
+
+storage_account_name=$(azd env get-value AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME 2>/dev/null || echo "")
+if [ -z "$storage_account_name" ]; then
+    storage_account_name="${AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME:-}"
+fi
+
+resource_group_name=$(azd env get-value AZURE_RESOURCE_GROUP 2>/dev/null || echo "")
+if [ -z "$resource_group_name" ]; then
+    resource_group_name="${AZURE_RESOURCE_GROUP:-}"
+fi
+
+azure_network_isolation=$(azd env get-value AZURE_NETWORK_ISOLATION 2>/dev/null || echo "")
+if [ -z "$azure_network_isolation" ]; then
+    azure_network_isolation="${AZURE_NETWORK_ISOLATION:-}"
+fi
 
 if [ "$deploy_sample_data" != "true" ]; then
     echo "DEPLOY_SAMPLE_DATA is not 'true'. Skipping sample data upload."
