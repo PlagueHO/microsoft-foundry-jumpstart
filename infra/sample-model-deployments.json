@@ -2,20 +2,8 @@
   {
     "model": {
       "format": "OpenAI",
-      "name": "model-router",
-      "version": "2025-05-19"
-    },
-    "name": "model-router",
-    "sku": {
-      "name": "GlobalStandard",
-      "capacity": 100
-    }
-  },
-  {
-    "model": {
-      "format": "OpenAI",
-      "name": "gpt-5-chat",
-      "version": "2025-08-07"
+      "name": "gpt-5.2-chat",
+      "version": "2025-12-11"
     },
     "name": "gpt-5-chat",
     "sku": {

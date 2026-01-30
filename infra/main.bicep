@@ -150,7 +150,7 @@ var sampleDataContainers = [for name in sampleDataContainersArray: {
   publicAccess: 'None'
 }]
 
-// Load sample OpenAI models from JSON file or use override parameter
+// Load sample models from JSON file or use override parameter
 var sampleModelDeploymentsFromFile = loadJsonContent('./sample-model-deployments.json')
 var sampleModelDeployments deploymentType[] = empty(deploySampleModelsList) ? sampleModelDeploymentsFromFile : deploySampleModelsList
 
