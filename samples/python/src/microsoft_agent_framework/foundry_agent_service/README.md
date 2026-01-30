@@ -378,7 +378,7 @@ configuration.
 | File content delivery | | ✅ In-context for published |
 | Pre-publish resource setup | | ✅ Vector stores, files |
 
-## Known Gaps in Microsoft Agent Framework (Preview)
+## Observed Challenges in Microsoft Agent Framework (Preview)
 
 As Microsoft Agent Framework is currently in **preview**, the following limitations exist:
 
