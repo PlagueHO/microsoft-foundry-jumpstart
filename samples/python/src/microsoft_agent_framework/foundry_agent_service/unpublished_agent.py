@@ -1,346 +1,505 @@
 """
-Unpublished Agent Sample - Development Mode with Microsoft Agent Framework.
+Azure Architect Agent - Development Mode with Microsoft Agent Framework.
 
-This sample demonstrates using Microsoft Agent Framework with an unpublished
-(development) agent in Microsoft Foundry Agent Service. In development mode,
-you have full access to the Responses API including:
-- Server-managed threads (conversations)
-- File uploads and file search
-- Vector stores
-- Code interpreter
-- Function calling (tools)
+This sample demonstrates an Azure Solutions Architect agent using Microsoft
+Agent Framework with an unpublished (development) agent in Microsoft Foundry
+Agent Service. The agent combines:
 
-The project endpoint provides the complete API surface for development,
-testing, and debugging your agents before publishing to production.
+1. MCP Tools (Microsoft Learn) - For searching Azure documentation
+2. Local Python Tools - For cost estimation, architecture validation, and IaC generation
+3. Persistent Chat (Cosmos DB) - For conversation history across sessions
+
+The Azure Architect agent helps users:
+- Design cloud solutions following the Well-Architected Framework
+- Estimate Azure resource costs
+- Validate architectures against best practices
+- Generate Bicep infrastructure-as-code snippets
+
+KEY CONCEPT: Tool Execution Locations
+=====================================
+- MCP Tools: Execute on server (HostedMCPTool) or client (MCPStreamableHTTPTool)
+- Local Python Tools: Always execute on the client
+- Both tool types work together seamlessly in the same agent
 
 Prerequisites:
 - Microsoft Foundry project with an agent created
 - Azure CLI authenticated (az login)
-- Environment variables: PROJECT_ENDPOINT, MODEL_DEPLOYMENT_NAME
+- Environment variables: PROJECT_ENDPOINT
+- Optional: COSMOS_DB_CONNECTION_STRING for persistent thread storage
 
 Usage:
-    python unpublished_agent.py
-    python unpublished_agent.py --interactive
-    python unpublished_agent.py --question "What is the capital of France?"
+    python unpublished_agent.py                     # Default demo
+    python unpublished_agent.py --hosted-mcp        # Server-side MCP + local tools
+    python unpublished_agent.py --local-mcp         # Client-side MCP + local tools
+    python unpublished_agent.py --cosmos            # With Cosmos DB persistence
+    python unpublished_agent.py --interactive       # Interactive chat mode
+
+Reference:
+- https://learn.microsoft.com/azure/well-architected/
+- https://learn.microsoft.com/agent-framework/
 """
-# pylint: disable=duplicate-code,too-many-statements
+# pylint: disable=duplicate-code,too-many-statements,too-many-locals,too-many-branches
 # pyright: reportUnknownMemberType=false, reportUnknownVariableType=false
 # pyright: reportUnknownArgumentType=false
 
-import argparse
 import asyncio
-import os
-from typing import Annotated, Any, Dict
 
-from azure.identity import DefaultAzureCredential
+from azure.identity.aio import AzureCliCredential
+
+from common import (  # pylint: disable=import-error
+    AZURE_ARCHITECT_INSTRUCTIONS,
+    AZURE_ARCHITECT_NAME,
+    AZURE_ARCHITECT_TOOLS,
+    CosmosDBChatMessageStore,
+    MCP_SERVER_NAME,
+    MCP_SERVER_URL,
+    create_argument_parser,
+    estimate_azure_costs,
+    generate_bicep_snippet,
+    get_cosmos_connection_string,
+    get_project_endpoint,
+    handle_approval_flow_with_thread,
+    load_environment,
+    print_header,
+    validate_architecture,
+)
 
 
-def load_environment() -> None:
-    """Load environment variables from .env file if available."""
-    # pylint: disable=import-outside-toplevel
-    try:
-        from dotenv import load_dotenv
-        load_dotenv()
-    except ImportError:
-        pass  # python-dotenv not installed, use system env vars
-
-
-def parse_arguments() -> argparse.Namespace:
-    """
-    Parse command-line arguments.
-
-    Returns:
-        argparse.Namespace: Parsed arguments.
-    """
-    parser = argparse.ArgumentParser(
+def parse_arguments():
+    """Parse command-line arguments with unpublished-specific options."""
+    parser = create_argument_parser(
         description="Microsoft Agent Framework - Unpublished Agent Sample",
-        epilog="Example: python unpublished_agent.py --question 'Tell me a joke'"
+        example="python unpublished_agent.py --hosted-mcp"
     )
     parser.add_argument(
-        "--question", "-q",
-        type=str,
-        default="What are the key differences between development and "
-                "production modes in Microsoft Foundry Agent Service?",
-        help="The question to ask the agent"
-    )
-    parser.add_argument(
-        "--interactive", "-i",
+        "--cosmos",
         action="store_true",
-        help="Run in interactive mode for multiple questions"
+        help="Use Cosmos DB for persistent thread storage"
     )
     return parser.parse_args()
 
 
-# ============================================================================
-# Tool Functions - These work the same in both unpublished and published modes
-# ============================================================================
-
-def get_current_weather(
-    location: Annotated[str, "The city and state, e.g., San Francisco, CA"],
-    unit: Annotated[str, "Temperature unit: celsius or fahrenheit"] = "celsius"
-) -> str:
+async def run_with_hosted_mcp(use_cosmos: bool = False) -> None:
     """
-    Get the current weather for a location.
+    Run Azure Architect agent with HOSTED MCP + local Python tools.
 
-    This is a mock implementation demonstrating function calling capability.
-    In a real application, this would call a weather API.
+    Combines server-side MCP (for Microsoft Learn docs) with local Python
+    tools for cost estimation, architecture validation, and Bicep generation.
 
     Args:
-        location: The location to get weather for.
-        unit: The temperature unit.
-
-    Returns:
-        A string describing the current weather.
-    """
-    # Mock weather data - replace with actual API call in production
-    weather_data: Dict[str, Dict[str, Any]] = {
-        "New York, NY": {"temp": 22, "condition": "Partly cloudy"},
-        "San Francisco, CA": {"temp": 18, "condition": "Foggy"},
-        "Seattle, WA": {"temp": 15, "condition": "Rainy"},
-        "Miami, FL": {"temp": 30, "condition": "Sunny"},
-    }
-
-    # Default weather for unknown locations
-    data = weather_data.get(location, {"temp": 20, "condition": "Clear"})
-
-    if unit.lower() == "fahrenheit":
-        temp = data["temp"] * 9 / 5 + 32
-        return f"The weather in {location} is {data['condition']} with a " \
-               f"temperature of {temp:.1f}°F."
-    return f"The weather in {location} is {data['condition']} with a " \
-           f"temperature of {data['temp']}°C."
-
-
-def calculate_loan_payment(
-    principal: Annotated[float, "The loan principal amount in dollars"],
-    annual_rate: Annotated[float, "Annual interest rate as a percentage"],
-    years: Annotated[int, "Loan term in years"]
-) -> str:
-    """
-    Calculate monthly loan payment using standard amortization formula.
-
-    This demonstrates a more complex tool that the agent can use.
-
-    Args:
-        principal: The loan amount.
-        annual_rate: Annual interest rate percentage.
-        years: Loan term in years.
-
-    Returns:
-        A string describing the monthly payment.
-    """
-    monthly_rate = annual_rate / 100 / 12
-    num_payments = years * 12
-
-    if monthly_rate == 0:
-        monthly_payment = principal / num_payments
-    else:
-        monthly_payment = principal * (
-            monthly_rate * (1 + monthly_rate) ** num_payments
-        ) / ((1 + monthly_rate) ** num_payments - 1)
-
-    total_payment = monthly_payment * num_payments
-    total_interest = total_payment - principal
-
-    return (
-        f"For a ${principal:,.2f} loan at {annual_rate}% APR over {years} years:\n"
-        f"- Monthly Payment: ${monthly_payment:,.2f}\n"
-        f"- Total Interest: ${total_interest:,.2f}\n"
-        f"- Total Cost: ${total_payment:,.2f}"
-    )
-
-
-async def run_with_agent_framework() -> None:
-    """
-    Run the sample using Microsoft Agent Framework with azure-ai-projects V2.
-
-    This demonstrates the recommended approach for unpublished agents using
-    the Agent Framework's AzureAIProjectAgentProvider.
+        use_cosmos: If True, use Cosmos DB for thread storage.
     """
     # pylint: disable=import-outside-toplevel
     try:
-        from agent_framework.azure import AzureAIProjectAgentProvider  # type: ignore[import-untyped]
-        from azure.ai.projects import AIProjectClient
+        from agent_framework import (  # type: ignore[import-untyped]
+            AgentThread,
+            FunctionTool,
+            HostedMCPTool,
+        )
+        from agent_framework.azure import (  # type: ignore[import-untyped]
+            AzureAIProjectAgentProvider,
+        )
     except ImportError as e:
         print(f"Error: Required packages not installed. {e}")
-        print("Install with: pip install agent-framework azure-ai-projects")
+        print("Install with: pip install agent-framework --pre")
         return
 
     args = parse_arguments()
     load_environment()
 
-    # Get configuration from environment
-    project_endpoint = os.environ.get("PROJECT_ENDPOINT")
-    model_deployment = os.environ.get("MODEL_DEPLOYMENT_NAME", "gpt-4o-mini")
-
+    project_endpoint = get_project_endpoint()
     if not project_endpoint:
         print("Error: PROJECT_ENDPOINT environment variable is required.")
-        print("Set it to your Microsoft Foundry project endpoint:")
-        print("  https://<resource>.services.ai.azure.com/api/projects/<project>")
         return
 
-    print(f"Connecting to project: {project_endpoint}")
-    print(f"Using model: {model_deployment}")
-    print("-" * 60)
+    print_header(
+        "Azure Architect Agent (Hosted MCP + Local Tools)",
+        "Server-side MCP for docs, Local Python tools for architecture"
+    )
+    print(f"Endpoint: {project_endpoint}")
+    print()
 
-    # Create Azure AI Project client
-    credential = DefaultAzureCredential()
-    project_client = AIProjectClient(
-        endpoint=project_endpoint,
-        credential=credential
+    # Set up Cosmos DB thread storage if requested
+    cosmos_store = None
+    if use_cosmos:
+        cosmos_conn = get_cosmos_connection_string()
+        if not cosmos_conn:
+            print("Warning: COSMOS_DB_CONNECTION_STRING not set.")
+            print("Using in-memory thread storage instead.\n")
+        else:
+            cosmos_store = CosmosDBChatMessageStore(
+                connection_string=cosmos_conn,
+                thread_id="azure_architect_hosted",
+                max_messages=100
+            )
+            print(f"Persistent chat enabled: {cosmos_store}")
+            print()
+
+    # Create local Python tools using FunctionTool
+    local_tools = [
+        FunctionTool(
+            name="estimate_azure_costs",
+            description=AZURE_ARCHITECT_TOOLS[0]["description"],
+            function=estimate_azure_costs,
+        ),
+        FunctionTool(
+            name="validate_architecture",
+            description=AZURE_ARCHITECT_TOOLS[1]["description"],
+            function=validate_architecture,
+        ),
+        FunctionTool(
+            name="generate_bicep_snippet",
+            description=AZURE_ARCHITECT_TOOLS[2]["description"],
+            function=generate_bicep_snippet,
+        ),
+    ]
+
+    # MCP tool for Microsoft Learn documentation
+    mcp_tool = HostedMCPTool(
+        name=MCP_SERVER_NAME,
+        url=MCP_SERVER_URL,
+        approval_mode="never_require",
     )
 
-    # Create agent provider from the project client
-    provider = AzureAIProjectAgentProvider(project_client)
-
-    # Create an agent with tools
-    # Note: In development mode (unpublished), we can dynamically create agents
-    agent = await provider.create_agent(
-        name="development-assistant",
-        model=model_deployment,
-        instructions="""You are a helpful assistant demonstrating capabilities
-        of the Microsoft Agent Framework with Microsoft Foundry Agent Service.
-
-        You have access to tools for:
-        1. Getting weather information (get_current_weather)
-        2. Calculating loan payments (calculate_loan_payment)
-        
-        When answering questions:
-        - Use the appropriate tools when relevant
-        - Be concise but informative
-        - Explain what you're doing when using tools
-        """,
-        tools=[get_current_weather, calculate_loan_payment]
-    )
-
-    print(f"Created agent: {agent.name} (ID: {agent.id})")
-
-    # Create a thread for the conversation
-    # In development mode, threads are server-managed and persistent
-    thread = await agent.get_new_thread()
-    print(f"Created thread: {thread.id}")
-    print("-" * 60)
-
-    async def ask_question(question: str) -> None:
-        """Send a question and display the response."""
-        print(f"\nUser: {question}")
-        print("\nAssistant: ", end="", flush=True)
-
-        # Run the agent with the question and thread
-        response = await agent.run(question, thread=thread)
-
-        # Display the response
-        print(response.text)
-        print()
-
-    if args.interactive:
-        print("\n=== INTERACTIVE MODE ===")
-        print("Type 'quit', 'exit', or 'q' to stop.")
-        print("Ask questions about weather, loan calculations, or anything else.\n")
-
-        while True:
-            try:
-                question = input("Your question: ").strip()
-                if question.lower() in ["quit", "exit", "q", ""]:
-                    print("Goodbye!")
-                    break
-                await ask_question(question)
-            except KeyboardInterrupt:
-                print("\nGoodbye!")
-                break
-            except (OSError, RuntimeError) as e:
-                print(f"Error: {e}")
-                continue
-    else:
-        # Ask a single question demonstrating the capabilities
-        await ask_question(args.question)
-
-        # Ask a follow-up to demonstrate thread/conversation state
-        await ask_question(
-            "Can you also tell me the weather in Seattle and "
-            "calculate a monthly payment for a $300,000 loan at 6.5% "
-            "over 30 years?"
+    async with (
+        AzureCliCredential() as credential,
+        AzureAIProjectAgentProvider(credential=credential) as provider,
+    ):
+        # Create agent with both MCP and local tools
+        agent = await provider.create_agent(
+            name=AZURE_ARCHITECT_NAME,
+            instructions=AZURE_ARCHITECT_INSTRUCTIONS,
+            tools=[mcp_tool] + local_tools,
         )
 
-    # Clean up resources
-    print("-" * 60)
-    print("Cleaning up resources...")
+        print(f"Created agent: {agent.name}")
+        print("Tools: MCP (Microsoft Learn) + 3 local Python tools")
 
-    # Delete thread (in development mode, threads persist until deleted)
-    await thread.delete()
-    print(f"Deleted thread: {thread.id}")
+        # Create thread - with Cosmos DB or server-managed
+        if cosmos_store:
+            thread = AgentThread(message_store=cosmos_store)
+            print(f"Using persistent thread: {cosmos_store.thread_id}")
+        else:
+            thread = agent.get_new_thread()
+            print("Using server-managed thread")
 
-    # Delete the agent (optional - you might want to keep it for reuse)
-    await agent.delete()
-    print(f"Deleted agent: {agent.id}")
+        if args.interactive:
+            print("\n=== AZURE ARCHITECT - INTERACTIVE MODE ===")
+            print("Ask about Azure architecture, costs, or IaC generation.")
+            print("Type 'quit' to exit.\n")
+            while True:
+                try:
+                    question = input("You: ").strip()
+                    if question.lower() in ["quit", "exit", "q", ""]:
+                        break
+                    print("\n[Processing with MCP + local tools...]")
+                    result = await handle_approval_flow_with_thread(
+                        question, agent, thread
+                    )
+                    print(f"\nArchitect: {result}\n")
+                except KeyboardInterrupt:
+                    break
+        else:
+            print(f"\nUser: {args.question}")
+            print("\n[Server is making MCP call...]")
+            result = await handle_approval_flow_with_thread(
+                args.question, agent, thread
+            )
+            print(f"\nAssistant: {result}")
+
+        # Show Cosmos DB persistence info
+        if cosmos_store:
+            messages = await cosmos_store.list_messages()
+            print(f"\nMessages stored in Cosmos DB: {len(messages)}")
+            await cosmos_store.aclose()
 
 
-async def run_with_azure_responses_client() -> None:
+async def run_with_local_mcp(use_cosmos: bool = False) -> None:
     """
-    Alternative approach using Azure OpenAI Responses Client directly.
+    Run Azure Architect agent with LOCAL MCP + local Python tools.
 
-    This demonstrates using the lower-level Azure OpenAI Responses Client
-    which provides more control but requires more manual management.
+    Combines client-side MCP (for Microsoft Learn docs) with local Python
+    tools for cost estimation, architecture validation, and Bicep generation.
+
+    Args:
+        use_cosmos: If True, use Cosmos DB for thread storage.
     """
     # pylint: disable=import-outside-toplevel
     try:
-        from agent_framework import Agent, AgentThread  # type: ignore[import-untyped]
-        from agent_framework.azure import AzureOpenAIResponsesClient  # type: ignore[import-untyped]
+        from agent_framework import (  # type: ignore[import-untyped]
+            AgentThread,
+            FunctionTool,
+            MCPStreamableHTTPTool,
+        )
+        from agent_framework.azure import (  # type: ignore[import-untyped]
+            AzureAIProjectAgentProvider,
+        )
     except ImportError as e:
         print(f"Error: Required packages not installed. {e}")
-        print("Install with: pip install agent-framework")
+        print("Install with: pip install agent-framework --pre")
         return
 
     args = parse_arguments()
     load_environment()
 
-    # Get configuration
-    project_endpoint = os.environ.get("PROJECT_ENDPOINT")
-    model_deployment = os.environ.get("MODEL_DEPLOYMENT_NAME", "gpt-4o-mini")
-
+    project_endpoint = get_project_endpoint()
     if not project_endpoint:
         print("Error: PROJECT_ENDPOINT environment variable is required.")
         return
 
-    credential = DefaultAzureCredential()
+    print_header(
+        "Azure Architect Agent (Local MCP + Local Tools)",
+        "Client-side MCP for docs, Local Python tools for architecture"
+    )
+    print(f"Endpoint: {project_endpoint}")
+    print()
 
-    # Create Azure OpenAI Responses client
-    # This is a lower-level client that uses the Responses API directly
-    client = AzureOpenAIResponsesClient(
-        azure_endpoint=project_endpoint,
-        credential=credential,
-        deployment_name=model_deployment
+    # Set up Cosmos DB thread storage if requested
+    cosmos_store = None
+    if use_cosmos:
+        cosmos_conn = get_cosmos_connection_string()
+        if cosmos_conn:
+            cosmos_store = CosmosDBChatMessageStore(
+                connection_string=cosmos_conn,
+                thread_id="azure_architect_local",
+                max_messages=100
+            )
+            print(f"Persistent chat enabled: {cosmos_store}")
+            print()
+
+    # Create local Python tools using FunctionTool
+    local_tools = [
+        FunctionTool(
+            name="estimate_azure_costs",
+            description=AZURE_ARCHITECT_TOOLS[0]["description"],
+            function=estimate_azure_costs,
+        ),
+        FunctionTool(
+            name="validate_architecture",
+            description=AZURE_ARCHITECT_TOOLS[1]["description"],
+            function=validate_architecture,
+        ),
+        FunctionTool(
+            name="generate_bicep_snippet",
+            description=AZURE_ARCHITECT_TOOLS[2]["description"],
+            function=generate_bicep_snippet,
+        ),
+    ]
+
+    # MCP tool for Microsoft Learn documentation (client-side)
+    mcp_tool = MCPStreamableHTTPTool(
+        name=MCP_SERVER_NAME,
+        url=MCP_SERVER_URL,
     )
 
-    # Create an agent using the chat client
-    agent = Agent(
-        name="responses-client-assistant",
-        model_client=client,
-        instructions="You are a helpful assistant with weather and loan tools.",
-        tools=[get_current_weather, calculate_loan_payment]
+    async with (
+        AzureCliCredential() as credential,
+        AzureAIProjectAgentProvider(credential=credential) as provider,
+    ):
+        # Create agent with both MCP and local tools
+        agent = await provider.create_agent(
+            name=AZURE_ARCHITECT_NAME,
+            instructions=AZURE_ARCHITECT_INSTRUCTIONS,
+            tools=[mcp_tool] + local_tools,
+        )
+
+        print(f"Created agent: {agent.name}")
+        print("Tools: MCP (Microsoft Learn) + 3 local Python tools")
+
+        async with agent:
+            # Create thread - with Cosmos DB or default
+            if cosmos_store:
+                thread = AgentThread(message_store=cosmos_store)
+                print(f"Using persistent thread: {cosmos_store.thread_id}")
+            else:
+                thread = agent.get_new_thread()
+                print("Using default thread")
+
+            if args.interactive:
+                print("\n=== AZURE ARCHITECT - INTERACTIVE MODE ===")
+                print("Ask about Azure architecture, costs, or IaC generation.")
+                print("Type 'quit' to exit.\n")
+                while True:
+                    try:
+                        question = input("You: ").strip()
+                        if question.lower() in ["quit", "exit", "q", ""]:
+                            break
+                        print("\n[Processing with MCP + local tools...]")
+                        result = await agent.run(question, thread=thread)
+                        print(f"\nArchitect: {result}\n")
+                    except KeyboardInterrupt:
+                        break
+            else:
+                print(f"\nYou: {args.question}")
+                print("\n[Processing with MCP + local tools...]")
+                result = await agent.run(args.question, thread=thread)
+                print(f"\nArchitect: {result}")
+
+            if cosmos_store:
+                messages = await cosmos_store.list_messages()
+                print(f"\nMessages stored in Cosmos DB: {len(messages)}")
+                await cosmos_store.aclose()
+
+
+async def run_cosmos_demo() -> None:
+    """
+    Demonstrate Azure Architect with Cosmos DB persistent chat.
+
+    Shows how conversation history persists across agent "restarts",
+    enabling multi-session architecture consulting.
+    """
+    # pylint: disable=import-outside-toplevel
+    try:
+        from agent_framework import (  # type: ignore[import-untyped]
+            AgentThread,
+            FunctionTool,
+        )
+        from agent_framework.azure import (  # type: ignore[import-untyped]
+            AzureAIProjectAgentProvider,
+        )
+    except ImportError as e:
+        print(f"Error: Required packages not installed. {e}")
+        return
+
+    load_environment()
+
+    cosmos_conn = get_cosmos_connection_string()
+    if not cosmos_conn:
+        print("Error: COSMOS_DB_CONNECTION_STRING environment variable required.")
+        print("Set it to your Cosmos DB connection string for thread persistence.")
+        return
+
+    project_endpoint = get_project_endpoint()
+    if not project_endpoint:
+        print("Error: PROJECT_ENDPOINT environment variable is required.")
+        return
+
+    print_header(
+        "Azure Architect - Persistent Chat Demo",
+        "Conversation history persists across sessions"
+    )
+    print()
+
+    # Create local Python tools
+    local_tools = [
+        FunctionTool(
+            name="estimate_azure_costs",
+            description=AZURE_ARCHITECT_TOOLS[0]["description"],
+            function=estimate_azure_costs,
+        ),
+        FunctionTool(
+            name="validate_architecture",
+            description=AZURE_ARCHITECT_TOOLS[1]["description"],
+            function=validate_architecture,
+        ),
+        FunctionTool(
+            name="generate_bicep_snippet",
+            description=AZURE_ARCHITECT_TOOLS[2]["description"],
+            function=generate_bicep_snippet,
+        ),
+    ]
+
+    # Create Cosmos DB store for persistent thread
+    conversation_id = "azure_architect_persistent"
+
+    print("--- Session 1: Starting architecture consultation ---")
+    store1 = CosmosDBChatMessageStore(
+        connection_string=cosmos_conn,
+        thread_id=conversation_id,
+        max_messages=50,
     )
 
-    # Create a local thread (client-managed, not server-managed)
-    thread = AgentThread()
+    async with (
+        AzureCliCredential() as credential,
+        AzureAIProjectAgentProvider(credential=credential) as provider,
+    ):
+        agent = await provider.create_agent(
+            name=AZURE_ARCHITECT_NAME,
+            instructions=AZURE_ARCHITECT_INSTRUCTIONS,
+            tools=local_tools,
+        )
 
-    print(f"Using Responses Client with model: {model_deployment}")
-    print("-" * 60)
+        # Session 1: Start architecture consultation
+        thread1 = AgentThread(message_store=store1)
 
-    print(f"\nUser: {args.question}")
-    response = await agent.run(args.question, thread=thread)
-    print(f"Assistant: {response.text}")
+        query1 = "I need to design a web application on Azure for an e-commerce site."
+        print(f"You: {query1}")
+        response1 = await agent.run(query1, thread=thread1)
+        print(f"Architect: {response1}")
+
+        query2 = "What would be the estimated monthly cost for App Service and SQL?"
+        print(f"\nYou: {query2}")
+        response2 = await agent.run(query2, thread=thread1)
+        print(f"Architect: {response2}")
+
+        messages = await store1.list_messages()
+        print(f"\n[Stored {len(messages)} messages in Cosmos DB]")
+        await store1.aclose()
+
+        # Session 2: Resume conversation (simulating app restart)
+        print("\n" + "=" * 60)
+        print("--- Session 2: Resuming consultation (after 'restart') ---")
+        print("=" * 60)
+        store2 = CosmosDBChatMessageStore(
+            connection_string=cosmos_conn,
+            thread_id=conversation_id,  # Same thread ID
+        )
+
+        thread2 = AgentThread(message_store=store2)
+
+        query3 = "Can you validate the architecture we discussed? Include Key Vault and VNet."
+        print(f"You: {query3}")
+        response3 = await agent.run(query3, thread=thread2)
+        print(f"Architect: {response3}")
+
+        messages_after = await store2.list_messages()
+        print(f"\n[Total messages after resuming: {len(messages_after)}]")
+
+        # Cleanup (optional - remove for true persistence demo)
+        print("\nCleaning up demo data...")
+        await store2.clear()
+        await store2.aclose()
+        print("Done!")
 
 
 async def main() -> None:
-    """Main entry point."""
-    print("=" * 60)
-    print("Microsoft Agent Framework - Unpublished Agent Sample")
-    print("Development Mode with Full API Access")
-    print("=" * 60)
+    """Main entry point for Azure Architect agent."""
+    args = parse_arguments()
+    load_environment()
+
+    print_header(
+        "Azure Architect Agent",
+        "MCP + Local Tools with Persistent Chat"
+    )
     print()
 
-    # Run the primary sample with Agent Framework
-    await run_with_agent_framework()
+    if args.cosmos and not args.hosted_mcp and not args.local_mcp:
+        # Run Cosmos DB persistence demo
+        await run_cosmos_demo()
+    elif args.hosted_mcp:
+        await run_with_hosted_mcp(use_cosmos=args.cosmos)
+    elif args.local_mcp:
+        await run_with_local_mcp(use_cosmos=args.cosmos)
+    else:
+        # Default: show usage info
+        print("This Azure Architect agent demonstrates:\n")
+        print("TOOLS:")
+        print("  - Microsoft Learn MCP: Search Azure documentation")
+        print("  - estimate_azure_costs: Calculate resource costs")
+        print("  - validate_architecture: Check Well-Architected compliance")
+        print("  - generate_bicep_snippet: Create Infrastructure as Code\n")
+        print("MODES:")
+        print("  --hosted-mcp: Server-side MCP + local Python tools")
+        print("  --local-mcp:  Client-side MCP + local Python tools")
+        print("  --cosmos:     Enable persistent chat with Cosmos DB")
+        print("  --interactive: Multi-turn conversation mode\n")
+        print("EXAMPLES:")
+        print("  python unpublished_agent.py --hosted-mcp --interactive")
+        print("  python unpublished_agent.py --local-mcp --cosmos")
+        print("  python unpublished_agent.py --cosmos  # Persistence demo\n")
+        print("-" * 60)
+        print("\nRunning default demo with hosted MCP:\n")
+        await run_with_hosted_mcp()
 
 
 if __name__ == "__main__":

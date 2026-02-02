@@ -9,6 +9,17 @@ azure-identity>=1.15.0
 # Used for unpublished agent access with full API
 azure-ai-projects>=1.0.0b1
 
+# Azure Cosmos DB for persistent thread storage
+# Used by CosmosDBChatMessageStore for conversation persistence
+azure-cosmos>=4.5.0
+
+# Redis for persistent thread storage
+# Used by RedisChatMessageStore for conversation persistence
+redis>=5.0.0
+
+# Pydantic for data validation in message stores
+pydantic>=2.0.0
+
 # OpenAI client for published agent access
 # Published agents expose OpenAI-compatible Responses API
 openai>=1.40.0

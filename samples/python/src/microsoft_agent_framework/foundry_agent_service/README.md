@@ -1,14 +1,49 @@
-# Microsoft Agent Framework with Microsoft Foundry Agent Service
+# Azure Architect Agent with Microsoft Agent Framework
 
 > [!WARNING]
 > **Preview Features - Discussion Document Only**
 >
 > This document discusses multiple preview features and represents exploratory approaches to using Agent Service Project Agents and Agent Applications. It is intended for discussion and exploration purposes only and **should not be used to make strategic decisions**. The patterns, workflows, and architectural guidance described here are subject to change as these preview features evolve.
 
-This directory contains samples demonstrating how to use the
+This directory contains samples demonstrating an **Azure Architect Agent** using the
 [Microsoft Agent Framework](https://github.com/microsoft/agent-framework) with
 [Microsoft Foundry Agent Service](https://learn.microsoft.com/azure/ai-foundry/agents) for
 both **development** (unpublished agents) and **production** (published agents) scenarios.
+
+## Azure Architect Agent
+
+The Azure Architect Agent is an AI assistant that helps users design, validate, and implement
+Azure cloud solutions following the Well-Architected Framework. It combines:
+
+### Tools
+
+| Tool | Type | Description |
+|------|------|-------------|
+| **Microsoft Learn MCP** | MCP Tool | Searches Azure documentation via Model Context Protocol |
+| **estimate_azure_costs** | Local Python | Generates cost estimates for Azure services |
+| **validate_architecture** | Local Python | Validates designs against Well-Architected pillars |
+| **generate_bicep_snippet** | Local Python | Creates infrastructure-as-code snippets |
+
+### Capabilities
+
+- Answer Azure architecture questions with up-to-date documentation
+- Estimate costs for proposed Azure solutions
+- Validate designs for security, reliability, performance, cost, and operations
+- Generate Bicep templates for common Azure resources
+
+### Example Interactions
+
+```text
+User: I need to design a web app with SQL and Redis cache
+
+Azure Architect: I'll help you design this solution. Let me:
+1. Search for best practices [calls MCP tool]
+2. Validate the architecture [calls validate_architecture]
+3. Estimate your costs [calls estimate_azure_costs]
+4. Generate Bicep templates [calls generate_bicep_snippet]
+
+Based on Well-Architected Framework...
+```
 
 ## Overview
 
@@ -39,13 +74,297 @@ works in **both** environments with minimal changes:
   `ChatMessageStore` that work regardless of backend support
 - **Tools**: Function calling works the same in both modes
 - **Files**: For published agents, file content can be passed in-context rather than uploaded
+- **MCP Tools**: Model Context Protocol tools work identically in both modes (see below)
+
+## MCP Tool Execution: Server-Side vs Client-Side
+
+A key capability of Microsoft Agent Framework is **MCP (Model Context Protocol)** tool support.
+MCP tools work **identically** whether your agent is published or unpublished. The key
+question is: **where does the MCP call execute?**
+
+### Understanding MCP Execution Locations
+
+```mermaid
+flowchart TB
+    subgraph "HOSTED MCP (Server-Side)"
+        Client1["Your Application"] -->|1. Send request| Server1["Foundry Agent Service"]
+        Server1 -->|2. Agent decides tool needed| Server1
+        Server1 -->|3. Server makes MCP call| MCP1["MCP Server<br/>(e.g., learn.microsoft.com/api/mcp)"]
+        MCP1 -->|4. Return results| Server1
+        Server1 -->|5. Generate response| Client1
+    end
+    
+    subgraph "LOCAL MCP (Client-Side)"
+        Client2["Your Application<br/>(Agent Framework)"] -->|1. Send request| Server2["Foundry Agent Service"]
+        Server2 -->|2. Agent decides tool needed| Server2
+        Server2 -->|3. Return tool request| Client2
+        Client2 -->|4. Client makes MCP call| MCP2["MCP Server<br/>(e.g., learn.microsoft.com/api/mcp)"]
+        MCP2 -->|5. Return results| Client2
+        Client2 -->|6. Send results to agent| Server2
+        Server2 -->|7. Generate response| Client2
+    end
+```
+
+### MCP Tool Types in Agent Framework
+
+| Tool Type | Execution Location | Use Case | Approval Support |
+|-----------|-------------------|----------|------------------|
+| `HostedMCPTool` | **Server-side** (Foundry Agent Service) | Production with governance | Yes (`always_require`, `never_require`, `auto`) |
+| `MCPStreamableHTTPTool` | **Client-side** (Agent Framework) | Development, full control | No (client controls) |
+
+### Key Insight: Same Behavior Across Published/Unpublished
+
+The MCP execution location is **independent** of whether your agent is published:
+
+| Configuration | Agent State | MCP Execution |
+|---------------|-------------|---------------|
+| `HostedMCPTool` + Project Endpoint | Unpublished | Server-side |
+| `HostedMCPTool` + Application Endpoint | Published | Server-side |
+| `MCPStreamableHTTPTool` + Project Endpoint | Unpublished | Client-side |
+| `MCPStreamableHTTPTool` + Application Endpoint | Published | Client-side |
+
+**The same MCP tool configuration produces identical results regardless of publish state.**
+
+### Code Comparison: Hosted vs Local MCP
+
+Both samples demonstrate the Azure Architect agent with MCP (`https://learn.microsoft.com/api/mcp`)
+plus local Python tools:
+
+```python
+# HOSTED MCP + Local Tools - Server makes the MCP call
+from agent_framework import HostedMCPTool, FunctionTool
+from common import (
+    AZURE_ARCHITECT_NAME, AZURE_ARCHITECT_INSTRUCTIONS, AZURE_ARCHITECT_TOOLS,
+    estimate_azure_costs, validate_architecture, generate_bicep_snippet,
+)
+
+# Create local Python tools
+local_tools = [
+    FunctionTool(name="estimate_azure_costs", description=AZURE_ARCHITECT_TOOLS[0]["description"], function=estimate_azure_costs),
+    FunctionTool(name="validate_architecture", description=AZURE_ARCHITECT_TOOLS[1]["description"], function=validate_architecture),
+    FunctionTool(name="generate_bicep_snippet", description=AZURE_ARCHITECT_TOOLS[2]["description"], function=generate_bicep_snippet),
+]
+
+# MCP tool for Microsoft Learn
+mcp_tool = HostedMCPTool(
+    name="Microsoft Learn MCP",
+    url="https://learn.microsoft.com/api/mcp",
+    approval_mode="never_require",
+)
+
+# Create agent with both tool types
+agent = await provider.create_agent(
+    name=AZURE_ARCHITECT_NAME,
+    instructions=AZURE_ARCHITECT_INSTRUCTIONS,
+    tools=[mcp_tool] + local_tools,
+)
+
+# LOCAL MCP + Local Tools - Client makes the MCP call
+from agent_framework import MCPStreamableHTTPTool, FunctionTool
+
+mcp_tool = MCPStreamableHTTPTool(
+    name="Microsoft Learn MCP",
+    url="https://learn.microsoft.com/api/mcp",
+)
+
+agent = await provider.create_agent(
+    name=AZURE_ARCHITECT_NAME,
+    instructions=AZURE_ARCHITECT_INSTRUCTIONS,
+    tools=[mcp_tool] + local_tools,  # Same local_tools as above
+)
+```
+
+### When to Use Each Approach
+
+| Scenario | Recommended Approach | Reason |
+|----------|---------------------|--------|
+| Production with governance | `HostedMCPTool` | Approval workflows, audit logging |
+| Production with sensitive MCP servers | `HostedMCPTool` | Server-side authentication, no client exposure |
+| Development and debugging | `MCPStreamableHTTPTool` | Full visibility into MCP calls |
+| Testing MCP integrations | `MCPStreamableHTTPTool` | Easily mock/intercept calls |
+| MCP server requires client auth | `MCPStreamableHTTPTool` | Client can handle OAuth/tokens |
+
+### Sample Commands
+
+```bash
+# Run Azure Architect with hosted MCP (server-side execution)
+python unpublished_agent.py --hosted-mcp
+
+# Run Azure Architect with local MCP (client-side execution)
+python unpublished_agent.py --local-mcp
+
+# Run Azure Architect in production mode with hosted MCP
+python published_agent.py --hosted-mcp
+
+# Run Azure Architect in production mode with local MCP
+python published_agent.py --local-mcp
+
+# Interactive mode for architecture consultation
+python unpublished_agent.py --hosted-mcp --interactive
+
+# Ask specific architecture questions
+python unpublished_agent.py --hosted-mcp -q "Estimate costs for App Service + SQL Database"
+```
+
+All combinations use the same Azure Architect tools and produce consistent results.
 
 ## Samples
 
 | Sample | Description |
 |--------|-------------|
-| [unpublished_agent.py](unpublished_agent.py) | Development mode using project endpoint with full API access |
-| [published_agent.py](published_agent.py) | Production mode using application endpoint with client-side state |
+| [unpublished_agent.py](unpublished_agent.py) | Azure Architect in development mode (project endpoint) with MCP + local tools |
+| [published_agent.py](published_agent.py) | Azure Architect in production mode (application endpoint) with MCP + local tools |
+| [common.py](common.py) | Shared: Azure Architect config, tools, ClientSideThread, re-exports message stores |
+| [cosmosdb_chat_message_store.py](cosmosdb_chat_message_store.py) | Cosmos DB persistent thread storage |
+| [redis_chat_message_store.py](redis_chat_message_store.py) | Redis persistent thread storage |
+
+## Persistent Thread Storage
+
+For production scenarios, you may want persistent thread storage that survives application
+restarts. Two implementations are provided, following the official
+[Third-Party Chat History Storage](https://learn.microsoft.com/en-us/agent-framework/tutorials/agents/third-party-chat-history-storage?pivots=programming-language-python)
+pattern from Microsoft Agent Framework:
+
+| Provider | Use Case | Latency | Scalability |
+|----------|----------|---------|-------------|
+| **Redis** | Low-latency, simple setup | Fastest (~1ms) | Single region / replicas |
+| **Cosmos DB** | Global distribution, durability | Low (~5-10ms) | Multi-region, auto-failover |
+
+### Redis Thread Storage
+
+Use Redis when you need fast, simple persistent storage:
+
+```python
+from redis_chat_message_store import RedisChatMessageStore
+from agent_framework import ChatAgent
+
+# Create agent with Redis message store factory
+agent = ChatAgent(
+    chat_client=chat_client,
+    name="my-agent",
+    instructions="You are a helpful assistant.",
+    chat_message_store_factory=lambda: RedisChatMessageStore(
+        redis_url=os.environ["REDIS_URL"],
+        max_messages=100,  # Auto-trim to last 100 messages
+    )
+)
+
+# Start a new conversation
+thread = agent.get_new_thread()
+response = await agent.run("What is Azure?", thread=thread)
+```
+
+### Cosmos DB Thread Storage
+
+For production scenarios, you may want persistent thread storage that survives application
+restarts. The `CosmosDBChatMessageStore` provides this capability,
+following the official [Third-Party Chat History Storage](https://learn.microsoft.com/en-us/agent-framework/tutorials/agents/third-party-chat-history-storage?pivots=programming-language-python) pattern from Microsoft Agent Framework.
+
+### Why Cosmos DB for Thread Storage?
+
+| Concern | In-Memory Threads | Cosmos DB Threads |
+|---------|-------------------|-------------------|
+| Persistence | Lost on app restart | Survives restarts |
+| Scalability | Single instance | Globally distributed |
+| Multi-instance | Not supported | Partition key isolation |
+| Cost | Free | Cosmos DB pricing |
+| Latency | Fastest | Low (few ms) |
+
+### Using Cosmos DB with chat_message_store_factory (Recommended)
+
+The recommended pattern from Microsoft Agent Framework is to use `chat_message_store_factory`
+when creating the agent. This factory creates a new store instance for each thread:
+
+```python
+from common import CosmosDBChatMessageStore
+from agent_framework import ChatAgent
+
+# Create agent with Cosmos DB message store factory
+agent = ChatAgent(
+    chat_client=chat_client,
+    name="my-agent",
+    instructions="You are a helpful assistant.",
+    chat_message_store_factory=lambda: CosmosDBChatMessageStore(
+        connection_string=os.environ["COSMOS_DB_CONNECTION_STRING"],
+        max_messages=100,  # Auto-trim to last 100 messages
+    )
+)
+
+# Start a new conversation - store is automatically created
+thread = agent.get_new_thread()
+response = await agent.run("What is Azure?", thread=thread)
+
+# The thread state can be serialized (includes store state)
+serialized_thread = thread.serialize()
+
+# Later: Resume the conversation from serialized state
+resumed_thread = await agent.deserialize_thread(serialized_thread)
+response = await agent.run("Tell me more", thread=resumed_thread)
+```
+
+### Alternative: Manual Thread Creation
+
+You can also create threads manually with explicit store instances:
+
+```python
+from common import CosmosDBChatMessageStore
+from agent_framework import AgentThread
+
+# Create a Cosmos DB-backed message store with specific thread ID
+cosmos_store = CosmosDBChatMessageStore(
+    connection_string=os.environ["COSMOS_DB_CONNECTION_STRING"],
+    thread_id="user-123-conversation-1",
+    max_messages=100,
+)
+
+# Use with Agent Framework's AgentThread
+thread = AgentThread(message_store=cosmos_store)
+result = await agent.run("What is Azure?", thread=thread)
+
+# Later: Resume the same conversation (even after app restart)
+resumed_store = CosmosDBChatMessageStore(
+    connection_string=os.environ["COSMOS_DB_CONNECTION_STRING"],
+    thread_id="user-123-conversation-1",  # Same thread ID
+)
+resumed_thread = AgentThread(message_store=resumed_store)
+result = await agent.run("Tell me more about that", thread=resumed_thread)
+```
+
+### Running with Cosmos DB
+
+```bash
+# Set the connection string
+export COSMOS_DB_CONNECTION_STRING="AccountEndpoint=https://..."
+
+# Run unpublished agent with Cosmos DB thread storage
+python unpublished_agent.py --cosmos
+
+# Combine with MCP options
+python unpublished_agent.py --hosted-mcp --cosmos
+
+# Run standalone Cosmos DB demo (shows persistence across "restarts")
+python unpublished_agent.py --cosmos
+```
+
+### Message Store Features
+
+Both implementations provide:
+
+- **Protocol Compliant**: Implements `add_messages`, `list_messages`, `serialize_state`, `deserialize_state`
+- **Thread Isolation**: Each conversation uses a unique key/partition
+- **Auto Message Limits**: Configurable automatic trimming of old messages
+- **Lazy Initialization**: Connects on first use
+- **State Serialization**: Compatible with Agent Framework thread serialization
+
+**Cosmos DB specific**:
+- Auto database/container creation
+- TTL support for automatic message expiration
+- Global distribution capability
+
+**Redis specific**:
+- Ultra-low latency (~1ms)
+- Simple setup with Redis Lists
+- Automatic key expiration via Redis TTL
 
 ## Prerequisites
 
@@ -67,6 +386,9 @@ AZURE_AI_APPLICATION_ENDPOINT=https://<your-foundry-resource>.services.ai.azure.
 
 # Model deployment name
 MODEL_DEPLOYMENT_NAME=gpt-5.2-chat
+
+# For Cosmos DB thread storage (optional)
+COSMOS_DB_CONNECTION_STRING=AccountEndpoint=https://<account>.documents.azure.com:443/;AccountKey=...
 ```
 
 ## Installation
@@ -76,7 +398,7 @@ MODEL_DEPLOYMENT_NAME=gpt-5.2-chat
 pip install agent-framework --pre
 
 # Install Azure dependencies
-pip install azure-identity azure-ai-projects
+pip install azure-identity azure-ai-projects azure-cosmos
 
 # Or use requirements.txt
 pip install -r requirements.txt
@@ -87,21 +409,45 @@ pip install -r requirements.txt
 ### Unpublished Agent (Development Mode)
 
 ```bash
-# Basic usage
+# Default: Show usage info and run hosted MCP demo
 python unpublished_agent.py
 
-# Interactive mode
-python unpublished_agent.py --interactive
+# Hosted MCP: Server-side MCP execution with local tools
+python unpublished_agent.py --hosted-mcp
+
+# Local MCP: Client-side MCP execution with local tools
+python unpublished_agent.py --local-mcp
+
+# Cosmos DB: Persistent thread storage demo
+python unpublished_agent.py --cosmos
+
+# Combine MCP and Cosmos DB
+python unpublished_agent.py --hosted-mcp --cosmos
+
+# Interactive architecture consultation
+python unpublished_agent.py --hosted-mcp --interactive
+
+# Custom architecture question
+python unpublished_agent.py --hosted-mcp -q "Validate: App Service + SQL + Redis Cache"
 ```
 
 ### Published Agent (Production Mode)
 
 ```bash
-# Basic usage
+# Default: Show usage info and run hosted MCP demo
 python published_agent.py
 
-# Interactive mode
-python published_agent.py --interactive
+# Hosted MCP: Server-side MCP execution with local tools
+python published_agent.py --hosted-mcp
+
+# Local MCP: Client-side MCP execution with local tools
+python published_agent.py --local-mcp
+
+# Interactive production consultation
+python published_agent.py --local-mcp --interactive
+
+# Generate Bicep for specific resource
+python published_agent.py --hosted-mcp -q "Generate Bicep for a Storage Account"
 ```
 
 ## Architecture Notes
