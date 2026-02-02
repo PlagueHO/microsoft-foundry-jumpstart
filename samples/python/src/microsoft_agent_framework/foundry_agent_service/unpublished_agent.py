@@ -44,7 +44,7 @@ Reference:
 
 import asyncio
 
-from azure.identity.aio import AzureCliCredential
+from azure.identity.aio import DefaultAzureCredential
 
 from common import (  # pylint: disable=import-error
     AZURE_ARCHITECT_INSTRUCTIONS,
@@ -57,6 +57,7 @@ from common import (  # pylint: disable=import-error
     estimate_azure_costs,
     generate_bicep_snippet,
     get_cosmos_connection_string,
+    get_model_deployment_name,
     get_project_endpoint,
     handle_approval_flow_with_thread,
     load_environment,
@@ -162,17 +163,22 @@ async def run_with_hosted_mcp(use_cosmos: bool = False) -> None:
     )
 
     async with (
-        AzureCliCredential() as credential,
-        AzureAIProjectAgentProvider(credential=credential) as provider,
+        DefaultAzureCredential() as credential,
+        AzureAIProjectAgentProvider(
+            credential=credential,
+            project_endpoint=project_endpoint
+        ) as provider,
     ):
         # Create agent with both MCP and local tools
         agent = await provider.create_agent(
             name=AZURE_ARCHITECT_NAME,
             instructions=AZURE_ARCHITECT_INSTRUCTIONS,
+            model=get_model_deployment_name(),
             tools=[mcp_tool] + local_tools,
         )
 
         print(f"Created agent: {agent.name}")
+        print(f"Model: {get_model_deployment_name()}")
         print("Tools: MCP (Microsoft Learn) + 3 local Python tools")
 
         # Create thread - with Cosmos DB or server-managed
@@ -293,17 +299,22 @@ async def run_with_local_mcp(use_cosmos: bool = False) -> None:
     )
 
     async with (
-        AzureCliCredential() as credential,
-        AzureAIProjectAgentProvider(credential=credential) as provider,
+        DefaultAzureCredential() as credential,
+        AzureAIProjectAgentProvider(
+            credential=credential,
+            project_endpoint=project_endpoint
+        ) as provider,
     ):
         # Create agent with both MCP and local tools
         agent = await provider.create_agent(
             name=AZURE_ARCHITECT_NAME,
             instructions=AZURE_ARCHITECT_INSTRUCTIONS,
+            model=get_model_deployment_name(),
             tools=[mcp_tool] + local_tools,
         )
 
         print(f"Created agent: {agent.name}")
+        print(f"Model: {get_model_deployment_name()}")
         print("Tools: MCP (Microsoft Learn) + 3 local Python tools")
 
         async with agent:
@@ -410,12 +421,16 @@ async def run_cosmos_demo() -> None:
     )
 
     async with (
-        AzureCliCredential() as credential,
-        AzureAIProjectAgentProvider(credential=credential) as provider,
+        DefaultAzureCredential() as credential,
+        AzureAIProjectAgentProvider(
+            credential=credential,
+            project_endpoint=project_endpoint
+        ) as provider,
     ):
         agent = await provider.create_agent(
             name=AZURE_ARCHITECT_NAME,
             instructions=AZURE_ARCHITECT_INSTRUCTIONS,
+            model=get_model_deployment_name(),
             tools=local_tools,
         )
 

@@ -495,6 +495,20 @@ def get_redis_url() -> Optional[str]:
     return os.environ.get("REDIS_URL")
 
 
+def get_model_deployment_name() -> str:
+    """Get the model deployment name from environment variables.
+    
+    Checks AZURE_AI_MODEL_DEPLOYMENT_NAME first (preferred),
+    then falls back to MODEL_DEPLOYMENT_NAME for backward compatibility.
+    Returns a default if neither is set.
+    """
+    return (
+        os.environ.get("AZURE_AI_MODEL_DEPLOYMENT_NAME") or
+        os.environ.get("MODEL_DEPLOYMENT_NAME") or
+        "gpt-5-mini"
+    )
+
+
 # ============================================================================
 # Client-Side Thread Management
 # ============================================================================
@@ -573,6 +587,7 @@ __all__ = [
     "get_application_endpoint",
     "get_cosmos_connection_string",
     "get_redis_url",
+    "get_model_deployment_name",
     "create_argument_parser",
     "ClientSideThread",
     "handle_approval_flow_with_thread",

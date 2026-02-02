@@ -46,7 +46,7 @@ import argparse
 import asyncio
 from typing import Any, List
 
-from azure.identity.aio import AzureCliCredential
+from azure.identity.aio import DefaultAzureCredential
 
 from common import (  # pylint: disable=import-error
     AZURE_ARCHITECT_INSTRUCTIONS,
@@ -186,7 +186,7 @@ async def run_with_hosted_mcp() -> None:
         return result
 
     async with (
-        AzureCliCredential() as credential,
+        DefaultAzureCredential() as credential,
         AIProjectClient(
             endpoint=application_endpoint,
             credential=credential
@@ -292,7 +292,7 @@ async def run_with_local_mcp() -> None:
     )
 
     async with (
-        AzureCliCredential() as credential,
+        DefaultAzureCredential() as credential,
         AIProjectClient(
             endpoint=application_endpoint,
             credential=credential

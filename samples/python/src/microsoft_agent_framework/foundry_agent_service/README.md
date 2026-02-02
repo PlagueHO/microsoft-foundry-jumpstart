@@ -385,7 +385,7 @@ PROJECT_ENDPOINT=https://<your-foundry-resource>.services.ai.azure.com/api/proje
 AZURE_AI_APPLICATION_ENDPOINT=https://<your-foundry-resource>.services.ai.azure.com/api/projects/<project-name>/applications/<app-name>/protocols
 
 # Model deployment name
-MODEL_DEPLOYMENT_NAME=gpt-5.2-chat
+AZURE_AI_MODEL_DEPLOYMENT_NAME=gpt-5-mini
 
 # For Cosmos DB thread storage (optional)
 COSMOS_DB_CONNECTION_STRING=AccountEndpoint=https://<account>.documents.azure.com:443/;AccountKey=...
