@@ -2,6 +2,10 @@
 # Install from PyPI - this includes all core components
 agent-framework>=0.1.0a1
 
+# Microsoft Agent Framework Redis Support (Official)
+# Provides RedisChatMessageStore for persistent thread storage
+agent-framework-redis>=0.1.0a1
+
 # Azure Identity for authentication
 azure-identity>=1.15.0
 
@@ -12,13 +16,6 @@ azure-ai-projects>=1.0.0b1
 # Azure Cosmos DB for persistent thread storage
 # Used by CosmosDBChatMessageStore for conversation persistence
 azure-cosmos>=4.5.0
-
-# Redis for persistent thread storage
-# Used by RedisChatMessageStore for conversation persistence
-redis>=5.0.0
-
-# Pydantic for data validation in message stores
-pydantic>=2.0.0
 
 # OpenAI client for published agent access
 # Published agents expose OpenAI-compatible Responses API

@@ -215,27 +215,28 @@ All combinations use the same Azure Architect tools and produce consistent resul
 | [unpublished_agent.py](unpublished_agent.py) | Azure Architect in development mode (project endpoint) with MCP + local tools |
 | [published_agent.py](published_agent.py) | Azure Architect in production mode (application endpoint) with MCP + local tools |
 | [common.py](common.py) | Shared: Azure Architect config, tools, ClientSideThread, re-exports message stores |
-| [cosmosdb_chat_message_store.py](cosmosdb_chat_message_store.py) | Cosmos DB persistent thread storage |
-| [redis_chat_message_store.py](redis_chat_message_store.py) | Redis persistent thread storage |
+| [cosmosdb_chat_message_store.py](cosmosdb_chat_message_store.py) | Cosmos DB persistent thread storage (custom implementation) |
+| [redis_chat_message_store.py](redis_chat_message_store.py) | **DEPRECATED**: Use `agent-framework-redis` package instead |
+
+> **Note**: Redis support now uses the official `agent-framework-redis` package. The custom
+> `redis_chat_message_store.py` file is deprecated and kept only for backward compatibility.
 
 ## Persistent Thread Storage
 
 For production scenarios, you may want persistent thread storage that survives application
-restarts. Two implementations are provided, following the official
-[Third-Party Chat History Storage](https://learn.microsoft.com/en-us/agent-framework/tutorials/agents/third-party-chat-history-storage?pivots=programming-language-python)
-pattern from Microsoft Agent Framework:
+restarts. Two implementations are provided:
 
-| Provider | Use Case | Latency | Scalability |
-|----------|----------|---------|-------------|
-| **Redis** | Low-latency, simple setup | Fastest (~1ms) | Single region / replicas |
-| **Cosmos DB** | Global distribution, durability | Low (~5-10ms) | Multi-region, auto-failover |
+| Provider | Use Case | Latency | Scalability | Package |
+|----------|----------|---------|-------------|----------|
+| **Redis** | Low-latency, simple setup | Fastest (~1ms) | Single region / replicas | `agent-framework-redis` (official) |
+| **Cosmos DB** | Global distribution, durability | Low (~5-10ms) | Multi-region, auto-failover | Custom implementation |
 
 ### Redis Thread Storage
 
-Use Redis when you need fast, simple persistent storage:
+Use the official `RedisChatMessageStore` from `agent-framework-redis` package for fast, simple persistent storage:
 
 ```python
-from redis_chat_message_store import RedisChatMessageStore
+from agent_framework_redis import RedisChatMessageStore
 from agent_framework import ChatAgent
 
 # Create agent with Redis message store factory
@@ -244,7 +245,7 @@ agent = ChatAgent(
     name="my-agent",
     instructions="You are a helpful assistant.",
     chat_message_store_factory=lambda: RedisChatMessageStore(
-        redis_url=os.environ["REDIS_URL"],
+        redis_url="redis://localhost:6379",
         max_messages=100,  # Auto-trim to last 100 messages
     )
 )
@@ -252,6 +253,25 @@ agent = ChatAgent(
 # Start a new conversation
 thread = agent.get_new_thread()
 response = await agent.run("What is Azure?", thread=thread)
+```
+
+**Azure Managed Redis with Azure AD:**
+
+```python
+from agent_framework_redis import RedisChatMessageStore
+from redis.credentials import CredentialProvider
+from azure.identity.aio import DefaultAzureCredential
+
+agent = ChatAgent(
+    chat_client=chat_client,
+    name="my-agent",
+    instructions="You are a helpful assistant.",
+    chat_message_store_factory=lambda: RedisChatMessageStore(
+        credential_provider=CredentialProvider(DefaultAzureCredential()),
+        host="myredis.redis.cache.windows.net",
+        max_messages=100,
+    )
+)
 ```
 
 ### Cosmos DB Thread Storage
@@ -361,10 +381,24 @@ Both implementations provide:
 - TTL support for automatic message expiration
 - Global distribution capability
 
-**Redis specific**:
+**Redis specific** (from `agent-framework-redis` package):
 - Ultra-low latency (~1ms)
 - Simple setup with Redis Lists
 - Automatic key expiration via Redis TTL
+- Azure AD authentication support for Azure Managed Redis
+
+### Additional Resources
+
+**Python Chat History Documentation:**
+- [Agent Chat History and Memory](https://learn.microsoft.com/agent-framework/tutorials/agents/chat-history) - Official Microsoft Agent Framework guide
+- [Multi-Turn Conversations with Azure AI Foundry](https://learn.microsoft.com/azure/ai-foundry/tutorials/agents/multi-turn) - Azure-specific guidance
+
+**.NET ChatHistoryProvider:**
+
+For .NET developers, use the official Cosmos DB ChatHistoryProvider:
+- [Microsoft.Agents.AI.CosmosNoSql](https://github.com/microsoft/agent-framework/tree/main/dotnet/src/Microsoft.Agents.AI.CosmosNoSql) - Official .NET implementation
+
+> **⚠️ Important Recommendation**: Always implement and test with a persistent `ChatMessageStore` (Python) or `ChatHistoryProvider` (.NET) as early as possible in your development cycle. The built-in Foundry conversation store should only be used for experimentation, as published agents require client-side storage.
 
 ## Prerequisites
 
@@ -397,12 +431,18 @@ COSMOS_DB_CONNECTION_STRING=AccountEndpoint=https://<account>.documents.azure.co
 # Install Microsoft Agent Framework (preview)
 pip install agent-framework --pre
 
+# Install official Redis support (optional, for persistent threads)
+pip install agent-framework-redis --pre
+
 # Install Azure dependencies
 pip install azure-identity azure-ai-projects azure-cosmos
 
 # Or use requirements.txt
 pip install -r requirements.txt
 ```
+
+> **Note**: The `agent-framework-redis` package is the official Microsoft implementation
+> for Redis support. It replaces the deprecated custom `redis_chat_message_store.py`.
 
 ## Running the Samples
 
@@ -724,6 +764,87 @@ configuration.
 | File content delivery | | ✅ In-context for published |
 | Pre-publish resource setup | | ✅ Vector stores, files |
 
+## Automating Agent Publication
+
+The agent publication process can be fully automated using the Azure Control Plane REST API, Azure Resource Manager (ARM), Bicep, or Terraform.
+
+### REST API
+
+Publish agents using the Azure Cognitive Services REST API:
+- [Publish Agents in Microsoft Foundry](https://learn.microsoft.com/azure/ai-foundry/agents/how-to/publish-agent) - Official publish guide
+
+### Infrastructure as Code (Bicep/Terraform)
+
+Agent Applications can be deployed as Azure resources:
+
+**Application Resource:**
+- [Microsoft.CognitiveServices/accounts/projects/applications](https://learn.microsoft.com/azure/templates/microsoft.cognitiveservices/accounts/projects/applications) - Bicep, ARM template & Terraform AzAPI reference
+
+**Agent Deployment Resource:**
+- [Microsoft.CognitiveServices/accounts/projects/applications/agentDeployments](https://learn.microsoft.com/azure/templates/microsoft.cognitiveservices/accounts/projects/applications/agentdeployments) - Bicep, ARM template & Terraform AzAPI reference
+
+### Example Bicep Template
+
+```bicep
+resource aiServices 'Microsoft.CognitiveServices/accounts@2024-10-01' existing = {
+  name: aiServicesName
+}
+
+resource project 'Microsoft.CognitiveServices/accounts/projects@2024-10-01' existing = {
+  parent: aiServices
+  name: projectName
+}
+
+resource application 'Microsoft.CognitiveServices/accounts/projects/applications@2024-10-01' = {
+  parent: project
+  name: applicationName
+  properties: {
+    displayName: 'Azure Architect Assistant'
+    description: 'AI assistant for Azure architecture and Well-Architected Framework'
+  }
+}
+
+resource agentDeployment 'Microsoft.CognitiveServices/accounts/projects/applications/agentDeployments@2024-10-01' = {
+  parent: application
+  name: 'default'
+  properties: {
+    agentName: agentName  // References the agent created in the project
+  }
+}
+```
+
+### CI/CD Integration
+
+Incorporate agent publication into your deployment pipeline:
+
+```yaml
+# Example: Azure DevOps pipeline step
+- task: AzureCLI@2
+  displayName: 'Publish Agent Application'
+  inputs:
+    azureSubscription: $(serviceConnection)
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az deployment group create \
+        --resource-group $(resourceGroup) \
+        --template-file infra/agent-application.bicep \
+        --parameters agentName=$(agentName) \
+        --parameters applicationName=$(applicationName)
+```
+
+### Agent Identity Configuration
+
+**Current Limitations (as of preview):**
+
+- Agent Identity is automatically created when an agent is published
+- Agent Identity naming/configuration may be customizable via the `agentDeployment` resource properties
+- APIs exist to configure Agent Identity attributes (Owner, Sponsor, etc.) but documentation is limited
+- Entra ID Terraform provider doesn't yet support Agent Identity resources
+- Assigning an existing Agent Identity to an agent during publishing is not yet documented
+
+This area is actively evolving in the preview. Check the latest documentation for updates.
+
 ## Observed Challenges in Microsoft Agent Framework (Preview)
 
 As Microsoft Agent Framework is currently in **preview**, the following limitations exist:
@@ -744,7 +865,17 @@ As Microsoft Agent Framework is currently in **preview**, the following limitati
 
 ## References
 
+### Microsoft Agent Framework
 - [Microsoft Agent Framework Documentation](https://learn.microsoft.com/agent-framework/)
-- [Microsoft Foundry Agents](https://learn.microsoft.com/azure/ai-foundry/agents/)
-- [Publishing Agents](https://learn.microsoft.com/azure/ai-foundry/agents/how-to/publish-agent)
 - [Agent Framework GitHub](https://github.com/microsoft/agent-framework)
+- [Agent Chat History and Memory](https://learn.microsoft.com/agent-framework/tutorials/agents/chat-history)
+- [.NET Cosmos DB ChatHistoryProvider](https://github.com/microsoft/agent-framework/tree/main/dotnet/src/Microsoft.Agents.AI.CosmosNoSql)
+
+### Azure AI Foundry Agents
+- [Microsoft Foundry Agents](https://learn.microsoft.com/azure/ai-foundry/agents/)
+- [Multi-Turn Conversations with Azure AI Foundry](https://learn.microsoft.com/azure/ai-foundry/tutorials/agents/multi-turn)
+- [Publishing Agents](https://learn.microsoft.com/azure/ai-foundry/agents/how-to/publish-agent)
+
+### Infrastructure as Code
+- [Application Resource - Bicep/ARM/Terraform](https://learn.microsoft.com/azure/templates/microsoft.cognitiveservices/accounts/projects/applications)
+- [Agent Deployment Resource - Bicep/ARM/Terraform](https://learn.microsoft.com/azure/templates/microsoft.cognitiveservices/accounts/projects/applications/agentdeployments)

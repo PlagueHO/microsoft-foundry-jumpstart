@@ -47,14 +47,13 @@ import asyncio
 from typing import Any, List
 
 from azure.identity.aio import DefaultAzureCredential
-
 from common import (  # pylint: disable=import-error
     AZURE_ARCHITECT_INSTRUCTIONS,
     AZURE_ARCHITECT_NAME,
     AZURE_ARCHITECT_TOOLS,
-    ClientSideThread,
     MCP_SERVER_NAME,
     MCP_SERVER_URL,
+    ClientSideThread,
     create_argument_parser,
     estimate_azure_costs,
     generate_bicep_snippet,
@@ -185,49 +184,47 @@ async def run_with_hosted_mcp() -> None:
         thread.add_message("assistant", str(result))
         return result
 
-    async with (
-        DefaultAzureCredential() as credential,
-        AIProjectClient(
+    async with DefaultAzureCredential() as credential:
+        async with AIProjectClient(
             endpoint=application_endpoint,
             credential=credential
-        ) as project_client,
-    ):
-        chat_client = AzureAIClient(project_client=project_client)
+        ) as project_client:
+            chat_client = AzureAIClient(project_client=project_client)
 
-        async with ChatAgent(
-            chat_client=chat_client,
-            name=AZURE_ARCHITECT_NAME,
-            instructions=AZURE_ARCHITECT_INSTRUCTIONS,
-            tools=[mcp_tool] + local_tools,
-        ) as agent:
-            print(f"Agent: {agent.name}")
-            print("Tools: MCP (Microsoft Learn) + 3 local Python tools")
-            thread = ClientSideThread()
+            async with ChatAgent(
+                chat_client=chat_client,
+                name=AZURE_ARCHITECT_NAME,
+                instructions=AZURE_ARCHITECT_INSTRUCTIONS,
+                tools=[mcp_tool] + local_tools,
+            ) as agent:
+                print(f"Agent: {agent.name}")
+                print("Tools: MCP (Microsoft Learn) + 3 local Python tools")
+                thread = ClientSideThread()
 
-            if args.interactive:
-                print("\n=== INTERACTIVE MODE (Hosted MCP - Published) ===")
-                print("Type 'quit' to exit. Type 'clear' to reset history.\n")
-                while True:
-                    try:
-                        question = input("Your question: ").strip()
-                        if question.lower() in ["quit", "exit", "q", ""]:
+                if args.interactive:
+                    print("\n=== INTERACTIVE MODE (Hosted MCP - Published) ===")
+                    print("Type 'quit' to exit. Type 'clear' to reset history.\n")
+                    while True:
+                        try:
+                            question = input("Your question: ").strip()
+                            if question.lower() in ["quit", "exit", "q", ""]:
+                                break
+                            if question.lower() == "clear":
+                                thread.clear()
+                                print("Conversation cleared.")
+                                continue
+                            print("\n[Server is making MCP call...]")
+                            result = await handle_approval_flow(question, agent, thread)
+                            print(f"\nAssistant: {result}\n")
+                        except KeyboardInterrupt:
                             break
-                        if question.lower() == "clear":
-                            thread.clear()
-                            print("Conversation cleared.")
-                            continue
-                        print("\n[Server is making MCP call...]")
-                        result = await handle_approval_flow(question, agent, thread)
-                        print(f"\nAssistant: {result}\n")
-                    except KeyboardInterrupt:
-                        break
-            else:
-                print(f"\nUser: {args.question}")
-                print("\n[Server is making MCP call...]")
-                result = await handle_approval_flow(args.question, agent, thread)
-                print(f"\nAssistant: {result}")
+                else:
+                    print(f"\nUser: {args.question}")
+                    print("\n[Server is making MCP call...]")
+                    result = await handle_approval_flow(args.question, agent, thread)
+                    print(f"\nAssistant: {result}")
 
-            print(f"\nConversation managed client-side: {len(thread.messages)} msgs")
+                print(f"\nConversation managed client-side: {len(thread.messages)} msgs")
 
 
 async def run_with_local_mcp() -> None:
@@ -291,54 +288,52 @@ async def run_with_local_mcp() -> None:
         url=MCP_SERVER_URL,
     )
 
-    async with (
-        DefaultAzureCredential() as credential,
-        AIProjectClient(
+    async with DefaultAzureCredential() as credential:
+        async with AIProjectClient(
             endpoint=application_endpoint,
             credential=credential
-        ) as project_client,
-    ):
-        chat_client = AzureAIClient(project_client=project_client)
+        ) as project_client:
+            chat_client = AzureAIClient(project_client=project_client)
 
-        async with ChatAgent(
-            chat_client=chat_client,
-            name=AZURE_ARCHITECT_NAME,
-            instructions=AZURE_ARCHITECT_INSTRUCTIONS,
-            tools=[mcp_tool] + local_tools,
-        ) as agent:
-            print(f"Agent: {agent.name}")
-            print("Tools: MCP (Microsoft Learn) + 3 local Python tools")
-            thread = ClientSideThread()
+            async with ChatAgent(
+                chat_client=chat_client,
+                name=AZURE_ARCHITECT_NAME,
+                instructions=AZURE_ARCHITECT_INSTRUCTIONS,
+                tools=[mcp_tool] + local_tools,
+            ) as agent:
+                print(f"Agent: {agent.name}")
+                print("Tools: MCP (Microsoft Learn) + 3 local Python tools")
+                thread = ClientSideThread()
 
-            if args.interactive:
-                print("\n=== INTERACTIVE MODE (Local MCP - Published) ===")
-                print("Type 'quit' to exit. Type 'clear' to reset history.\n")
-                while True:
-                    try:
-                        question = input("Your question: ").strip()
-                        if question.lower() in ["quit", "exit", "q", ""]:
+                if args.interactive:
+                    print("\n=== INTERACTIVE MODE (Local MCP - Published) ===")
+                    print("Type 'quit' to exit. Type 'clear' to reset history.\n")
+                    while True:
+                        try:
+                            question = input("Your question: ").strip()
+                            if question.lower() in ["quit", "exit", "q", ""]:
+                                break
+                            if question.lower() == "clear":
+                                thread.clear()
+                                print("Conversation cleared.")
+                                continue
+                            messages = thread.get_messages() + [
+                                {"role": "user", "content": question}
+                            ]
+                            print("\n[Client is making MCP call...]")
+                            result = await agent.run(messages)  # type: ignore[arg-type]
+                            thread.add_message("user", question)
+                            thread.add_message("assistant", str(result))
+                            print(f"\nAssistant: {result}\n")
+                        except KeyboardInterrupt:
                             break
-                        if question.lower() == "clear":
-                            thread.clear()
-                            print("Conversation cleared.")
-                            continue
-                        messages = thread.get_messages() + [
-                            {"role": "user", "content": question}
-                        ]
-                        print("\n[Client is making MCP call...]")
-                        result = await agent.run(messages)  # type: ignore[arg-type]
-                        thread.add_message("user", question)
-                        thread.add_message("assistant", str(result))
-                        print(f"\nAssistant: {result}\n")
-                    except KeyboardInterrupt:
-                        break
-            else:
-                print(f"\nUser: {args.question}")
-                print("\n[Client is making MCP call...]")
-                result = await agent.run(args.question)
-                print(f"\nAssistant: {result}")
+                else:
+                    print(f"\nUser: {args.question}")
+                    print("\n[Client is making MCP call...]")
+                    result = await agent.run(args.question)
+                    print(f"\nAssistant: {result}")
 
-            print(f"\nConversation managed client-side: {len(thread.messages)} msgs")
+                print(f"\nConversation managed client-side: {len(thread.messages)} msgs")
 
 
 async def main() -> None:

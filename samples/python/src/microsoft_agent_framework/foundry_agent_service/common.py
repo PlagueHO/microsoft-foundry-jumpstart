@@ -23,7 +23,6 @@ import os
 from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
-
 # ============================================================================
 # MCP Configuration - Same for all samples
 # ============================================================================
@@ -497,7 +496,7 @@ def get_redis_url() -> Optional[str]:
 
 def get_model_deployment_name() -> str:
     """Get the model deployment name from environment variables.
-    
+
     Checks AZURE_AI_MODEL_DEPLOYMENT_NAME first (preferred),
     then falls back to MODEL_DEPLOYMENT_NAME for backward compatibility.
     Returns a default if neither is set.
@@ -558,14 +557,26 @@ class ClientSideThread:
 
 
 # ============================================================================
-# Chat Message Store Providers (re-exported from separate modules)
+# Chat Message Store Providers
 # ============================================================================
 
-# Re-export the chat message store implementations for convenience
-# These are in separate files so they can be used independently
+# Re-export the official chat message store implementations
+# CosmosDB implementation is custom (AVM doesn't provide one yet)
+# Redis implementation is from the official agent-framework-redis package
 # pylint: disable=wrong-import-position,import-error
 from cosmosdb_chat_message_store import CosmosDBChatMessageStore  # noqa: E402
-from redis_chat_message_store import RedisChatMessageStore  # noqa: E402
+
+try:
+    from agent_framework_redis import RedisChatMessageStore  # noqa: E402
+except ImportError:
+    # Provide a helpful error if the package isn't installed
+    class RedisChatMessageStore:  # type: ignore[no-redef]
+        """Placeholder for missing agent_framework_redis package."""
+        def __init__(self, *args, **kwargs):  # type: ignore[no-untyped-def]
+            raise ImportError(
+                "agent_framework_redis package is required for Redis support. "
+                "Install with: pip install agent-framework-redis --pre"
+            )
 
 __all__ = [
     # Chat message stores

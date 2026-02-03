@@ -12,7 +12,8 @@ Get the Azure Architect Agent samples running in 5 minutes.
 
 ```bash
 pip install agent-framework --pre
-pip install azure-identity azure-ai-projects azure-cosmos redis
+pip install agent-framework-redis --pre  # Official Redis support
+pip install azure-identity azure-ai-projects azure-cosmos
 ```
 
 Or use the requirements file:
@@ -20,6 +21,9 @@ Or use the requirements file:
 ```bash
 pip install -r requirements.txt
 ```
+
+> **Note**: `agent-framework-redis` is the official Microsoft package for Redis support.
+> The custom `redis_chat_message_store.py` is deprecated.
 
 ## 2. Configure Environment
 

@@ -22,6 +22,7 @@ import os
 
 from azure.identity.aio import DefaultAzureCredential
 from dotenv import load_dotenv
+
 from semantic_kernel.agents import AzureAIAgent, AzureAIAgentSettings
 
 # Load environment variables

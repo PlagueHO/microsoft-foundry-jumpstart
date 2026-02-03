@@ -24,7 +24,6 @@ from typing import Any, Dict, List, Optional
 from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
 from openai import AzureOpenAI
-
 from tools.fallacy_detector import detect_fallacies
 from tools.syllogism import evaluate_syllogism
 

@@ -45,14 +45,13 @@ Reference:
 import asyncio
 
 from azure.identity.aio import DefaultAzureCredential
-
 from common import (  # pylint: disable=import-error
     AZURE_ARCHITECT_INSTRUCTIONS,
     AZURE_ARCHITECT_NAME,
     AZURE_ARCHITECT_TOOLS,
-    CosmosDBChatMessageStore,
     MCP_SERVER_NAME,
     MCP_SERVER_URL,
+    CosmosDBChatMessageStore,
     create_argument_parser,
     estimate_azure_costs,
     generate_bicep_snippet,
@@ -162,32 +161,30 @@ async def run_with_hosted_mcp(use_cosmos: bool = False) -> None:
         approval_mode="never_require",
     )
 
-    async with (
-        DefaultAzureCredential() as credential,
-        AzureAIProjectAgentProvider(
+    async with DefaultAzureCredential() as credential:
+        async with AzureAIProjectAgentProvider(
             credential=credential,
             project_endpoint=project_endpoint
-        ) as provider,
-    ):
-        # Create agent with both MCP and local tools
-        agent = await provider.create_agent(
-            name=AZURE_ARCHITECT_NAME,
-            instructions=AZURE_ARCHITECT_INSTRUCTIONS,
-            model=get_model_deployment_name(),
-            tools=[mcp_tool] + local_tools,
-        )
+        ) as provider:
+            # Create agent with both MCP and local tools
+            agent = await provider.create_agent(
+                name=AZURE_ARCHITECT_NAME,
+                instructions=AZURE_ARCHITECT_INSTRUCTIONS,
+                model=get_model_deployment_name(),
+                tools=[mcp_tool] + local_tools,
+            )
 
-        print(f"Created agent: {agent.name}")
-        print(f"Model: {get_model_deployment_name()}")
-        print("Tools: MCP (Microsoft Learn) + 3 local Python tools")
+            print(f"Created agent: {agent.name}")
+            print(f"Model: {get_model_deployment_name()}")
+            print("Tools: MCP (Microsoft Learn) + 3 local Python tools")
 
-        # Create thread - with Cosmos DB or server-managed
-        if cosmos_store:
-            thread = AgentThread(message_store=cosmos_store)
-            print(f"Using persistent thread: {cosmos_store.thread_id}")
-        else:
-            thread = agent.get_new_thread()
-            print("Using server-managed thread")
+            # Create thread - with Cosmos DB or server-managed
+            if cosmos_store:
+                thread = AgentThread(message_store=cosmos_store)
+                print(f"Using persistent thread: {cosmos_store.thread_id}")
+            else:
+                thread = agent.get_new_thread()
+                print("Using server-managed thread")
 
         if args.interactive:
             print("\n=== AZURE ARCHITECT - INTERACTIVE MODE ===")
@@ -213,11 +210,11 @@ async def run_with_hosted_mcp(use_cosmos: bool = False) -> None:
             )
             print(f"\nAssistant: {result}")
 
-        # Show Cosmos DB persistence info
-        if cosmos_store:
-            messages = await cosmos_store.list_messages()
-            print(f"\nMessages stored in Cosmos DB: {len(messages)}")
-            await cosmos_store.aclose()
+            # Show Cosmos DB persistence info
+            if cosmos_store:
+                messages = await cosmos_store.list_messages()
+                print(f"\nMessages stored in Cosmos DB: {len(messages)}")
+                await cosmos_store.aclose()
 
 
 async def run_with_local_mcp(use_cosmos: bool = False) -> None:
@@ -298,58 +295,56 @@ async def run_with_local_mcp(use_cosmos: bool = False) -> None:
         url=MCP_SERVER_URL,
     )
 
-    async with (
-        DefaultAzureCredential() as credential,
-        AzureAIProjectAgentProvider(
+    async with DefaultAzureCredential() as credential:
+        async with AzureAIProjectAgentProvider(
             credential=credential,
             project_endpoint=project_endpoint
-        ) as provider,
-    ):
-        # Create agent with both MCP and local tools
-        agent = await provider.create_agent(
-            name=AZURE_ARCHITECT_NAME,
-            instructions=AZURE_ARCHITECT_INSTRUCTIONS,
-            model=get_model_deployment_name(),
-            tools=[mcp_tool] + local_tools,
-        )
+        ) as provider:
+            # Create agent with both MCP and local tools
+            agent = await provider.create_agent(
+                name=AZURE_ARCHITECT_NAME,
+                instructions=AZURE_ARCHITECT_INSTRUCTIONS,
+                model=get_model_deployment_name(),
+                tools=[mcp_tool] + local_tools,
+            )
 
-        print(f"Created agent: {agent.name}")
-        print(f"Model: {get_model_deployment_name()}")
-        print("Tools: MCP (Microsoft Learn) + 3 local Python tools")
+            print(f"Created agent: {agent.name}")
+            print(f"Model: {get_model_deployment_name()}")
+            print("Tools: MCP (Microsoft Learn) + 3 local Python tools")
 
-        async with agent:
-            # Create thread - with Cosmos DB or default
-            if cosmos_store:
-                thread = AgentThread(message_store=cosmos_store)
-                print(f"Using persistent thread: {cosmos_store.thread_id}")
-            else:
-                thread = agent.get_new_thread()
-                print("Using default thread")
+            async with agent:
+                # Create thread - with Cosmos DB or default
+                if cosmos_store:
+                    thread = AgentThread(message_store=cosmos_store)
+                    print(f"Using persistent thread: {cosmos_store.thread_id}")
+                else:
+                    thread = agent.get_new_thread()
+                    print("Using default thread")
 
-            if args.interactive:
-                print("\n=== AZURE ARCHITECT - INTERACTIVE MODE ===")
-                print("Ask about Azure architecture, costs, or IaC generation.")
-                print("Type 'quit' to exit.\n")
-                while True:
-                    try:
-                        question = input("You: ").strip()
-                        if question.lower() in ["quit", "exit", "q", ""]:
+                if args.interactive:
+                    print("\n=== AZURE ARCHITECT - INTERACTIVE MODE ===")
+                    print("Ask about Azure architecture, costs, or IaC generation.")
+                    print("Type 'quit' to exit.\n")
+                    while True:
+                        try:
+                            question = input("You: ").strip()
+                            if question.lower() in ["quit", "exit", "q", ""]:
+                                break
+                            print("\n[Processing with MCP + local tools...]")
+                            result = await agent.run(question, thread=thread)
+                            print(f"\nArchitect: {result}\n")
+                        except KeyboardInterrupt:
                             break
-                        print("\n[Processing with MCP + local tools...]")
-                        result = await agent.run(question, thread=thread)
-                        print(f"\nArchitect: {result}\n")
-                    except KeyboardInterrupt:
-                        break
-            else:
-                print(f"\nYou: {args.question}")
-                print("\n[Processing with MCP + local tools...]")
-                result = await agent.run(args.question, thread=thread)
-                print(f"\nArchitect: {result}")
+                else:
+                    print(f"\nYou: {args.question}")
+                    print("\n[Processing with MCP + local tools...]")
+                    result = await agent.run(args.question, thread=thread)
+                    print(f"\nArchitect: {result}")
 
-            if cosmos_store:
-                messages = await cosmos_store.list_messages()
-                print(f"\nMessages stored in Cosmos DB: {len(messages)}")
-                await cosmos_store.aclose()
+                if cosmos_store:
+                    messages = await cosmos_store.list_messages()
+                    print(f"\nMessages stored in Cosmos DB: {len(messages)}")
+                    await cosmos_store.aclose()
 
 
 async def run_cosmos_demo() -> None:
@@ -420,22 +415,20 @@ async def run_cosmos_demo() -> None:
         max_messages=50,
     )
 
-    async with (
-        DefaultAzureCredential() as credential,
-        AzureAIProjectAgentProvider(
+    async with DefaultAzureCredential() as credential:
+        async with AzureAIProjectAgentProvider(
             credential=credential,
             project_endpoint=project_endpoint
-        ) as provider,
-    ):
-        agent = await provider.create_agent(
-            name=AZURE_ARCHITECT_NAME,
-            instructions=AZURE_ARCHITECT_INSTRUCTIONS,
-            model=get_model_deployment_name(),
-            tools=local_tools,
-        )
+        ) as provider:
+            agent = await provider.create_agent(
+                name=AZURE_ARCHITECT_NAME,
+                instructions=AZURE_ARCHITECT_INSTRUCTIONS,
+                model=get_model_deployment_name(),
+                tools=local_tools,
+            )
 
-        # Session 1: Start architecture consultation
-        thread1 = AgentThread(message_store=store1)
+            # Session 1: Start architecture consultation
+            thread1 = AgentThread(message_store=store1)
 
         query1 = "I need to design a web application on Azure for an e-commerce site."
         print(f"You: {query1}")
@@ -471,7 +464,7 @@ async def run_cosmos_demo() -> None:
         print(f"\n[Total messages after resuming: {len(messages_after)}]")
 
         # Cleanup (optional - remove for true persistence demo)
-        print("\nCleaning up demo data...")
+        print("\\nCleaning up demo data...")
         await store2.clear()
         await store2.aclose()
         print("Done!")

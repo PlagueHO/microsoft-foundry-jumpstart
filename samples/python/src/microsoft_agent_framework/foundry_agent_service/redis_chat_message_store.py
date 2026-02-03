@@ -1,12 +1,24 @@
 """
 Redis-backed ChatMessageStore for Microsoft Agent Framework.
 
-This module provides a Redis implementation of the ChatMessageStore protocol
-for persistent chat history storage, following the official Microsoft Agent
-Framework documentation pattern:
-https://learn.microsoft.com/agent-framework/tutorials/agents/third-party-chat-history-storage
+**DEPRECATED**: This custom implementation is deprecated as of the official
+agent-framework-redis package release. Use the official package instead:
 
-Usage with chat_message_store_factory:
+    pip install agent-framework-redis --pre
+
+    from agent_framework_redis import RedisChatMessageStore
+
+The official implementation provides:
+- Better performance and reliability
+- Azure AD authentication support for Azure Managed Redis
+- Production-ready error handling and connection pooling
+- Official support and updates from Microsoft
+
+This file is kept for backward compatibility only and may be removed in future versions.
+
+Documentation: https://learn.microsoft.com/agent-framework/tutorials/agents/third-party-chat-history-storage
+
+Legacy Usage (not recommended):
     ```python
     from redis_chat_message_store import RedisChatMessageStore
 
@@ -28,11 +40,21 @@ Prerequisites:
 # pyright: reportUnknownArgumentType=false
 
 import json
+import warnings
 from collections.abc import Sequence
 from typing import Any, Dict, List
 from uuid import uuid4
 
 from pydantic import BaseModel
+
+# Emit deprecation warning when imported
+warnings.warn(
+    "The custom redis_chat_message_store module is deprecated. "
+    "Use the official 'agent-framework-redis' package instead: "
+    "pip install agent-framework-redis --pre",
+    DeprecationWarning,
+    stacklevel=2
+)
 
 
 class RedisStoreState(BaseModel):
