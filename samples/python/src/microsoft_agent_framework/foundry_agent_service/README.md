@@ -377,11 +377,13 @@ Both implementations provide:
 - **State Serialization**: Compatible with Agent Framework thread serialization
 
 **Cosmos DB specific**:
+
 - Auto database/container creation
 - TTL support for automatic message expiration
 - Global distribution capability
 
 **Redis specific** (from `agent-framework-redis` package):
+
 - Ultra-low latency (~1ms)
 - Simple setup with Redis Lists
 - Automatic key expiration via Redis TTL
@@ -390,12 +392,14 @@ Both implementations provide:
 ### Additional Resources
 
 **Python Chat History Documentation:**
+
 - [Agent Chat History and Memory](https://learn.microsoft.com/agent-framework/tutorials/agents/chat-history) - Official Microsoft Agent Framework guide
 - [Multi-Turn Conversations with Azure AI Foundry](https://learn.microsoft.com/azure/ai-foundry/tutorials/agents/multi-turn) - Azure-specific guidance
 
 **.NET ChatHistoryProvider:**
 
 For .NET developers, use the official Cosmos DB ChatHistoryProvider:
+
 - [Microsoft.Agents.AI.CosmosNoSql](https://github.com/microsoft/agent-framework/tree/main/dotnet/src/Microsoft.Agents.AI.CosmosNoSql) - Official .NET implementation
 
 > **⚠️ Important Recommendation**: Always implement and test with a persistent `ChatMessageStore` (Python) or `ChatHistoryProvider` (.NET) as early as possible in your development cycle. The built-in Foundry conversation store should only be used for experimentation, as published agents require client-side storage.
@@ -771,6 +775,7 @@ The agent publication process can be fully automated using the Azure Control Pla
 ### REST API
 
 Publish agents using the Azure Cognitive Services REST API:
+
 - [Publish Agents in Microsoft Foundry](https://learn.microsoft.com/azure/ai-foundry/agents/how-to/publish-agent) - Official publish guide
 
 ### Infrastructure as Code (Bicep/Terraform)
@@ -778,9 +783,11 @@ Publish agents using the Azure Cognitive Services REST API:
 Agent Applications can be deployed as Azure resources:
 
 **Application Resource:**
+
 - [Microsoft.CognitiveServices/accounts/projects/applications](https://learn.microsoft.com/azure/templates/microsoft.cognitiveservices/accounts/projects/applications) - Bicep, ARM template & Terraform AzAPI reference
 
 **Agent Deployment Resource:**
+
 - [Microsoft.CognitiveServices/accounts/projects/applications/agentDeployments](https://learn.microsoft.com/azure/templates/microsoft.cognitiveservices/accounts/projects/applications/agentdeployments) - Bicep, ARM template & Terraform AzAPI reference
 
 ### Example Bicep Template
@@ -866,16 +873,19 @@ As Microsoft Agent Framework is currently in **preview**, the following limitati
 ## References
 
 ### Microsoft Agent Framework
+
 - [Microsoft Agent Framework Documentation](https://learn.microsoft.com/agent-framework/)
 - [Agent Framework GitHub](https://github.com/microsoft/agent-framework)
 - [Agent Chat History and Memory](https://learn.microsoft.com/agent-framework/tutorials/agents/chat-history)
 - [.NET Cosmos DB ChatHistoryProvider](https://github.com/microsoft/agent-framework/tree/main/dotnet/src/Microsoft.Agents.AI.CosmosNoSql)
 
 ### Azure AI Foundry Agents
+
 - [Microsoft Foundry Agents](https://learn.microsoft.com/azure/ai-foundry/agents/)
 - [Multi-Turn Conversations with Azure AI Foundry](https://learn.microsoft.com/azure/ai-foundry/tutorials/agents/multi-turn)
 - [Publishing Agents](https://learn.microsoft.com/azure/ai-foundry/agents/how-to/publish-agent)
 
 ### Infrastructure as Code
+
 - [Application Resource - Bicep/ARM/Terraform](https://learn.microsoft.com/azure/templates/microsoft.cognitiveservices/accounts/projects/applications)
 - [Agent Deployment Resource - Bicep/ARM/Terraform](https://learn.microsoft.com/azure/templates/microsoft.cognitiveservices/accounts/projects/applications/agentdeployments)
