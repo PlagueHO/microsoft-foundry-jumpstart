@@ -76,6 +76,11 @@ works in **both** environments with minimal changes:
 - **Files**: For published agents, file content can be passed in-context rather than uploaded
 - **MCP Tools**: Model Context Protocol tools work identically in both modes (see below)
 
+> [!WARNING]
+> **Python SDK Limitation**: As of February 2025, the Python Microsoft Agent Framework SDK **does not support published Agent Applications**. The framework only works with unpublished (project) agents. For published agents, you must use direct REST API calls. See [Observed Challenges](#observed-challenges-in-microsoft-agent-framework-preview) for complete details and workaround code.
+>
+> **Impact**: The advantages listed above are **theoretical** for published agents until SDK support is added. Currently, only unpublished agents can use the framework's abstractions in Python.
+
 ## MCP Tool Execution: Server-Side vs Client-Side
 
 A key capability of Microsoft Agent Framework is **MCP (Model Context Protocol)** tool support.
@@ -210,14 +215,16 @@ All combinations use the same Azure Architect tools and produce consistent resul
 
 ## Samples
 
-| Sample | Description |
-|--------|-------------|
-| [unpublished_agent.py](unpublished_agent.py) | Azure Architect in development mode (project endpoint) with MCP + local tools |
-| [published_agent.py](published_agent.py) | Azure Architect in production mode (application endpoint) with MCP + local tools |
-| [common.py](common.py) | Shared: Azure Architect config, tools, ClientSideThread, re-exports message stores |
-| [cosmosdb_chat_message_store.py](cosmosdb_chat_message_store.py) | Cosmos DB persistent thread storage (custom implementation) |
-| [redis_chat_message_store.py](redis_chat_message_store.py) | **DEPRECATED**: Use `agent-framework-redis` package instead |
+| Sample | Description | SDK Support |
+|--------|-------------|-------------|
+| [unpublished_agent.py](unpublished_agent.py) | Azure Architect in development mode (project endpoint) with MCP + local tools | ✅ **Fully Supported** |
+| [published_agent.py](published_agent.py) | Azure Architect in production mode (application endpoint) with MCP + local tools | ⚠️ **Requires REST API Workaround** (see [Observed Challenges](#observed-challenges-in-microsoft-agent-framework-preview)) |
+| [common.py](common.py) | Shared: Azure Architect config, tools, ClientSideThread, re-exports message stores | N/A |
+| [cosmosdb_chat_message_store.py](cosmosdb_chat_message_store.py) | Cosmos DB persistent thread storage (custom implementation) | ✅ **Fully Supported** |
+| [redis_chat_message_store.py](redis_chat_message_store.py) | **DEPRECATED**: Use `agent-framework-redis` package instead | ⚠️ Deprecated |
 
+> [!IMPORTANT]
+> **Published Agent Limitation**: The Python Microsoft Agent Framework SDK does not currently support published Agent Applications (production endpoints). The `published_agent.py` sample demonstrates the required REST API workaround pattern. See [Observed Challenges](#observed-challenges-in-microsoft-agent-framework-preview) for detailed explanation and tracking issues.
 > **Note**: Redis support now uses the official `agent-framework-redis` package. The custom
 > `redis_chat_message_store.py` file is deprecated and kept only for backward compatibility.
 
@@ -476,6 +483,9 @@ python unpublished_agent.py --hosted-mcp -q "Validate: App Service + SQL + Redis
 ```
 
 ### Published Agent (Production Mode)
+
+> [!WARNING]
+> **SDK Limitation**: The commands below demonstrate the intended usage pattern, but currently **require REST API workaround code** due to lack of SDK support for published agents. The `published_agent.py` file contains the necessary workaround. See [Observed Challenges](#observed-challenges-in-microsoft-agent-framework-preview) for details.
 
 ```bash
 # Default: Show usage info and run hosted MCP demo
@@ -856,19 +866,112 @@ This area is actively evolving in the preview. Check the latest documentation fo
 
 As Microsoft Agent Framework is currently in **preview**, the following limitations exist:
 
-1. **No direct Microsoft Foundry Application endpoint support in agent-framework.azure module**:
-   As of the preview, direct integration with published Agent Applications requires using
-   the OpenAI-compatible endpoint directly. The framework's `AzureAIProjectAgentProvider`
-   works with project endpoints but not application endpoints.
+### 1. No Published Agent Support in Python SDK (Critical Limitation)
 
-2. **File upload during published agent runs**: Published agents cannot access `/files` API,
-   so files must be passed as context in the message content.
+**Status**: The Python Microsoft Agent Framework SDK **does not support published Agent Applications**. This is a fundamental gap that prevents using the SDK for production scenarios.
 
-3. **Vector store creation**: Published agents cannot create vector stores dynamically;
-   these should be configured at the agent definition level before publishing.
+**What's Missing**:
 
-4. **Server-side thread management**: The `azure-ai-projects` V2 SDK thread APIs are not
-   available through published agent endpoints; use client-side `ChatMessageStore` instead.
+| Component | Issue | Impact |
+|-----------|-------|--------|
+| **Client Class** | No `AzureAIApplicationClient` or equivalent for application endpoints | Cannot initialize clients for published agents |
+| **Agent Provider** | `AzureAIProjectAgentProvider` only works with project endpoints (`/api/projects/{project}`) | Framework's agent creation APIs are incompatible with application endpoints |
+| **Published Endpoint Support** | SDK doesn't recognize `/api/projects/{project}/applications/{app}/protocols/openai/responses` pattern | Must use direct REST API calls |
+| **Underlying SDK** | `azure-ai-projects` package lacks published agent APIs | No lower-level SDK support to build upon |
+
+**Why This Matters**:
+
+Published agents are the **only supported production deployment model** for Agent Applications. Without SDK support, developers must:
+
+1. **Use Raw REST API Calls**: Bypass the framework entirely and make direct HTTP requests
+2. **Implement Manual Authentication**: Handle Azure credential token retrieval manually
+3. **Manage Conversation State**: Manually serialize/deserialize conversation history
+4. **Handle Protocol Details**: Deal with OpenAI protocol compatibility layer directly
+
+**Current Workaround** (Required Until SDK Support Arrives):
+
+```python
+import httpx
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+
+# Manual token provider
+credential = DefaultAzureCredential()
+token_provider = get_bearer_token_provider(
+    credential, 
+    "https://ai.azure.com/.default"
+)
+
+# Direct REST API call to published agent
+endpoint = "https://{resource}.services.ai.azure.com/api/projects/{project}/applications/{app}/protocols/openai/responses"
+
+async with httpx.AsyncClient() as client:
+    response = await client.post(
+        endpoint,
+        headers={
+            "Authorization": f"Bearer {token_provider()}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "messages": [{"role": "user", "content": "What is Azure?"}],
+            "store": False,  # Published agents don't support server-side storage
+        }
+    )
+    result = response.json()
+```
+
+**Comparison with .NET**:
+
+The .NET SDK has a **partial workaround** documented in [GitHub issue #54426](https://github.com/Azure/azure-sdk-for-net/issues/54426):
+
+```csharp
+// .NET workaround: Direct client initialization with custom pipeline
+var azureOpenAIClient = new AzureOpenAIClient(
+    new Uri(endpoint),
+    new DefaultAzureCredential(),
+    new AzureOpenAIClientOptions {
+        NetworkTimeout = TimeSpan.FromMinutes(5)
+    }
+);
+
+var agentClient = azureOpenAIClient.GetAgentClient();
+```
+
+**Python has no equivalent approach** because:
+
+- The Python SDK architecture doesn't expose the same client initialization extensibility
+- No documented pattern exists for connecting Agent Framework to application endpoints
+- The `agent-framework` package's `AzureAIClient` doesn't accept application endpoint URLs
+
+**Tracking**:
+
+- Python Agent Framework: No issue raised yet for published agent support, but it's a critical gap that needs to be addressed before production use. Developers should monitor the GitHub repository for updates and raise an issue if they need this feature urgently.
+- .NET Agent Framework: [microsoft/agent-framework#2722](https://github.com/microsoft/agent-framework/issues/2722)
+- .NET Azure SDK: [Azure/azure-sdk-for-net#54426](https://github.com/Azure/azure-sdk-for-net/issues/54426) (partial workaround available)
+
+**Impact on Samples**:
+
+- ✅ `unpublished_agent.py` - **Works**: Uses project endpoints with full SDK support
+- ❌ `published_agent.py` - **Requires workaround**: Cannot use Agent Framework APIs, must use REST API directly
+
+**Recommendation**: Until SDK support is added, use REST API workaround for published agents or remain on unpublished (project) agents for development scenarios where the framework's high-level abstractions are valuable.
+
+### 2. File Upload During Published Agent Runs
+
+Published agents cannot access the `/files` API endpoint. Files must be passed as inline content in message context rather than uploaded separately.
+
+**Workaround**: Include file content directly in message content using base64 encoding or text inclusion.
+
+### 3. Vector Store Creation
+
+Published agents cannot create vector stores dynamically via API. Vector stores must be pre-configured at the agent definition level before publishing.
+
+**Workaround**: Configure all required vector stores during agent creation, before publishing. Use IaC (Bicep/Terraform) to ensure vector stores are created with the agent definition.
+
+### 4. Server-Side Thread Management
+
+The `azure-ai-projects` V2 SDK thread APIs (`/threads`, `/conversations`) are not available through published agent endpoints. Published agents require client-side conversation history management.
+
+**Workaround**: Use Agent Framework's `ChatMessageStore` implementations (Redis, Cosmos DB) for persistent conversation storage, or implement custom storage using the `ChatMessageStore` protocol.
 
 ## References
 
