@@ -73,7 +73,9 @@
     "aifp",
     "aisch",
     "aifhp",
-    "aisvc"
+    "aisvc",
+    "agentic",
+    "Entra"
   ],
   "ignorePaths": [
     "node_modules/**",
