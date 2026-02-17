@@ -1,0 +1,122 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "languageVersion": "2.0",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.40.2.10011",
+      "templateHash": "10797061714279501803"
+    }
+  },
+  "definitions": {
+    "secretSetOutputType": {
+      "type": "object",
+      "properties": {
+        "secretResourceId": {
+          "type": "string",
+          "metadata": {
+            "description": "The resourceId of the exported secret."
+          }
+        },
+        "secretUri": {
+          "type": "string",
+          "metadata": {
+            "description": "The secret URI of the exported secret."
+          }
+        },
+        "secretUriWithVersion": {
+          "type": "string",
+          "metadata": {
+            "description": "The secret URI with version of the exported secret."
+          }
+        }
+      },
+      "metadata": {
+        "description": "An AVM-aligned type for the output of the secret set via the secrets export feature.",
+        "__bicep_imported_from!": {
+          "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.0"
+        }
+      }
+    },
+    "secretToSetType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The name of the secret to set."
+          }
+        },
+        "value": {
+          "type": "securestring",
+          "metadata": {
+            "description": "Required. The value of the secret to set."
+          }
+        }
+      },
+      "metadata": {
+        "description": "An AVM-aligned type for the secret to set via the secrets export feature.",
+        "__bicep_imported_from!": {
+          "sourceTemplate": "br:mcr.microsoft.com/bicep/avm/utl/types/avm-common-types:0.6.0"
+        }
+      }
+    }
+  },
+  "parameters": {
+    "keyVaultName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the Key Vault to set the secrets in."
+      }
+    },
+    "secretsToSet": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/secretToSetType"
+      },
+      "metadata": {
+        "description": "Required. The secrets to set in the Key Vault."
+      }
+    }
+  },
+  "resources": {
+    "keyVault": {
+      "existing": true,
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2022-07-01",
+      "name": "[parameters('keyVaultName')]"
+    },
+    "secrets": {
+      "copy": {
+        "name": "secrets",
+        "count": "[length(parameters('secretsToSet'))]"
+      },
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2023-07-01",
+      "name": "[format('{0}/{1}', parameters('keyVaultName'), parameters('secretsToSet')[copyIndex()].name)]",
+      "properties": {
+        "value": "[parameters('secretsToSet')[copyIndex()].value]"
+      }
+    }
+  },
+  "outputs": {
+    "secretsSet": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/secretSetOutputType"
+      },
+      "metadata": {
+        "description": "The references to the secrets exported to the provided Key Vault."
+      },
+      "copy": {
+        "count": "[length(range(0, length(coalesce(parameters('secretsToSet'), createArray()))))]",
+        "input": {
+          "secretResourceId": "[resourceId('Microsoft.KeyVault/vaults/secrets', parameters('keyVaultName'), parameters('secretsToSet')[range(0, length(coalesce(parameters('secretsToSet'), createArray())))[copyIndex()]].name)]",
+          "secretUri": "[reference(format('secrets[{0}]', range(0, length(coalesce(parameters('secretsToSet'), createArray())))[copyIndex()])).secretUri]",
+          "secretUriWithVersion": "[reference(format('secrets[{0}]', range(0, length(coalesce(parameters('secretsToSet'), createArray())))[copyIndex()])).secretUriWithVersion]"
+        }
+      }
+    }
+  }
+}

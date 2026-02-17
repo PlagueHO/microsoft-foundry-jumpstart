@@ -152,6 +152,8 @@ import { capabilityHostType } from 'capabilityHost/main.bicep'
 @sys.description('Optional. Capability hosts to create in the Cognitive Services account. These enable AI agent functionality.')
 param capabilityHosts capabilityHostType[] = []
 
+import { applicationType, applicationOutputType } from 'project/application/main.bicep'
+
 @sys.description('Optional. The flag to disable stored completions. When true, Azure OpenAI will not store prompts and completions for content filtering and abuse monitoring.')
 param storedCompletionsDisabled bool?
 
@@ -541,6 +543,7 @@ module cognitiveService_projects './project/main.bicep' = [
       managedIdentities: project.?managedIdentities ?? managedIdentities
       roleAssignments: project.?roleAssignments ?? roleAssignments
       tags: project.?tags ?? tags
+      applications: project.?applications ?? []
     }
   }
 ]
@@ -686,6 +689,7 @@ output projects projectOutputType[] = [
     name: cognitiveService_projects[index].outputs.projectResourceName
     resourceId: cognitiveService_projects[index].outputs.projectResourceId
     systemAssignedMIPrincipalId: cognitiveService_projects[index].outputs.?systemAssignedMIPrincipalId
+    applications: cognitiveService_projects[index].outputs.?applications ?? []
   }
 ]
 
@@ -737,6 +741,9 @@ type projectOutputType = {
 
   @description('The principal ID of the system assigned identity.')
   systemAssignedMIPrincipalId: string?
+
+  @description('The applications created in the project.')
+  applications: applicationOutputType[]?
 }
 
 @export()
@@ -835,6 +842,9 @@ type projectType = {
 
   @sys.description('Resource tags. This corresponds to the "tags" property of the Microsoft.CognitiveServices/accounts/projects resource.')
   tags: object?
+
+  @sys.description('Applications to deploy within this Foundry Project.')
+  applications: applicationType[]?
 }
 
 @sys.description('Defines the nested properties for an Azure Foundry Project, corresponding to the "properties" object of the Microsoft.CognitiveServices/accounts/projects resource.')

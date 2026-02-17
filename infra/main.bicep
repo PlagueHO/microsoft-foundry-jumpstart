@@ -3,6 +3,7 @@ extension microsoftGraphV1
 
 import { deploymentType } from './cognitive-services/accounts/main.bicep'
 import { capabilityHostType } from './cognitive-services/accounts/capabilityHost/main.bicep'
+import { applicationType } from './cognitive-services/accounts/project/application/main.bicep'
 
 @sys.description('Name of the the environment which is used to generate a short unique hash used in all resources.')
 @minLength(1)
@@ -90,6 +91,9 @@ param foundryProjectFriendlyName string
 
 @sys.description('Use projects defined in sample-foundry-projects.json file instead of the single project parameters. When true, the foundryProject* parameters are ignored. Defaults to false.')
 param foundryProjectsFromJson bool = false
+
+@sys.description('Applications to deploy within each Foundry project. Defaults to empty (no applications).')
+param foundryApplications applicationType[] = []
 
 @sys.description('Deploy Azure AI Search and all dependent configuration. Set to false to skip its deployment.')
 param azureAiSearchDeploy bool = true
@@ -194,6 +198,7 @@ var foundryServiceProjects = [for project in effectiveProjectList: {
       principalId: principalId
     }
   ] : []
+  applications: foundryApplications
 }]
 
 // ---------- RESOURCE GROUP ----------

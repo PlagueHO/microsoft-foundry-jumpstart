@@ -34,6 +34,9 @@ param foundryProjectDescription = readEnvironmentVariable('MICROSOFT_FOUNDRY_PRO
 param foundryProjectFriendlyName = readEnvironmentVariable('MICROSOFT_FOUNDRY_PROJECT_FRIENDLY_NAME', 'Sample Project')
 param foundryProjectsFromJson = toLower(readEnvironmentVariable('MICROSOFT_FOUNDRY_PROJECTS_FROM_JSON', 'false')) == 'true'
 
+// Foundry Application parameters (applications deployed to each project)
+param foundryApplications = []
+
 // Sample data parameters
 param deploySampleModels = toLower(readEnvironmentVariable('DEPLOY_SAMPLE_MODELS', 'true')) == 'true'
 // Override sample model deployments with custom array (defaults to empty, which loads from sample-model-deployments.json)

@@ -1,0 +1,612 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "languageVersion": "2.0",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.40.2.10011",
+      "templateHash": "16182969756855805011"
+    },
+    "name": "Cognitive Services Application",
+    "description": "This module creates an application within a Cognitive Services project.\r\nApplications are agentic application instances that can contain agent deployments.\r\nSee: https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/applications\r\n"
+  },
+  "definitions": {
+    "agentReferenceType": {
+      "type": "object",
+      "properties": {
+        "agentId": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The agent's unique identifier within the organization."
+          }
+        },
+        "agentName": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The agent's name (unique within the project/app)."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for a reference to an agent within an application."
+      }
+    },
+    "applicationAuthorizationPolicyType": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "allowedValues": [
+            "Channels",
+            "Default",
+            "OrganizationScope"
+          ],
+          "metadata": {
+            "description": "Required. The authorization scheme type."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for the authorization policy of an application."
+      }
+    },
+    "assignedIdentityType": {
+      "type": "object",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The client ID of the identity."
+          }
+        },
+        "kind": {
+          "type": "string",
+          "allowedValues": [
+            "AgentBlueprint",
+            "AgentInstance",
+            "AgenticUser",
+            "Managed",
+            "None"
+          ],
+          "metadata": {
+            "description": "Required. Specifies the kind of Entra identity."
+          }
+        },
+        "principalId": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The principal ID of the identity."
+          }
+        },
+        "subject": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The subject of this identity assignment."
+          }
+        },
+        "tenantId": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The tenant ID of the identity."
+          }
+        },
+        "type": {
+          "type": "string",
+          "allowedValues": [
+            "None",
+            "System",
+            "User"
+          ],
+          "metadata": {
+            "description": "Required. The identity type from a management perspective."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for an assigned identity."
+      }
+    },
+    "applicationTrafficRoutingPolicyType": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "type": "string",
+          "allowedValues": [
+            "FixedRatio"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Methodology used to route traffic to deployments."
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/trafficRoutingRuleType"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Collection of traffic routing rules."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for the traffic routing policy."
+      }
+    },
+    "trafficRoutingRuleType": {
+      "type": "object",
+      "properties": {
+        "deploymentId": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The unique identifier of the deployment to route traffic to."
+          }
+        },
+        "description": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. A description for this traffic routing rule."
+          }
+        },
+        "ruleId": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The identifier of this traffic routing rule."
+          }
+        },
+        "trafficPercentage": {
+          "type": "int",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The percentage of traffic allocated to this instance."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for a traffic routing rule."
+      }
+    },
+    "applicationType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The name of the application."
+          }
+        },
+        "displayName": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The display name of the application."
+          }
+        },
+        "description": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. A description of the application."
+          }
+        },
+        "authorizationPolicy": {
+          "$ref": "#/definitions/applicationAuthorizationPolicyType",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The authorization policy for the application."
+          }
+        },
+        "agentIdentityBlueprint": {
+          "$ref": "#/definitions/assignedIdentityType",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The Entra ID agentic blueprint of the application."
+          }
+        },
+        "defaultInstanceIdentity": {
+          "$ref": "#/definitions/assignedIdentityType",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The default agent instance identity."
+          }
+        },
+        "baseUrl": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The application's dedicated invocation endpoint."
+          }
+        },
+        "trafficRoutingPolicy": {
+          "$ref": "#/definitions/applicationTrafficRoutingPolicyType",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The traffic routing policy for the application's deployments."
+          }
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/agentReferenceType"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The list of agent references in this application."
+          }
+        },
+        "tags": {
+          "type": "object",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Tags for the application properties."
+          }
+        },
+        "agentDeployments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/agentDeploymentType"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Agent deployments to create within this application."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for an application configuration, used when defining applications for a project."
+      }
+    },
+    "applicationOutputType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "metadata": {
+            "description": "The name of the application."
+          }
+        },
+        "resourceId": {
+          "type": "string",
+          "metadata": {
+            "description": "The resource ID of the application."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for the application output."
+      }
+    },
+    "_1.agentProtocolVersionType": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "type": "string",
+          "allowedValues": [
+            "A2A",
+            "Agent",
+            "Responses"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The protocol used by the agent."
+          }
+        },
+        "version": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The version of the protocol."
+          }
+        }
+      },
+      "metadata": {
+        "description": "The type for an agent protocol version.",
+        "__bicep_imported_from!": {
+          "sourceTemplate": "agentDeployment/main.bicep"
+        }
+      }
+    },
+    "_1.versionedAgentReferenceType": {
+      "type": "object",
+      "properties": {
+        "agentId": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The agent's unique identifier within the organization."
+          }
+        },
+        "agentName": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The agent's name (unique within the project/app)."
+          }
+        },
+        "agentVersion": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The agent's version (unique for each agent lineage)."
+          }
+        }
+      },
+      "metadata": {
+        "description": "The type for a versioned agent reference.",
+        "__bicep_imported_from!": {
+          "sourceTemplate": "agentDeployment/main.bicep"
+        }
+      }
+    },
+    "agentDeploymentType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The name of the agent deployment."
+          }
+        },
+        "deploymentType": {
+          "type": "string",
+          "allowedValues": [
+            "Hosted",
+            "Managed"
+          ],
+          "metadata": {
+            "description": "Required. The type of deployment."
+          }
+        },
+        "displayName": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The display name of the deployment."
+          }
+        },
+        "description": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The description of the deployment."
+          }
+        },
+        "deploymentId": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The unique identifier of the deployment."
+          }
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/_1.versionedAgentReferenceType"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. List of agent:version pairs deployed in this deployment."
+          }
+        },
+        "protocols": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/_1.agentProtocolVersionType"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Protocol types and versions exposed by this deployment."
+          }
+        },
+        "minReplicas": {
+          "type": "int",
+          "nullable": true,
+          "minValue": 0,
+          "metadata": {
+            "description": "Optional. The minimum number of replicas. Only applicable when deploymentType is \"Hosted\"."
+          }
+        },
+        "maxReplicas": {
+          "type": "int",
+          "nullable": true,
+          "minValue": 0,
+          "metadata": {
+            "description": "Optional. The maximum number of replicas. Only applicable when deploymentType is \"Hosted\"."
+          }
+        },
+        "tags": {
+          "type": "object",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Tags for the deployment."
+          }
+        }
+      },
+      "metadata": {
+        "description": "The type for an agent deployment configuration.",
+        "__bicep_imported_from!": {
+          "sourceTemplate": "agentDeployment/main.bicep"
+        }
+      }
+    }
+  },
+  "parameters": {
+    "accountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the parent Cognitive Services account."
+      }
+    },
+    "projectName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the parent project."
+      }
+    },
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the application."
+      }
+    },
+    "displayName": {
+      "type": "string",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The display name of the application."
+      }
+    },
+    "description": {
+      "type": "string",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. A description of the application."
+      }
+    },
+    "authorizationPolicy": {
+      "$ref": "#/definitions/applicationAuthorizationPolicyType",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The authorization policy for the application."
+      }
+    },
+    "agentIdentityBlueprint": {
+      "$ref": "#/definitions/assignedIdentityType",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The Entra ID agentic blueprint of the application."
+      }
+    },
+    "defaultInstanceIdentity": {
+      "$ref": "#/definitions/assignedIdentityType",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The default agent instance identity of the application."
+      }
+    },
+    "baseUrl": {
+      "type": "string",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The application's dedicated invocation endpoint."
+      }
+    },
+    "trafficRoutingPolicy": {
+      "$ref": "#/definitions/applicationTrafficRoutingPolicyType",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The traffic routing policy for the application's deployments."
+      }
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/agentReferenceType"
+      },
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The list of agent references in this application."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. Tags for the application properties."
+      }
+    },
+    "agentDeployments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/agentDeploymentType"
+      },
+      "defaultValue": [],
+      "metadata": {
+        "description": "Optional. Agent deployments to create within this application."
+      }
+    }
+  },
+  "resources": {
+    "parentAccount": {
+      "existing": true,
+      "type": "Microsoft.CognitiveServices/accounts",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[parameters('accountName')]"
+    },
+    "parentProject": {
+      "existing": true,
+      "type": "Microsoft.CognitiveServices/accounts/projects",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[format('{0}/{1}', parameters('accountName'), parameters('projectName'))]"
+    },
+    "application": {
+      "type": "Microsoft.CognitiveServices/accounts/projects/applications",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[format('{0}/{1}/{2}', parameters('accountName'), parameters('projectName'), parameters('name'))]",
+      "properties": {
+        "displayName": "[parameters('displayName')]",
+        "description": "[parameters('description')]",
+        "authorizationPolicy": "[parameters('authorizationPolicy')]",
+        "agentIdentityBlueprint": "[parameters('agentIdentityBlueprint')]",
+        "defaultInstanceIdentity": "[parameters('defaultInstanceIdentity')]",
+        "baseUrl": "[parameters('baseUrl')]",
+        "trafficRoutingPolicy": "[parameters('trafficRoutingPolicy')]",
+        "agents": "[parameters('agents')]",
+        "tags": "[parameters('tags')]"
+      }
+    },
+    "application_agentDeployments": {
+      "copy": {
+        "name": "application_agentDeployments",
+        "count": "[length(coalesce(parameters('agentDeployments'), createArray()))]",
+        "mode": "serial",
+        "batchSize": 1
+      },
+      "type": "Microsoft.CognitiveServices/accounts/projects/applications/agentDeployments",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[format('{0}/{1}/{2}/{3}', parameters('accountName'), parameters('projectName'), parameters('name'), coalesce(parameters('agentDeployments'), createArray())[copyIndex()].name)]",
+      "properties": "[union(createObject('deploymentType', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'displayName', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'displayName'), 'description', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'description'), 'deploymentId', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'deploymentId'), 'agents', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'agents'), 'protocols', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'protocols'), 'tags', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'tags')), if(equals(coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'Hosted'), createObject('minReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'minReplicas'), 'maxReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'maxReplicas')), createObject()))]",
+      "dependsOn": [
+        "application"
+      ]
+    }
+  },
+  "outputs": {
+    "resourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource ID of the application."
+      },
+      "value": "[resourceId('Microsoft.CognitiveServices/accounts/projects/applications', parameters('accountName'), parameters('projectName'), parameters('name'))]"
+    },
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the application."
+      },
+      "value": "[parameters('name')]"
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the resource group the application was created in."
+      },
+      "value": "[resourceGroup().name]"
+    }
+  }
+}

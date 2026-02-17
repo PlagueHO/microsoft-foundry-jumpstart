@@ -1,0 +1,312 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "languageVersion": "2.0",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.40.2.10011",
+      "templateHash": "16621922061991050056"
+    },
+    "name": "Cognitive Services Application Agent Deployment",
+    "description": "This module creates an agent deployment within an application in a Cognitive Services project.\r\nAgent deployments define how agents within an application are deployed and scaled.\r\nSee: https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/applications/agentdeployments\r\n"
+  },
+  "definitions": {
+    "versionedAgentReferenceType": {
+      "type": "object",
+      "properties": {
+        "agentId": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The agent's unique identifier within the organization."
+          }
+        },
+        "agentName": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The agent's name (unique within the project/app)."
+          }
+        },
+        "agentVersion": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The agent's version (unique for each agent lineage)."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for a versioned agent reference."
+      }
+    },
+    "agentProtocolVersionType": {
+      "type": "object",
+      "properties": {
+        "protocol": {
+          "type": "string",
+          "allowedValues": [
+            "A2A",
+            "Agent",
+            "Responses"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The protocol used by the agent."
+          }
+        },
+        "version": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The version of the protocol."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for an agent protocol version."
+      }
+    },
+    "agentDeploymentType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The name of the agent deployment."
+          }
+        },
+        "deploymentType": {
+          "type": "string",
+          "allowedValues": [
+            "Hosted",
+            "Managed"
+          ],
+          "metadata": {
+            "description": "Required. The type of deployment."
+          }
+        },
+        "displayName": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The display name of the deployment."
+          }
+        },
+        "description": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The description of the deployment."
+          }
+        },
+        "deploymentId": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The unique identifier of the deployment."
+          }
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/versionedAgentReferenceType"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. List of agent:version pairs deployed in this deployment."
+          }
+        },
+        "protocols": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/agentProtocolVersionType"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Protocol types and versions exposed by this deployment."
+          }
+        },
+        "minReplicas": {
+          "type": "int",
+          "nullable": true,
+          "minValue": 0,
+          "metadata": {
+            "description": "Optional. The minimum number of replicas. Only applicable when deploymentType is \"Hosted\"."
+          }
+        },
+        "maxReplicas": {
+          "type": "int",
+          "nullable": true,
+          "minValue": 0,
+          "metadata": {
+            "description": "Optional. The maximum number of replicas. Only applicable when deploymentType is \"Hosted\"."
+          }
+        },
+        "tags": {
+          "type": "object",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Tags for the deployment."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for an agent deployment configuration."
+      }
+    }
+  },
+  "parameters": {
+    "accountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the parent Cognitive Services account."
+      }
+    },
+    "projectName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the parent project."
+      }
+    },
+    "applicationName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the parent application."
+      }
+    },
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the agent deployment."
+      }
+    },
+    "deploymentType": {
+      "type": "string",
+      "allowedValues": [
+        "Hosted",
+        "Managed"
+      ],
+      "metadata": {
+        "description": "Required. The type of deployment. Use \"Hosted\" for hosted deployments with scaling or \"Managed\" for managed deployments."
+      }
+    },
+    "displayName": {
+      "type": "string",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The display name of the deployment."
+      }
+    },
+    "description": {
+      "type": "string",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The description of the deployment."
+      }
+    },
+    "deploymentId": {
+      "type": "string",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. The unique identifier of the deployment."
+      }
+    },
+    "agents": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/versionedAgentReferenceType"
+      },
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. List of agent:version pairs deployed in this deployment."
+      }
+    },
+    "protocols": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/agentProtocolVersionType"
+      },
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. Protocol types and versions exposed by this deployment."
+      }
+    },
+    "minReplicas": {
+      "type": "int",
+      "nullable": true,
+      "minValue": 0,
+      "metadata": {
+        "description": "Optional. The minimum number of replicas for hosted deployments. Only applicable when deploymentType is \"Hosted\"."
+      }
+    },
+    "maxReplicas": {
+      "type": "int",
+      "nullable": true,
+      "minValue": 0,
+      "metadata": {
+        "description": "Optional. The maximum number of replicas for hosted deployments. Only applicable when deploymentType is \"Hosted\"."
+      }
+    },
+    "tags": {
+      "type": "object",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. Tags for the deployment."
+      }
+    }
+  },
+  "resources": {
+    "parentAccount": {
+      "existing": true,
+      "type": "Microsoft.CognitiveServices/accounts",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[parameters('accountName')]"
+    },
+    "parentProject": {
+      "existing": true,
+      "type": "Microsoft.CognitiveServices/accounts/projects",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[format('{0}/{1}', parameters('accountName'), parameters('projectName'))]"
+    },
+    "parentApplication": {
+      "existing": true,
+      "type": "Microsoft.CognitiveServices/accounts/projects/applications",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[format('{0}/{1}/{2}', parameters('accountName'), parameters('projectName'), parameters('applicationName'))]"
+    },
+    "agentDeployment": {
+      "type": "Microsoft.CognitiveServices/accounts/projects/applications/agentDeployments",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[format('{0}/{1}/{2}/{3}', parameters('accountName'), parameters('projectName'), parameters('applicationName'), parameters('name'))]",
+      "properties": "[union(createObject('deploymentType', parameters('deploymentType'), 'displayName', parameters('displayName'), 'description', parameters('description'), 'deploymentId', parameters('deploymentId'), 'agents', parameters('agents'), 'protocols', parameters('protocols'), 'tags', parameters('tags')), if(equals(parameters('deploymentType'), 'Hosted'), createObject('minReplicas', parameters('minReplicas'), 'maxReplicas', parameters('maxReplicas')), createObject()))]"
+    }
+  },
+  "outputs": {
+    "resourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource ID of the agent deployment."
+      },
+      "value": "[resourceId('Microsoft.CognitiveServices/accounts/projects/applications/agentDeployments', parameters('accountName'), parameters('projectName'), parameters('applicationName'), parameters('name'))]"
+    },
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the agent deployment."
+      },
+      "value": "[parameters('name')]"
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the resource group the agent deployment was created in."
+      },
+      "value": "[resourceGroup().name]"
+    }
+  }
+}

@@ -39,6 +39,10 @@ import { connectionType } from '../connection/main.bicep'
 @sys.description('Optional. Connections to create in the Foundry Project.')
 param connections connectionType[] = []
 
+import { applicationType } from './application/main.bicep'
+@sys.description('Optional. Applications to create in the Foundry Project.')
+param applications applicationType[] = []
+
 
 var formattedUserAssignedIdentities = reduce(
   map((managedIdentities.?userAssignedResourceIds ?? []), (id) => { '${id}': {} }),
@@ -236,6 +240,28 @@ resource project_connections 'Microsoft.CognitiveServices/accounts/projects/conn
   }
 ]
 
+@batchSize(1)
+module project_applications './application/main.bicep' = [
+  for (application, index) in (applications ?? []): {
+    name: '${take('${accountName}-${name}-${application.name}', 60)}-app'
+    params: {
+      accountName: accountName
+      projectName: project.name
+      name: application.name
+      displayName: application.?displayName
+      description: application.?description
+      authorizationPolicy: application.?authorizationPolicy
+      agentIdentityBlueprint: application.?agentIdentityBlueprint
+      defaultInstanceIdentity: application.?defaultInstanceIdentity
+      baseUrl: application.?baseUrl
+      trafficRoutingPolicy: application.?trafficRoutingPolicy
+      agents: application.?agents
+      tags: application.?tags
+      agentDeployments: application.?agentDeployments ?? []
+    }
+  }
+]
+
 resource project_roleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
   for (roleAssignment, index) in (formattedRoleAssignments ?? []): {
     name: roleAssignment.?name ?? guid(project.id, roleAssignment.principalId, roleAssignment.roleDefinitionId)
@@ -292,3 +318,12 @@ output systemAssignedMIPrincipalId string? = project.?identity.?principalId
 
 @sys.description('The name of the resource group the Foundry Project created in.')
 output resourceGroupName string = resourceGroup().name
+
+import { applicationOutputType } from './application/main.bicep'
+@sys.description('The applications created in the Foundry Project.')
+output applications applicationOutputType[] = [
+  for (application, index) in (applications ?? []): {
+    name: project_applications[index].outputs.name
+    resourceId: project_applications[index].outputs.resourceId
+  }
+]
