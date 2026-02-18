@@ -29,6 +29,16 @@ on:
         required: false
         type: string
         default: 'false'
+      MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON:
+        description: "Whether to deploy sample applications from the sample-foundry-applications.json file"
+        required: false
+        type: string
+        default: 'false'
+      DEPLOY_CAPABILITY_HOSTS:
+        description: "Whether to deploy Cosmos DB and configure capability hosts (enables COSMOS_DB_DEPLOY, COSMOS_DB_CAPABILITY_HOST, AZURE_AI_SEARCH_CAPABILITY_HOST, AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST)"
+        required: false
+        type: string
+        default: 'false'
 
     secrets:
       AZURE_TENANT_ID:
@@ -56,6 +66,8 @@ jobs:
       AZURE_NETWORK_ISOLATION: ${{ inputs.AZURE_NETWORK_ISOLATION }}
       DEPLOY_SAMPLE_MODELS: ${{ inputs.DEPLOY_SAMPLE_MODELS }}
       DEPLOY_SAMPLE_DATA: true
+      MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: ${{ inputs.MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON }}
+      DEPLOY_CAPABILITY_HOSTS: ${{ inputs.DEPLOY_CAPABILITY_HOSTS }}
       AZURE_PRINCIPAL_ID_TYPE: 'ServicePrincipal'
 
     environment: ${{ inputs.ENVIRONMENT }}
@@ -96,6 +108,13 @@ jobs:
           azd env set DEPLOY_SAMPLE_DATA "$DEPLOY_SAMPLE_DATA"
           azd env set DEPLOY_SAMPLE_MODELS "$DEPLOY_SAMPLE_MODELS"
           azd env set AZURE_NETWORK_ISOLATION "$AZURE_NETWORK_ISOLATION"
+          azd env set MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON "$MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON"
+          if [ "$DEPLOY_CAPABILITY_HOSTS" = "true" ]; then
+            azd env set COSMOS_DB_DEPLOY "true"
+            azd env set COSMOS_DB_CAPABILITY_HOST "true"
+            azd env set AZURE_AI_SEARCH_CAPABILITY_HOST "true"
+            azd env set AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST "true"
+          fi
           azd env set AZURE_PRINCIPAL_ID_TYPE "$AZURE_PRINCIPAL_ID_TYPE"
 
       - name: Provision Infrastructure using Azure Developer CLI

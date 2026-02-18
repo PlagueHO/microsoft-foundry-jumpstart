@@ -153,6 +153,7 @@ import { capabilityHostType } from 'capabilityHost/main.bicep'
 param capabilityHosts capabilityHostType[] = []
 
 import { applicationType, applicationOutputType } from 'project/application/main.bicep'
+import { projectCapabilityHostType, projectCapabilityHostOutputType } from 'project/capabilityHost/main.bicep'
 
 @sys.description('Optional. The flag to disable stored completions. When true, Azure OpenAI will not store prompts and completions for content filtering and abuse monitoring.')
 param storedCompletionsDisabled bool?
@@ -544,6 +545,7 @@ module cognitiveService_projects './project/main.bicep' = [
       roleAssignments: project.?roleAssignments ?? roleAssignments
       tags: project.?tags ?? tags
       applications: project.?applications ?? []
+      capabilityHosts: project.?capabilityHosts ?? []
     }
   }
 ]
@@ -690,6 +692,7 @@ output projects projectOutputType[] = [
     resourceId: cognitiveService_projects[index].outputs.projectResourceId
     systemAssignedMIPrincipalId: cognitiveService_projects[index].outputs.?systemAssignedMIPrincipalId
     applications: cognitiveService_projects[index].outputs.?applications ?? []
+    capabilityHosts: cognitiveService_projects[index].outputs.?capabilityHostsOutput ?? []
   }
 ]
 
@@ -744,6 +747,9 @@ type projectOutputType = {
 
   @description('The applications created in the project.')
   applications: applicationOutputType[]?
+
+  @description('The capability hosts created in the project.')
+  capabilityHosts: projectCapabilityHostOutputType[]?
 }
 
 @export()
@@ -845,6 +851,9 @@ type projectType = {
 
   @sys.description('Applications to deploy within this Foundry Project.')
   applications: applicationType[]?
+
+  @sys.description('Capability hosts to deploy within this Foundry Project. These configure per-project storage backends for threads, vectors, and files.')
+  capabilityHosts: projectCapabilityHostType[]?
 }
 
 @sys.description('Defines the nested properties for an Azure Foundry Project, corresponding to the "properties" object of the Microsoft.CognitiveServices/accounts/projects resource.')

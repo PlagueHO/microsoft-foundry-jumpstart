@@ -1,0 +1,200 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "languageVersion": "2.0",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.40.2.10011",
+      "templateHash": "13271068657458212328"
+    },
+    "name": "Cognitive Services Project Capability Host",
+    "description": "This module creates a capability host in a Cognitive Services project.\r\nProject-level capability hosts configure per-project storage backends for threads, vectors, and files,\r\nallowing different projects to use different storage connections.\r\nSee: https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/capabilityhosts\r\n"
+  },
+  "definitions": {
+    "projectCapabilityHostType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. Name of the capability host to create."
+          }
+        },
+        "aiServicesConnectionNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Array of AI services connection names. These must match connection names defined in the account or project connections."
+          }
+        },
+        "threadStorageConnectionNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Array of connection names for thread storage. These must match connection names defined in the account or project connections."
+          }
+        },
+        "vectorStoreConnectionNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Array of connection names for vector stores. These must match connection names defined in the account or project connections."
+          }
+        },
+        "storageConnectionNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Array of connection names for file storage. These must match connection names defined in the account or project connections."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for a project-level capability host configuration."
+      }
+    },
+    "projectCapabilityHostOutputType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "metadata": {
+            "description": "The name of the project capability host."
+          }
+        },
+        "resourceId": {
+          "type": "string",
+          "metadata": {
+            "description": "The resource ID of the project capability host."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The output type for a project-level capability host."
+      }
+    }
+  },
+  "parameters": {
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. Name of the capability host to create."
+      }
+    },
+    "accountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the parent Cognitive Services account."
+      }
+    },
+    "projectName": {
+      "type": "string",
+      "metadata": {
+        "description": "Required. The name of the parent Foundry Project."
+      }
+    },
+    "aiServicesConnections": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. Array of AI services connection resource IDs. These connections reference AI services available to the project."
+      }
+    },
+    "threadStorageConnections": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. Array of connection resource IDs for thread storage. These connections store conversation thread data for agents."
+      }
+    },
+    "vectorStoreConnections": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. Array of connection resource IDs for vector stores. These connections store vector embeddings for semantic search."
+      }
+    },
+    "storageConnections": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. Array of connection resource IDs for file storage. These connections store files uploaded to agents."
+      }
+    }
+  },
+  "resources": {
+    "parentAccount": {
+      "existing": true,
+      "type": "Microsoft.CognitiveServices/accounts",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[parameters('accountName')]"
+    },
+    "parentProject": {
+      "existing": true,
+      "type": "Microsoft.CognitiveServices/accounts/projects",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[format('{0}/{1}', parameters('accountName'), parameters('projectName'))]"
+    },
+    "capabilityHost": {
+      "type": "Microsoft.CognitiveServices/accounts/projects/capabilityHosts",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[format('{0}/{1}/{2}', parameters('accountName'), parameters('projectName'), parameters('name'))]",
+      "properties": {
+        "aiServicesConnections": "[parameters('aiServicesConnections')]",
+        "threadStorageConnections": "[parameters('threadStorageConnections')]",
+        "vectorStoreConnections": "[parameters('vectorStoreConnections')]",
+        "storageConnections": "[parameters('storageConnections')]"
+      }
+    }
+  },
+  "outputs": {
+    "resourceId": {
+      "type": "string",
+      "metadata": {
+        "description": "The resource ID of the project capability host."
+      },
+      "value": "[resourceId('Microsoft.CognitiveServices/accounts/projects/capabilityHosts', parameters('accountName'), parameters('projectName'), parameters('name'))]"
+    },
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the project capability host."
+      },
+      "value": "[parameters('name')]"
+    },
+    "resourceGroupName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the resource group the project capability host was created in."
+      },
+      "value": "[resourceGroup().name]"
+    }
+  }
+}

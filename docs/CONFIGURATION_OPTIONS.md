@@ -10,6 +10,7 @@ The configuration options are grouped into the following categories:
 - [Azure AI Search Service](#azure-ai-search-service)
 - [Azure Cosmos DB](#azure-cosmos-db)
 - [Capability Hosts](#capability-hosts)
+- [Applications & Agent Deployments](#applications--agent-deployments)
 - [Identity & Access](#identity--access)
 - [Optional Infrastructure](#optional-infrastructure)
 - [Security](#security)
@@ -339,6 +340,168 @@ Default: `false`.
 ```powershell
 azd env set AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST true
 ```
+
+### Custom Capability Hosts via Bicep Parameter
+
+For advanced scenarios, you can provide additional capability hosts directly in `main.bicepparam` using the `foundryCapabilityHosts` parameter. These are combined with any auto-configured capability hosts from the boolean flags above.
+
+```bicep
+param foundryCapabilityHosts = [
+  {
+    name: 'custom-agents'
+    capabilityHostKind: 'Agents'
+    threadStorageConnectionNames: ['my-cosmos-connection']
+    vectorStoreConnectionNames: ['my-search-connection']
+    storageConnectionNames: ['my-storage-connection']
+  }
+]
+```
+
+> [!NOTE]
+> Connection names referenced in capability hosts must match connection names defined in the `connections` parameter of the Foundry account. The boolean flags (`COSMOS_DB_CAPABILITY_HOST`, `AZURE_AI_SEARCH_CAPABILITY_HOST`, `AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST`) automatically create a `default` capability host when any of them are enabled.
+
+### Account-Level vs Project-Level Capability Hosts
+
+Capability hosts can be deployed at two levels:
+
+- **Account-level** ([`accounts/capabilityHosts`](https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/capabilityhosts)): Defines the hosting infrastructure and kind (e.g., `Agents`) at the AI Services resource scope. Shared by all projects. This is what the `foundryCapabilityHosts` parameter and the boolean flags above configure.
+
+- **Project-level** ([`accounts/projects/capabilityHosts`](https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/capabilityhosts)): Configures per-project storage connections for threads, vectors, and files. Does not have `capabilityHostKind` — the kind is established at the account level. Useful when different projects need different storage backends.
+
+### Project-Level Capability Hosts via Bicep Parameter
+
+To configure capability hosts at the project level, add a `capabilityHosts` array to a project definition in your `.bicepparam` file or JSON:
+
+```bicep
+param foundryServiceProjects = [
+  {
+    name: 'my-project'
+    location: 'eastus'
+    properties: {
+      displayName: 'My Project'
+      description: 'A project with its own capability host'
+    }
+    capabilityHosts: [
+      {
+        name: 'default'
+        threadStorageConnectionNames: ['my-cosmos-connection']
+        vectorStoreConnectionNames: ['my-search-connection']
+        storageConnectionNames: ['my-storage-connection']
+      }
+    ]
+  }
+]
+```
+
+Project-level capability host properties:
+
+| Property                      | Description                                                                |
+| ----------------------------- | -------------------------------------------------------------------------- |
+| name                          | Name of the capability host (required)                                     |
+| aiServicesConnectionNames     | Array of AI services connection names                                      |
+| threadStorageConnectionNames  | Array of connection names for thread storage                               |
+| vectorStoreConnectionNames    | Array of connection names for vector stores                                |
+| storageConnectionNames        | Array of connection names for file storage                                 |
+
+> [!NOTE]
+> Project-level capability hosts do not have a `capabilityHostKind` property. The hosting kind is established by the account-level capability host. Connection names must match connections defined at the account or project level.
+
+## Applications & Agent Deployments
+
+Applications are agentic application instances deployed within Foundry projects. Each application can contain one or more agent deployments that define how agents are hosted and scaled.
+
+For more information, see:
+
+- [Applications resource reference](https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/applications)
+- [Agent Deployments resource reference](https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/applications/agentdeployments)
+
+### MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON
+
+Use applications defined in `infra/sample-foundry-applications.json` instead of the `foundryApplications` parameter.
+When set to `true`, the sample applications and their agent deployments are deployed to every Foundry project.
+
+Default: `false`.
+
+```powershell
+azd env set MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON true
+```
+
+The `infra/sample-foundry-applications.json` file contains an array of application definitions. Each application can include nested agent deployments:
+
+| Property            | Description                                                       |
+| ------------------- | ----------------------------------------------------------------- |
+| name                | The name of the application (used in resource name)               |
+| displayName         | Display name shown in the Azure portal                            |
+| description         | Optional description of the application                           |
+| authorizationPolicy | Authorization scheme: `Default`, `Channels`, or `OrganizationScope` |
+| agentDeployments    | Array of agent deployment definitions (see below)                 |
+
+Each agent deployment in the `agentDeployments` array supports:
+
+| Property       | Description                                                              |
+| -------------- | ------------------------------------------------------------------------ |
+| name           | The name of the agent deployment                                         |
+| deploymentType | `Managed` (platform-managed) or `Hosted` (with replica scaling)          |
+| displayName    | Display name for the deployment                                          |
+| description    | Optional description                                                     |
+| minReplicas    | Minimum replicas (only for `Hosted` deployments)                         |
+| maxReplicas    | Maximum replicas (only for `Hosted` deployments)                         |
+| protocols      | Supported protocols: `A2A`, `Agent`, `Responses`                         |
+
+Example JSON structure:
+
+```json
+[
+  {
+    "name": "my-agent-app",
+    "displayName": "My Agent Application",
+    "description": "An agentic application with managed deployment.",
+    "authorizationPolicy": {
+      "type": "Default"
+    },
+    "agentDeployments": [
+      {
+        "name": "production",
+        "deploymentType": "Managed",
+        "displayName": "Production Deployment",
+        "description": "The production managed deployment."
+      }
+    ]
+  }
+]
+```
+
+### Custom Applications via Bicep Parameter
+
+For more control, you can provide applications directly in `main.bicepparam` using the `foundryApplications` parameter:
+
+```bicep
+param foundryApplications = [
+  {
+    name: 'my-agent-app'
+    displayName: 'My Agent Application'
+    description: 'An agentic application'
+    authorizationPolicy: { type: 'Default' }
+    agentDeployments: [
+      {
+        name: 'production'
+        deploymentType: 'Managed'
+        displayName: 'Production Deployment'
+      }
+      {
+        name: 'staging-hosted'
+        deploymentType: 'Hosted'
+        displayName: 'Staging Hosted Deployment'
+        minReplicas: 1
+        maxReplicas: 3
+      }
+    ]
+  }
+]
+```
+
+> [!NOTE]
+> The `foundryApplications` parameter must be set in a `.bicepparam` file rather than as an environment variable, as it requires a strongly-typed array. When `MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON` is `true`, the `foundryApplications` parameter is ignored.
 
 ## Identity & Access
 

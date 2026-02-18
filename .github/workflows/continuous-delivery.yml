@@ -38,9 +38,23 @@ jobs:
           - name: project-public
             AZURE_NETWORK_ISOLATION: 'false'
             DEPLOY_SAMPLE_MODELS: 'true'
+            MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: 'false'
+            DEPLOY_CAPABILITY_HOSTS: 'false'
           - name: project-isolated
             AZURE_NETWORK_ISOLATION: 'true'
             DEPLOY_SAMPLE_MODELS: 'true'
+            MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: 'false'
+            DEPLOY_CAPABILITY_HOSTS: 'false'
+          - name: project-apps
+            AZURE_NETWORK_ISOLATION: 'false'
+            DEPLOY_SAMPLE_MODELS: 'true'
+            MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: 'true'
+            DEPLOY_CAPABILITY_HOSTS: 'false'
+          - name: capability-hosts
+            AZURE_NETWORK_ISOLATION: 'false'
+            DEPLOY_SAMPLE_MODELS: 'true'
+            MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: 'false'
+            DEPLOY_CAPABILITY_HOSTS: 'true'
 
     name: E2E Test (${{ matrix.name }})
     uses: ./.github/workflows/e2e-test.yml
@@ -51,6 +65,8 @@ jobs:
       AZURE_ENV_NAME: ${{ format('aifj-{0}-{1}', matrix.name, github.run_id) }}
       AZURE_NETWORK_ISOLATION: ${{ matrix.AZURE_NETWORK_ISOLATION }}
       DEPLOY_SAMPLE_MODELS: ${{ matrix.DEPLOY_SAMPLE_MODELS }}
+      MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: ${{ matrix.MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON }}
+      DEPLOY_CAPABILITY_HOSTS: ${{ matrix.DEPLOY_CAPABILITY_HOSTS }}
     secrets:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}

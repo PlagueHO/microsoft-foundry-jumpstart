@@ -29,6 +29,16 @@ on:
         required: false
         type: string
         default: 'false'
+      MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON:
+        description: "Whether to deploy sample applications from the sample-foundry-applications.json file"
+        required: false
+        type: string
+        default: 'false'
+      DEPLOY_CAPABILITY_HOSTS:
+        description: "Whether to deploy Cosmos DB and configure capability hosts"
+        required: false
+        type: string
+        default: 'false'
 
     secrets:
       AZURE_TENANT_ID:
@@ -75,5 +85,10 @@ jobs:
               "environmentName": "${{ inputs.AZURE_ENV_NAME }}",
               "azureNetworkIsolation": "${{ inputs.AZURE_NETWORK_ISOLATION }}",
               "deploySampleModels": "${{ inputs.DEPLOY_SAMPLE_MODELS }}",
-              "deploySampleData": "true"
+              "deploySampleData": "true",
+              "foundryApplicationsFromJson": "${{ inputs.MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON }}",
+              "cosmosDbDeploy": "${{ inputs.DEPLOY_CAPABILITY_HOSTS }}",
+              "cosmosDbCapabilityHost": "${{ inputs.DEPLOY_CAPABILITY_HOSTS }}",
+              "azureAiSearchCapabilityHost": "${{ inputs.DEPLOY_CAPABILITY_HOSTS }}",
+              "azureStorageAccountCapabilityHost": "${{ inputs.DEPLOY_CAPABILITY_HOSTS }}"
             }

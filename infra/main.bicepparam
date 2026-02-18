@@ -36,6 +36,7 @@ param foundryProjectsFromJson = toLower(readEnvironmentVariable('MICROSOFT_FOUND
 
 // Foundry Application parameters (applications deployed to each project)
 param foundryApplications = []
+param foundryApplicationsFromJson = toLower(readEnvironmentVariable('MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON', 'false')) == 'true'
 
 // Sample data parameters
 param deploySampleModels = toLower(readEnvironmentVariable('DEPLOY_SAMPLE_MODELS', 'true')) == 'true'

@@ -27,6 +27,16 @@ on:
         description: "Whether to deploy the sample model deployments"
         required: true
         type: string
+      MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON:
+        description: "Whether to deploy sample applications from the sample-foundry-applications.json file"
+        required: false
+        type: string
+        default: 'false'
+      DEPLOY_CAPABILITY_HOSTS:
+        description: "Whether to deploy Cosmos DB and configure capability hosts"
+        required: false
+        type: string
+        default: 'false'
 
     secrets:
       AZURE_TENANT_ID:
@@ -49,6 +59,8 @@ jobs:
       AZURE_ENV_NAME: ${{ inputs.AZURE_ENV_NAME }}
       AZURE_NETWORK_ISOLATION: ${{ inputs.AZURE_NETWORK_ISOLATION }}
       DEPLOY_SAMPLE_MODELS: ${{ inputs.DEPLOY_SAMPLE_MODELS }}
+      MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: ${{ inputs.MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON }}
+      DEPLOY_CAPABILITY_HOSTS: ${{ inputs.DEPLOY_CAPABILITY_HOSTS }}
     secrets:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -64,6 +76,8 @@ jobs:
       AZURE_ENV_NAME: ${{ inputs.AZURE_ENV_NAME }}
       AZURE_NETWORK_ISOLATION: ${{ inputs.AZURE_NETWORK_ISOLATION }}
       DEPLOY_SAMPLE_MODELS: ${{ inputs.DEPLOY_SAMPLE_MODELS }}
+      MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: ${{ inputs.MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON }}
+      DEPLOY_CAPABILITY_HOSTS: ${{ inputs.DEPLOY_CAPABILITY_HOSTS }}
     secrets:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}

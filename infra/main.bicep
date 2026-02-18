@@ -95,6 +95,9 @@ param foundryProjectsFromJson bool = false
 @sys.description('Applications to deploy within each Foundry project. Defaults to empty (no applications).')
 param foundryApplications applicationType[] = []
 
+@sys.description('Use applications defined in sample-foundry-applications.json file instead of the foundryApplications parameter. Defaults to false.')
+param foundryApplicationsFromJson bool = false
+
 @sys.description('Deploy Azure AI Search and all dependent configuration. Set to false to skip its deployment.')
 param azureAiSearchDeploy bool = true
 
@@ -158,6 +161,10 @@ var sampleDataContainers = [for name in sampleDataContainersArray: {
 var sampleModelDeploymentsFromFile = loadJsonContent('./sample-model-deployments.json')
 var sampleModelDeployments deploymentType[] = empty(deploySampleModelsList) ? sampleModelDeploymentsFromFile : deploySampleModelsList
 
+// Load sample applications from JSON file or use parameter
+var sampleApplicationsFromFile = loadJsonContent('./sample-foundry-applications.json')
+var effectiveFoundryApplications applicationType[] = foundryApplicationsFromJson ? sampleApplicationsFromFile : foundryApplications
+
 // Transform IP allow list for networkAcls
 var foundryIpRules = [for ip in foundryIpAllowList: {
   value: ip
@@ -198,7 +205,7 @@ var foundryServiceProjects = [for project in effectiveProjectList: {
       principalId: principalId
     }
   ] : []
-  applications: foundryApplications
+  applications: effectiveFoundryApplications
 }]
 
 // ---------- RESOURCE GROUP ----------
