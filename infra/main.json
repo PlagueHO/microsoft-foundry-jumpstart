@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.40.2.10011",
-      "templateHash": "18357282786956187575"
+      "templateHash": "4585962327028676079"
     }
   },
   "definitions": {
@@ -1093,7 +1093,7 @@
     "sampleDataStorageAccountName": "[if(equals(parameters('azureStorageAccountName'), 'default'), take(toLower(replace(format('{0}{1}sample', variables('abbrs').storageStorageAccounts, parameters('environmentName')), '-', '')), 24), take(toLower(replace(format('{0}sample', parameters('azureStorageAccountName')), '-', '')), 24))]",
     "aiSearchServiceName": "[format('{0}{1}', variables('abbrs').aiSearchSearchServices, parameters('environmentName'))]",
     "foundryServiceName": "[format('{0}{1}', variables('abbrs').foundryAccounts, parameters('environmentName'))]",
-    "foundryCustomSubDomainName": "[toLower(replace(parameters('environmentName'), '-', ''))]",
+    "foundryCustomSubDomainName": "[variables('foundryServiceName')]",
     "bastionHostName": "[format('{0}{1}', variables('abbrs').networkBastionHosts, parameters('environmentName'))]",
     "cosmosDbAccountName": "[format('{0}{1}', variables('abbrs').cosmosDBAccounts, replace(parameters('environmentName'), '-', ''))]",
     "networkDefaultAction": "[if(parameters('azureNetworkIsolation'), 'Deny', 'Allow')]",

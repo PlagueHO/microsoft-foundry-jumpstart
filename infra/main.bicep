@@ -145,7 +145,7 @@ var sampleDataStorageAccountName = azureStorageAccountName == 'default'
   : take(toLower(replace('${azureStorageAccountName}sample', '-', '')), 24)
 var aiSearchServiceName = '${abbrs.aiSearchSearchServices}${environmentName}'
 var foundryServiceName = '${abbrs.foundryAccounts}${environmentName}'
-var foundryCustomSubDomainName = toLower(replace(environmentName, '-', ''))
+var foundryCustomSubDomainName = foundryServiceName // <-- To enable v2 this needs to be same as the foundryName
 var bastionHostName = '${abbrs.networkBastionHosts}${environmentName}'
 var cosmosDbAccountName = '${abbrs.cosmosDBAccounts}${replace(environmentName, '-', '')}'
 var networkDefaultAction = azureNetworkIsolation ? 'Deny' : 'Allow'
