@@ -222,51 +222,61 @@ The key trade-off is that observability is **post-hoc by design**: you cannot pa
 
 ## Microsoft Agent Framework
 
-[Microsoft Agent Framework](https://learn.microsoft.com/agent-framework/overview/) is an open-source, production-ready framework for building multi-agent AI applications in .NET and Python. A core design goal is to abstract the agent loop — reasoning, tool execution, and observation — so that the same application code works regardless of which backend API or model provider is used.
+[Microsoft Agent Framework](https://learn.microsoft.com/agent-framework/overview/) is an open-source SDK for building multi-agent AI applications in .NET and Python. Its core value proposition is **code portability**: the same application code works regardless of whether tools execute server-side or client-side, and regardless of which API or model provider is used. You write `agent.Run()` once and swap the backend by changing only the provider configuration.
 
-### Provider and API Agnosticism
+### Unified Agent Interface
 
-Agent Framework decouples your agent logic from the underlying API surface. An `AIAgent` written with Agent Framework can target any supported backend without changing the agent-level code:
-
-| Backend | Client Type | Use When |
-|---------|------------|----------|
-| [Responses API](https://learn.microsoft.com/agent-framework/agents/providers/azure-openai) | `AzureOpenAIResponsesClient` / `OpenAIResponsesClient` | New agents; full hosted tool support (code interpreter, file search, web search, hosted MCP) |
-| [Chat Completions API](https://learn.microsoft.com/agent-framework/agents/providers/azure-openai) | `AzureOpenAIChatClient` / `OpenAIChatClient` | Migrating existing apps; broad model compatibility; stateless interactions |
-| [Assistants API](https://learn.microsoft.com/agent-framework/agents/providers/azure-openai) | `AzureOpenAIAssistantsClient` / `OpenAIAssistantsClient` | Server-managed threads with code interpreter and file search |
-| [Other providers](https://learn.microsoft.com/agent-framework/agents/providers/) | Anthropic, Ollama, and [more](https://learn.microsoft.com/agent-framework/agents/providers/) | Non-Azure or on-premises deployments |
-
-All client types produce a standard `AIAgent` interface with the same operations: `Run()` / `RunAsync()`, streaming, middleware, multi-turn sessions, and multi-agent orchestration.
-
-### Abstracting the ReAct Loop
-
-When using client-side orchestration — Responses API in stateless mode or Chat Completions API — Agent Framework owns the tool execution loop internally. Your application code calls `agent.Run()` and receives the final answer, exactly as it would with server-side Agent Service:
+Agent Framework provides a single `AIAgent` interface that abstracts the underlying API surface. You create agents through a [provider](https://learn.microsoft.com/agent-framework/agents/providers/) — a thin wrapper around the SDK client for each backend:
 
 ```python
+# Python — create via provider, run identically regardless of backend
+from agent_framework.azure import AzureAIAgentProvider
+
+provider = AzureAIAgentProvider(ai_project_client)
+agent = await provider.create_agent(name="assistant", model=model, instructions="...", tools=[tool])
 result = await agent.run("Summarize the blobs in this container")
 print(result)
 ```
 
 ```csharp
+// C# — create via Foundry SDK extension, run identically regardless of backend
+AIAgent agent = await persistentAgentsClient.CreateAIAgentAsync(
+    model, name: "assistant", instructions: "...", tools: [tool]);
 var result = await agent.RunAsync("Summarize the blobs in this container");
 Console.WriteLine(result);
 ```
 
-Internally, Agent Framework handles the full ReAct iteration:
+The same `Run()` / `RunAsync()`, streaming, middleware, multi-turn sessions, and multi-agent orchestration APIs are available across all providers:
+
+| Backend | Provider / Client | Tool Execution |
+|---------|-------------------|----------------|
+| [Foundry Agent Service](https://learn.microsoft.com/agent-framework/agents/providers/azure-openai) | `AzureAIProjectAgentProvider` / `PersistentAgentsClient` | **Server-side** — platform manages the ReAct loop, hosted MCP, code interpreter, file search, web search |
+| [Responses API](https://learn.microsoft.com/agent-framework/agents/providers/azure-openai) | `AzureOpenAIResponsesClient` / `OpenAIResponsesClient` | **Client-side** — Agent Framework manages the ReAct loop locally |
+| [Chat Completions API](https://learn.microsoft.com/agent-framework/agents/providers/azure-openai) | `AzureOpenAIChatClient` / `OpenAIChatClient` | **Client-side** — Agent Framework manages the ReAct loop locally |
+| [Other providers](https://learn.microsoft.com/agent-framework/agents/providers/) | Anthropic, Ollama, [and more](https://learn.microsoft.com/agent-framework/agents/providers/) | Depends on provider |
+
+### Same Code, Different Tool Execution
+
+The key insight is that **your application code is identical** whether tools run server-side or client-side. When tools execute server-side (Foundry Agent Service), the platform handles the ReAct loop internally and Agent Framework receives the final answer. When tools execute client-side (Responses API stateless mode or Chat Completions API), Agent Framework owns the ReAct loop and handles it automatically:
 
 1. Detects `function_call` items in the response
 2. Invokes the registered tool functions with the LLM-provided arguments
 3. Feeds results back to the model as `function_call_output` items
 4. Loops until the model produces a final answer with no remaining tool calls
 
-This means the **client complexity** row in the comparison matrix — "Significant — loop, error handling, retry" — is **fully handled by Agent Framework**. Application code has the same simplicity as server-side Agent Service, while still running the loop in the application process.
+This means the **client complexity** row in the comparison matrix — "Significant — loop, error handling, retry" — is **fully handled by Agent Framework**. Application code has the same simplicity regardless of where the ReAct loop runs.
 
-### Relationship to Foundry Agent Service
+### How Agent Framework Works with Foundry Agent Service
 
-Agent Framework is a complement to Foundry Agent Service, not a replacement. The right choice depends on where you need control:
+Agent Framework is a layer **on top of** Foundry Agent Service, not an alternative to it. The [Foundry SDK](https://learn.microsoft.com/azure/ai-foundry/foundry-sdk-overview) is a thin-client SDK auto-generated from the REST API for creating, configuring, and calling agents on the service. Agent Framework adds orchestration, middleware, observability, and multi-agent workflows on top of that thin client.
 
-- **Foundry Agent Service (server-side)**: The platform manages the ReAct loop and tool execution via project-level MCP connections. Credentials never leave the service. Best for published agents requiring enterprise observability (continuous evaluation, red teaming, Application Insights dashboards) and credential isolation.
-- **Agent Framework + Responses API (client-side)**: Your application owns the tool execution loop, but Agent Framework handles all loop mechanics. Enables fine-grained human-in-the-loop control, custom error handling, and access to providers not available in Agent Service — while keeping your code as clean as server-side.
-- **Agent Framework + Chat Completions API**: Targets models or providers not available through the Responses API, or accommodates legacy integrations requiring the Chat Completions format.
+When you use Agent Framework with Foundry Agent Service:
+
+- **Agent creation** uses the Foundry SDK (`PersistentAgentsClient` / `AIProjectClient`) to provision agents server-side, with hosted tools (MCP connections, code interpreter, file search, web search) configured via project-level connections.
+- **Agent execution** uses `agent.Run()` / `agent.RunAsync()` — the same call you would make with any other provider. The framework delegates to the service, which manages the full ReAct loop and tool execution. Credentials never leave the service.
+- **Switching providers** requires changing only the provider setup code. The rest of your application — orchestration logic, middleware, error handling, telemetry — remains untouched.
+
+This design means you can develop and test locally against the Chat Completions API (with client-side tool execution), then deploy in production against Foundry Agent Service (with server-side tool execution) — using the same agent code.
 
 > **References**:
 >
@@ -274,6 +284,10 @@ Agent Framework is a complement to Foundry Agent Service, not a replacement. The
 > - [Supported providers](https://learn.microsoft.com/agent-framework/agents/providers/)
 > - [Azure OpenAI agents](https://learn.microsoft.com/agent-framework/agents/providers/azure-openai)
 > - [OpenAI-compatible endpoints](https://learn.microsoft.com/agent-framework/integrations/openai-endpoints)
+> - [Foundry SDK alignment spec](https://github.com/microsoft/agent-framework/blob/main/docs/specs/001-foundry-sdk-alignment.md) — details the relationship between Agent Framework and Foundry SDK
+> - [Agent provider samples (.NET)](https://github.com/microsoft/agent-framework/tree/main/dotnet/samples/GettingStarted/AgentProviders/) | [Agent samples (Python)](https://github.com/microsoft/agent-framework/tree/main/python/samples/getting_started/agents/)
+> - [Middleware samples (.NET)](https://github.com/microsoft/agent-framework/tree/main/dotnet/samples/GettingStarted/Agents/Agent_Step14_Middleware/) | [Middleware samples (Python)](https://github.com/microsoft/agent-framework/tree/main/python/samples/getting_started/middleware/)
+> - [OpenTelemetry samples (.NET)](https://github.com/microsoft/agent-framework/tree/main/dotnet/samples/GettingStarted/AgentOpenTelemetry/) | [Observability samples (Python)](https://github.com/microsoft/agent-framework/tree/main/python/samples/getting_started/observability/)
 
 ## Summary
 
