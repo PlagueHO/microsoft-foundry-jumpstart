@@ -70,6 +70,67 @@ The client **explicitly implements the ReAct loop**: it receives a tool call, ex
 | **Conversation state** | [`previous_response_id`](https://learn.microsoft.com/azure/ai-foundry/openai/reference-preview-latest?view=foundry-classic#create-response) chaining | Same [`previous_response_id`](https://learn.microsoft.com/azure/ai-foundry/openai/reference-preview-latest?view=foundry-classic#create-response) chaining |
 | **Context window truncation** | Controlled via [`truncation`](https://learn.microsoft.com/azure/foundry/openai/how-to/responses) parameter on the request | Same [`truncation`](https://learn.microsoft.com/azure/foundry/openai/how-to/responses) parameter available |
 | **Context compaction** | Available via [`POST /responses/compact`](https://learn.microsoft.com/azure/foundry/openai/how-to/responses#compact-a-response) | Same [`compact`](https://learn.microsoft.com/azure/foundry/openai/how-to/responses#compact-a-response) endpoint available |
+| **Hybrid orchestration** | Yes — server-side tools + [function calling](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/function-calling) in a single agent | N/A — client owns all tool execution |
+
+## Hybrid Orchestration: Mixing Server-Side and Client-Side Tool Execution
+
+Server-side and client-side tool execution are **not mutually exclusive**. A single Foundry agent can be configured with both server-side tools (executed internally by the Agent Service) and [function calling](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/function-calling) tools (returned to the client for execution) — creating a hybrid orchestration pattern within one agent run.
+
+### Tool execution categories
+
+The Agent Service classifies tools by where they execute:
+
+| Execution | Tool Types |
+|-----------|------------|
+| **Server-side** (Agent Service executes internally) | [MCP](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/model-context-protocol), [Code Interpreter](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/code-interpreter), [File Search](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/file-search), [Azure AI Search](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/azure-ai-search), [Bing Grounding](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/bing-grounding), [OpenAPI](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/openapi-spec), SharePoint, Fabric, Browser Automation, Image Generation |
+| **Client-side** (returned as `function_call`) | [Function calling](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/function-calling) — custom functions defined by your application |
+
+An agent can have **any combination** of these registered simultaneously. See the [tool support matrix](https://learn.microsoft.com/azure/foundry/agents/concepts/tool-best-practice) for region and model availability.
+
+### Hybrid flow
+
+When an agent has both server-side and function calling tools, a single run interleaves both execution modes:
+
+```text
+Client                          Agent Service (hybrid loop)
+  |                                    |
+  |--- POST /responses --------------->|
+  |                                    |---> LLM: Reason (need search_index)
+  |                                    |---> Act: call Azure AI Search (server-side)
+  |                                    |---> Observe: search results
+  |                                    |---> LLM: Reason (need custom function)
+  |<-- function_call: enrich_record ---|     (pauses internal loop)
+  |                                    |
+  |--- execute enrich_record locally   |
+  |                                    |
+  |--- POST /responses (tool result)-->|
+  |                                    |---> LLM: Reason (need code_interpreter)
+  |                                    |---> Act: call Code Interpreter (server-side)
+  |                                    |---> Observe: code output
+  |                                    |---> LLM: Reason (have everything)
+  |<-- Response (final answer) --------|
+```
+
+The Agent Service executes server-side tools internally within the ReAct loop but **pauses and returns control to the client** whenever the model requests a function call. The client executes the function, submits `function_call_output` via `POST /responses` with `previous_response_id`, and the Agent Service resumes — potentially calling more server-side tools before returning the final answer.
+
+### MCP approval requests: another hybrid variant
+
+The [`mcp_approval_request`](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/model-context-protocol#set-up-the-mcp-connection) pattern is a second form of hybrid flow. MCP tools execute server-side, but when an approval-required tool is invoked, the Agent Service pauses to return an approval request to the client. The client reviews the tool name and arguments, approves or rejects, and control returns to the server. This combines server-side credential isolation with client-side human oversight.
+
+### When to use hybrid orchestration
+
+- **Extend server-side agents with custom logic**: Register MCP/search/file tools for server-side execution and add function calling for business logic that only your application can perform (e.g., writing to a local database, calling a proprietary API not exposed via MCP).
+- **Approval gates on sensitive actions**: Use `mcp_approval_request` for high-risk MCP tool calls to get human review without moving the entire tool execution client-side.
+- **Progressive migration**: Start with full server-side orchestration. Add function calling tools incrementally as custom requirements emerge, without refactoring existing server-side tool configurations.
+
+> **Tip**: Use [`tool_choice`](https://learn.microsoft.com/azure/foundry/agents/concepts/tool-best-practice) and clear agent instructions to control which tools the model prefers. For example: _"Use Azure AI Search for internal documents. Use the `enrich_record` function only when the search results need enrichment from the CRM system."_
+
+> **References**:
+>
+> - [Function calling with Foundry agents](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/function-calling)
+> - [Tool best practices](https://learn.microsoft.com/azure/foundry/agents/concepts/tool-best-practice)
+> - [MCP tool approval](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/model-context-protocol#set-up-the-mcp-connection)
+> - [Foundry tool catalog](https://learn.microsoft.com/azure/foundry/agents/concepts/tool-catalog)
 
 ## Security
 
