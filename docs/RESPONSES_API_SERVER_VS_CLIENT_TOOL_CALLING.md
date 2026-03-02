@@ -12,42 +12,13 @@ Both approaches implement the same **Reason-Act-Observe** loop. The difference i
 
 ### Server-Side (Agent Service Orchestration)
 
-```text
-Client                          Agent Service (internal loop)
-  |                                    |
-  |--- POST /responses --------------->|
-  |                                    |---> LLM: Reason (need list_blobs)
-  |                                    |---> Act: call MCP list_blobs
-  |                                    |---> Observe: blob list result
-  |                                    |---> LLM: Reason (need read_blob)
-  |                                    |---> Act: call MCP read_blob
-  |                                    |---> Observe: blob content
-  |                                    |---> LLM: Reason (have everything)
-  |<-- Response (final answer) --------|
-```
+![Server-Side Orchestration sequence diagram](diagrams/agent-service-server-side-orchestration-diagram.png)
 
 The **entire ReAct loop is encapsulated** in a single request. The LLM reasons, acts (tool call), observes (tool result), and loops — all server-side. The client sees only the final output. The number of internal iterations is bounded by the agent's configuration and the model's reasoning, but is **opaque to the client**.
 
 ### Client-Side (Client Orchestration)
 
-```text
-Client (owns the loop)          Responses API          MCP Server
-  |                                   |                      |
-  |--- POST /responses -------------->|                      |
-  |<-- function_call: list_blobs -----|   (Reason)           |
-  |                                                          |
-  |--- tools/call list_blobs ------------------------------->|  (Act)
-  |<-- blob list --------------------------------------------|  (Observe)
-  |                                                          |
-  |--- POST /responses (tool result)->|                      |
-  |<-- function_call: read_blob ------|   (Reason)           |
-  |                                                          |
-  |--- tools/call read_blob -------------------------------->|  (Act)
-  |<-- blob content -----------------------------------------|  (Observe)
-  |                                                          |
-  |--- POST /responses (tool result)->|                      |
-  |<-- final answer ------------------|   (Reason: done)     |
-```
+![Client-Side Orchestration sequence diagram](diagrams/agent-service-client-side-orchestration-diagram.png)
 
 The client **explicitly implements the ReAct loop**: it receives a tool call, executes it, feeds the result back, and repeats until the response contains no more tool calls. Each Reason step is a `POST /responses`, each Act step is a client-executed tool call.
 
@@ -91,25 +62,7 @@ An agent can have **any combination** of these registered simultaneously. See th
 
 When an agent has both server-side and function calling tools, a single run interleaves both execution modes:
 
-```text
-Client                          Agent Service (hybrid loop)
-  |                                    |
-  |--- POST /responses --------------->|
-  |                                    |---> LLM: Reason (need search_index)
-  |                                    |---> Act: call Azure AI Search (server-side)
-  |                                    |---> Observe: search results
-  |                                    |---> LLM: Reason (need custom function)
-  |<-- function_call: enrich_record ---|     (pauses internal loop)
-  |                                    |
-  |--- execute enrich_record locally   |
-  |                                    |
-  |--- POST /responses (tool result)-->|
-  |                                    |---> LLM: Reason (need code_interpreter)
-  |                                    |---> Act: call Code Interpreter (server-side)
-  |                                    |---> Observe: code output
-  |                                    |---> LLM: Reason (have everything)
-  |<-- Response (final answer) --------|
-```
+![Hybrid Orchestration sequence diagram](diagrams/agent-service-hybrid-orchestration-diagram.png)
 
 The Agent Service executes server-side tools internally within the ReAct loop but **pauses and returns control to the client** whenever the model requests a function call. The client executes the function, submits `function_call_output` via `POST /responses` with `previous_response_id`, and the Agent Service resumes — potentially calling more server-side tools before returning the final answer.
 
