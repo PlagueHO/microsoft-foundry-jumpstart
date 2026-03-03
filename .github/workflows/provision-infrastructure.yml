@@ -40,6 +40,74 @@ on:
         type: string
         default: 'false'
 
+    outputs:
+      AZURE_RESOURCE_GROUP:
+        description: "The Azure resource group name"
+        value: ${{ jobs.provision-infrastructure.outputs.AZURE_RESOURCE_GROUP }}
+      AZURE_PRINCIPAL_ID:
+        description: "The Azure principal ID"
+        value: ${{ jobs.provision-infrastructure.outputs.AZURE_PRINCIPAL_ID }}
+      AZURE_PRINCIPAL_ID_TYPE:
+        description: "The Azure principal ID type"
+        value: ${{ jobs.provision-infrastructure.outputs.AZURE_PRINCIPAL_ID_TYPE }}
+      LOG_ANALYTICS_WORKSPACE_NAME:
+        description: "The Log Analytics workspace name"
+        value: ${{ jobs.provision-infrastructure.outputs.LOG_ANALYTICS_WORKSPACE_NAME }}
+      LOG_ANALYTICS_RESOURCE_ID:
+        description: "The Log Analytics resource ID"
+        value: ${{ jobs.provision-infrastructure.outputs.LOG_ANALYTICS_RESOURCE_ID }}
+      LOG_ANALYTICS_WORKSPACE_ID:
+        description: "The Log Analytics workspace ID"
+        value: ${{ jobs.provision-infrastructure.outputs.LOG_ANALYTICS_WORKSPACE_ID }}
+      APPLICATION_INSIGHTS_NAME:
+        description: "The Application Insights name"
+        value: ${{ jobs.provision-infrastructure.outputs.APPLICATION_INSIGHTS_NAME }}
+      APPLICATION_INSIGHTS_RESOURCE_ID:
+        description: "The Application Insights resource ID"
+        value: ${{ jobs.provision-infrastructure.outputs.APPLICATION_INSIGHTS_RESOURCE_ID }}
+      APPLICATION_INSIGHTS_INSTRUMENTATION_KEY:
+        description: "The Application Insights instrumentation key"
+        value: ${{ jobs.provision-infrastructure.outputs.APPLICATION_INSIGHTS_INSTRUMENTATION_KEY }}
+      AZURE_AI_SEARCH_NAME:
+        description: "The Azure AI Search service name"
+        value: ${{ jobs.provision-infrastructure.outputs.AZURE_AI_SEARCH_NAME }}
+      AZURE_AI_SEARCH_ID:
+        description: "The Azure AI Search service resource ID"
+        value: ${{ jobs.provision-infrastructure.outputs.AZURE_AI_SEARCH_ID }}
+      MICROSOFT_FOUNDRY_NAME:
+        description: "The Microsoft Foundry service name"
+        value: ${{ jobs.provision-infrastructure.outputs.MICROSOFT_FOUNDRY_NAME }}
+      MICROSOFT_FOUNDRY_ID:
+        description: "The Microsoft Foundry service resource ID"
+        value: ${{ jobs.provision-infrastructure.outputs.MICROSOFT_FOUNDRY_ID }}
+      MICROSOFT_FOUNDRY_ENDPOINT:
+        description: "The Microsoft Foundry service endpoint"
+        value: ${{ jobs.provision-infrastructure.outputs.MICROSOFT_FOUNDRY_ENDPOINT }}
+      MICROSOFT_FOUNDRY_RESOURCE_ID:
+        description: "The Microsoft Foundry service resource ID"
+        value: ${{ jobs.provision-infrastructure.outputs.MICROSOFT_FOUNDRY_RESOURCE_ID }}
+      MICROSOFT_FOUNDRY_PROJECT_NAME:
+        description: "The Microsoft Foundry project name"
+        value: ${{ jobs.provision-infrastructure.outputs.MICROSOFT_FOUNDRY_PROJECT_NAME }}
+      COSMOS_DB_NAME:
+        description: "The Cosmos DB account name"
+        value: ${{ jobs.provision-infrastructure.outputs.COSMOS_DB_NAME }}
+      COSMOS_DB_ID:
+        description: "The Cosmos DB account resource ID"
+        value: ${{ jobs.provision-infrastructure.outputs.COSMOS_DB_ID }}
+      COSMOS_DB_ENDPOINT:
+        description: "The Cosmos DB account endpoint"
+        value: ${{ jobs.provision-infrastructure.outputs.COSMOS_DB_ENDPOINT }}
+      AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME:
+        description: "The sample data storage account name"
+        value: ${{ jobs.provision-infrastructure.outputs.AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME }}
+      AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_RESOURCE_ID:
+        description: "The sample data storage account resource ID"
+        value: ${{ jobs.provision-infrastructure.outputs.AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_RESOURCE_ID }}
+      AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_BLOB_ENDPOINT:
+        description: "The sample data storage account blob endpoint"
+        value: ${{ jobs.provision-infrastructure.outputs.AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_BLOB_ENDPOINT }}
+
     secrets:
       AZURE_TENANT_ID:
         description: "The Azure tenant ID to use for authentication to Azure for deployment"
@@ -54,6 +122,8 @@ on:
 jobs:
   provision-infrastructure:
     name: Provision Infrastructure ${{ inputs.ENVIRONMENT }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.ENVIRONMENT }}
     permissions:
       id-token: write
       contents: read
@@ -70,19 +140,36 @@ jobs:
       DEPLOY_CAPABILITY_HOSTS: ${{ inputs.DEPLOY_CAPABILITY_HOSTS }}
       AZURE_PRINCIPAL_ID_TYPE: 'ServicePrincipal'
 
-    environment: ${{ inputs.ENVIRONMENT }}
-    runs-on: ubuntu-latest
-
     outputs:
-      AZURE_AI_SERVICES_ENDPOINT: ${{ steps.get_endpoints.outputs.AZURE_AI_SERVICES_ENDPOINT }}
-      AZURE_STORAGE_ACCOUNT_BLOB_ENDPOINT: ${{ steps.get_endpoints.outputs.AZURE_STORAGE_ACCOUNT_BLOB_ENDPOINT }}
+      AZURE_RESOURCE_GROUP: ${{ steps.get_infrastructure_outputs.outputs.AZURE_RESOURCE_GROUP }}
+      AZURE_PRINCIPAL_ID: ${{ steps.get_infrastructure_outputs.outputs.AZURE_PRINCIPAL_ID }}
+      AZURE_PRINCIPAL_ID_TYPE: ${{ steps.get_infrastructure_outputs.outputs.AZURE_PRINCIPAL_ID_TYPE }}
+      LOG_ANALYTICS_WORKSPACE_NAME: ${{ steps.get_infrastructure_outputs.outputs.LOG_ANALYTICS_WORKSPACE_NAME }}
+      LOG_ANALYTICS_RESOURCE_ID: ${{ steps.get_infrastructure_outputs.outputs.LOG_ANALYTICS_RESOURCE_ID }}
+      LOG_ANALYTICS_WORKSPACE_ID: ${{ steps.get_infrastructure_outputs.outputs.LOG_ANALYTICS_WORKSPACE_ID }}
+      APPLICATION_INSIGHTS_NAME: ${{ steps.get_infrastructure_outputs.outputs.APPLICATION_INSIGHTS_NAME }}
+      APPLICATION_INSIGHTS_RESOURCE_ID: ${{ steps.get_infrastructure_outputs.outputs.APPLICATION_INSIGHTS_RESOURCE_ID }}
+      APPLICATION_INSIGHTS_INSTRUMENTATION_KEY: ${{ steps.get_infrastructure_outputs.outputs.APPLICATION_INSIGHTS_INSTRUMENTATION_KEY }}
+      AZURE_AI_SEARCH_NAME: ${{ steps.get_infrastructure_outputs.outputs.AZURE_AI_SEARCH_NAME }}
+      AZURE_AI_SEARCH_ID: ${{ steps.get_infrastructure_outputs.outputs.AZURE_AI_SEARCH_ID }}
+      MICROSOFT_FOUNDRY_NAME: ${{ steps.get_infrastructure_outputs.outputs.MICROSOFT_FOUNDRY_NAME }}
+      MICROSOFT_FOUNDRY_ID: ${{ steps.get_infrastructure_outputs.outputs.MICROSOFT_FOUNDRY_ID }}
+      MICROSOFT_FOUNDRY_ENDPOINT: ${{ steps.get_infrastructure_outputs.outputs.MICROSOFT_FOUNDRY_ENDPOINT }}
+      MICROSOFT_FOUNDRY_RESOURCE_ID: ${{ steps.get_infrastructure_outputs.outputs.MICROSOFT_FOUNDRY_RESOURCE_ID }}
+      MICROSOFT_FOUNDRY_PROJECT_NAME: ${{ steps.get_infrastructure_outputs.outputs.MICROSOFT_FOUNDRY_PROJECT_NAME }}
+      COSMOS_DB_NAME: ${{ steps.get_infrastructure_outputs.outputs.COSMOS_DB_NAME }}
+      COSMOS_DB_ID: ${{ steps.get_infrastructure_outputs.outputs.COSMOS_DB_ID }}
+      COSMOS_DB_ENDPOINT: ${{ steps.get_infrastructure_outputs.outputs.COSMOS_DB_ENDPOINT }}
+      AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME: ${{ steps.get_infrastructure_outputs.outputs.AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME }}
+      AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_RESOURCE_ID: ${{ steps.get_infrastructure_outputs.outputs.AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_RESOURCE_ID }}
+      AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_BLOB_ENDPOINT: ${{ steps.get_infrastructure_outputs.outputs.AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_BLOB_ENDPOINT }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install Azure Developer CLI
-        uses: Azure/setup-azd@v2.1.0
+        uses: Azure/setup-azd@v2.2.0
 
       - name: Authenticate Azure Developer CLI (Federated Credentials)
         run: |
@@ -91,14 +178,7 @@ jobs:
             --federated-credential-provider "github" \
             --tenant-id "$AZURE_TENANT_ID"
 
-      - name: Authenticate Azure CLI (Federated Credentials)
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Create azd environment
+      - name: Create Azure Developer CLI environment
         run: |
           azd env new "$AZURE_ENV_NAME" --location "$AZURE_LOCATION"
 
@@ -135,10 +215,50 @@ jobs:
           echo "::error::Infrastructure provisioning failed. Partial deployment has been cleaned up."
           exit 1
 
-      - name: Get Output Endpoints
-        id: get_endpoints
+      - name: Save azd environment state
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: azd-env-${{ inputs.AZURE_ENV_NAME }}
+          path: .azure/${{ inputs.AZURE_ENV_NAME }}
+          retention-days: 1
+
+      - name: Get Infrastructure Outputs
+        id: get_infrastructure_outputs
         run: |
-          AI_ENDPOINT=$(azd env get-values | grep AZURE_AI_SERVICES_ENDPOINT | cut -d'=' -f2- | xargs)
-          STORAGE_ENDPOINT=$(azd env get-values | grep AZURE_STORAGE_ACCOUNT_BLOB_ENDPOINT | cut -d'=' -f2- | xargs)
-          echo "AZURE_AI_SERVICES_ENDPOINT=$AI_ENDPOINT" >> $GITHUB_OUTPUT
-          echo "AZURE_STORAGE_ACCOUNT_BLOB_ENDPOINT=$STORAGE_ENDPOINT" >> $GITHUB_OUTPUT
+          # Get all outputs from azd env get-values and pass them through directly
+          echo "Getting azd environment outputs..."
+          AZD_OUTPUTS=$(azd env get-values)
+
+          # Define all the output variables we want to extract from azd outputs
+          OUTPUT_VARS=(
+            "AZURE_RESOURCE_GROUP"
+            "AZURE_PRINCIPAL_ID"
+            "AZURE_PRINCIPAL_ID_TYPE"
+            "LOG_ANALYTICS_WORKSPACE_NAME"
+            "LOG_ANALYTICS_RESOURCE_ID"
+            "LOG_ANALYTICS_WORKSPACE_ID"
+            "APPLICATION_INSIGHTS_NAME"
+            "APPLICATION_INSIGHTS_RESOURCE_ID"
+            "APPLICATION_INSIGHTS_INSTRUMENTATION_KEY"
+            "AZURE_AI_SEARCH_NAME"
+            "AZURE_AI_SEARCH_ID"
+            "MICROSOFT_FOUNDRY_NAME"
+            "MICROSOFT_FOUNDRY_ID"
+            "MICROSOFT_FOUNDRY_ENDPOINT"
+            "MICROSOFT_FOUNDRY_RESOURCE_ID"
+            "MICROSOFT_FOUNDRY_PROJECT_NAME"
+            "COSMOS_DB_NAME"
+            "COSMOS_DB_ID"
+            "COSMOS_DB_ENDPOINT"
+            "AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_NAME"
+            "AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_RESOURCE_ID"
+            "AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_BLOB_ENDPOINT"
+          )
+
+          # Extract and set each output variable directly from azd outputs
+          for VAR_NAME in "${OUTPUT_VARS[@]}"; do
+            VAR_VALUE=$(echo "$AZD_OUTPUTS" | grep "^${VAR_NAME}=" | cut -d'=' -f2- | xargs)
+            echo "$VAR_NAME=$VAR_VALUE" >> $GITHUB_OUTPUT
+            echo "Set $VAR_NAME=$VAR_VALUE"
+          done

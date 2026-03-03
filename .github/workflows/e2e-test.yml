@@ -91,8 +91,8 @@ jobs:
     steps:
       - name: Echo endpoints
         run: |
-          echo "AI Endpoint: ${{ needs.provision-infrastructure.outputs.AZURE_AI_SERVICES_ENDPOINT }}"
-          echo "Storage Endpoint: ${{ needs.provision-infrastructure.outputs.AZURE_STORAGE_ACCOUNT_BLOB_ENDPOINT }}"
+          echo "Foundry Endpoint: ${{ needs.provision-infrastructure.outputs.MICROSOFT_FOUNDRY_ENDPOINT }}"
+          echo "Storage Endpoint: ${{ needs.provision-infrastructure.outputs.AZURE_SAMPLE_DATA_STORAGE_ACCOUNT_BLOB_ENDPOINT }}"
 
   delete-infrastructure:
     needs: [validate-infrastructure, provision-infrastructure, e2e-tests]
