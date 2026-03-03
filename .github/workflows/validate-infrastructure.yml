@@ -78,7 +78,7 @@ jobs:
           scope: subscription
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           location: ${{ inputs.AZURE_LOCATION }}
-          template-file: ./infrastructure_bicep/main.bicep
+          template-file: ./infrastructure_bicep/infra/main.bicep
           parameters: >
             {
               "location": "${{ inputs.AZURE_LOCATION }}",
