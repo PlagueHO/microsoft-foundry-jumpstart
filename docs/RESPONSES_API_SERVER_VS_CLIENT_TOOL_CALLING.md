@@ -297,9 +297,9 @@ When using the Responses API — whether through the Foundry Agent Service (serv
 
 The Responses API is **stateful by default**. When you call `POST /responses`, the service stores the response (including input items, output items, and metadata) server-side. This stored state enables [`previous_response_id` chaining](https://learn.microsoft.com/azure/ai-foundry/openai/how-to/responses#chaining-responses-together), [response retrieval](https://learn.microsoft.com/azure/ai-foundry/openai/how-to/responses#retrieve-a-response), and [compaction](https://learn.microsoft.com/azure/ai-foundry/openai/how-to/responses#compact-a-response). By default, response data is [retained for 30 days](https://learn.microsoft.com/azure/ai-foundry/openai/how-to/responses#delete-response) and can be deleted by the customer at any time.
 
-When using the **Foundry Agent Service**, additional stateful entities are stored — including Threads, Messages, Runs, and uploaded files. These are stored either in Microsoft-managed storage (basic setup) or in [customer-provisioned resources](https://learn.microsoft.com/azure/foundry/agents/how-to/use-your-own-resources) such as Azure Cosmos DB, Azure AI Search, and Azure Storage (standard setup).
+When using the **Foundry Agent Service**, additional stateful entities are stored — including conversations, Messages, Runs, and uploaded files. These are stored either in Microsoft-managed storage (basic setup) or in [customer-provisioned resources](https://learn.microsoft.com/azure/foundry/agents/how-to/use-your-own-resources) such as Azure Cosmos DB, Azure AI Search, and Azure Storage (standard setup).
 
-**All data stored at rest remains in the geography of the Azure AI Foundry resource** (i.e., the Azure OpenAI / AI Services resource). For example, if your resource is created in the **Australia East** region, all stateful data — response history, thread state, messages, uploaded files — is stored at rest in **Australia**.
+**All data stored at rest remains in the geography of the Azure AI Foundry resource** (i.e., the Azure OpenAI / AI Services resource). For example, if your resource is created in the **Australia East** region, all stateful data — response history, conversation state, messages, uploaded files — is stored at rest in **Australia**.
 
 Data at rest is encrypted by default using [FIPS 140-2 compliant AES-256 encryption](https://learn.microsoft.com/azure/ai-foundry/openai/encrypt-data-at-rest), with an optional [customer-managed key (CMK)](https://learn.microsoft.com/azure/foundry/concepts/encryption-keys-portal) for additional control.
 
@@ -321,12 +321,14 @@ Consider this common scenario:
 
 - **Azure AI Foundry resource**: Australia East
 - **Foundry Agent Service**: Hosted in Australia East
-- **Model deployment**: GPT-4.1 with **Global Standard** deployment type
+- **Model deployment**: Stateless model (e.g., GPT-5.2) with **Global Standard** deployment type
+
+![Microsoft Foundry Agent Service using Global Standard deployment diagram](diagrams/agent-service-data-at-rest-data-processing-global-standard-diagram.png)
 
 In this configuration:
 
-1. **Data at rest** (response state, `previous_response_id` chains, agent threads, messages, runs, uploaded files) → stored in **Australia** (the geography of the Azure AI Foundry resource).
-2. **Model inferencing** (prompts and completions sent to the LLM) → may be processed in **any Azure region globally** where GPT-4.1 capacity is available (e.g., US, Europe, or other regions). Azure dynamically routes each inference request to the datacenter with the best availability.
+1. **Data at rest** (response state, `previous_response_id` chains, agent conversations, messages, runs, uploaded files) → stored in **Australia** (the geography of the Azure AI Foundry resource).
+2. **Model inferencing** (prompts and completions sent to the LLM) → may be processed in **any Azure region globally** where the model has available capacity (e.g., US, Europe, or other regions). Azure dynamically routes each inference request to the datacenter with the best availability.
 3. **Agent Service orchestration** (the ReAct loop, tool dispatch, state management) → runs in **Australia East** where the Agent Service is hosted.
 4. **Tool execution** (MCP servers, Code Interpreter, File Search, etc.) → depends on the hosting location of the tools. Server-side tools execute where the Agent Service or tool endpoint is hosted. Client-side function calls execute wherever the client runs.
 
