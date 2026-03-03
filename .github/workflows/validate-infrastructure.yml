@@ -56,6 +56,17 @@ jobs:
     name: Validate Infrastructure ${{ inputs.ENVIRONMENT }}
     environment: ${{ inputs.ENVIRONMENT }}
     runs-on: ubuntu-latest
+    env:
+      AZURE_ENV_NAME: ${{ inputs.AZURE_ENV_NAME }}
+      AZURE_LOCATION: ${{ inputs.AZURE_LOCATION }}
+      AZURE_NETWORK_ISOLATION: ${{ inputs.AZURE_NETWORK_ISOLATION }}
+      DEPLOY_SAMPLE_MODELS: ${{ inputs.DEPLOY_SAMPLE_MODELS }}
+      DEPLOY_SAMPLE_DATA: 'true'
+      MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: ${{ inputs.MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON }}
+      COSMOS_DB_DEPLOY: ${{ inputs.DEPLOY_CAPABILITY_HOSTS }}
+      COSMOS_DB_CAPABILITY_HOST: ${{ inputs.DEPLOY_CAPABILITY_HOSTS }}
+      AZURE_AI_SEARCH_CAPABILITY_HOST: ${{ inputs.DEPLOY_CAPABILITY_HOSTS }}
+      AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST: ${{ inputs.DEPLOY_CAPABILITY_HOSTS }}
 
     steps:
       - name: Download Build Artifacts
@@ -79,16 +90,4 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           location: ${{ inputs.AZURE_LOCATION }}
           template-file: ./infrastructure_bicep/main.bicep
-          parameters: >
-            {
-              "location": "${{ inputs.AZURE_LOCATION }}",
-              "environmentName": "${{ inputs.AZURE_ENV_NAME }}",
-              "azureNetworkIsolation": "${{ inputs.AZURE_NETWORK_ISOLATION }}",
-              "deploySampleModels": "${{ inputs.DEPLOY_SAMPLE_MODELS }}",
-              "deploySampleData": "true",
-              "foundryApplicationsFromJson": "${{ inputs.MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON }}",
-              "cosmosDbDeploy": "${{ inputs.DEPLOY_CAPABILITY_HOSTS }}",
-              "cosmosDbCapabilityHost": "${{ inputs.DEPLOY_CAPABILITY_HOSTS }}",
-              "azureAiSearchCapabilityHost": "${{ inputs.DEPLOY_CAPABILITY_HOSTS }}",
-              "azureStorageAccountCapabilityHost": "${{ inputs.DEPLOY_CAPABILITY_HOSTS }}"
-            }
+          parameters-file: ./infrastructure_bicep/main.bicepparam
