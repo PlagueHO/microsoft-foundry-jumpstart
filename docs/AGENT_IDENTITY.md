@@ -3,7 +3,7 @@
 This document explains how [agent identities](https://learn.microsoft.com/azure/ai-foundry/agents/concepts/agent-identity) work in [Microsoft Foundry Agent Service](https://learn.microsoft.com/azure/foundry/agents/overview), how they integrate with [Microsoft Entra ID](https://learn.microsoft.com/entra/fundamentals/what-is-entra), and how tokens flow from an authenticated user through an application to the agent and on to backend tools. It is intended as a single reference for building sample applications that demonstrate and experiment with Agent Identity.
 
 > [!NOTE]
-> [Microsoft Entra Agent ID](https://learn.microsoft.com/entra/agent-id/identity-platform/) is currently in **preview**. Features and APIs may change before general availability.
+> As of 2026-03-03, [Microsoft Entra Agent ID](https://learn.microsoft.com/entra/agent-id/identity-platform/) is currently in **preview**. Features and APIs may change before general availability.
 
 ## Concepts and Terminology
 
@@ -351,25 +351,7 @@ Which identity mode applies to each tool type depends on the [tool's authenticat
 
 ## Publishing and Identity Reassignment
 
-When you [publish an agent](https://learn.microsoft.com/azure/foundry/agents/how-to/publish-agent), Foundry creates a **distinct agent identity** that replaces the shared project identity for that agent. This has critical implications for RBAC:
-
-```mermaid
-graph LR
-    subgraph Before Publishing
-        DEV_AGENT["Agent (Dev)"] -->|"uses"| SHARED_ID["Shared Project<br/>Agent Identity"]
-        SHARED_ID -->|"RBAC roles on"| RES1["Azure Storage"]
-        SHARED_ID -->|"RBAC roles on"| RES2["MCP Server"]
-    end
-
-    subgraph After Publishing
-        PUB_AGENT["Agent (Published)"] -->|"uses"| DISTINCT_ID["Distinct<br/>Agent Identity"]
-        DISTINCT_ID -.->|"❌ No roles yet!"| RES3["Azure Storage"]
-        DISTINCT_ID -.->|"❌ No roles yet!"| RES4["MCP Server"]
-    end
-
-    style SHARED_ID fill:#7b68ee,color:#fff
-    style DISTINCT_ID fill:#e74c3c,color:#fff
-```
+When you [publish an agent](https://learn.microsoft.com/azure/foundry/agents/how-to/publish-agent), Foundry creates a **distinct agent identity** that replaces the shared project identity for that agent. This has critical implications for RBAC - they must be reassigned to the new identity.
 
 ### Steps After Publishing
 
