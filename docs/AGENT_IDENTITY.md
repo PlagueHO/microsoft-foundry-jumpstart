@@ -5,23 +5,6 @@ This document explains how [agent identities](https://learn.microsoft.com/azure/
 > [!NOTE]
 > [Microsoft Entra Agent ID](https://learn.microsoft.com/entra/agent-id/identity-platform/) is currently in **preview**. Features and APIs may change before general availability.
 
-## Table of Contents
-
-- [Concepts and Terminology](#concepts-and-terminology)
-- [Identity Lifecycle in Foundry](#identity-lifecycle-in-foundry)
-- [Tool Authentication Modes](#tool-authentication-modes)
-- [End-to-End Authentication Flows](#end-to-end-authentication-flows)
-  - [Mode A: Agent Identity (Unattended)](#mode-a-agent-identity-unattended)
-  - [Mode B: Delegated User Identity (On-Behalf-Of)](#mode-b-delegated-user-identity-on-behalf-of)
-  - [Mode C: OAuth Identity Passthrough](#mode-c-oauth-identity-passthrough)
-- [How Your App Passes the User Token to Agent Service](#how-your-app-passes-the-user-token-to-agent-service)
-- [Tool Authentication Matrix](#tool-authentication-matrix)
-- [Publishing and Identity Reassignment](#publishing-and-identity-reassignment)
-- [Security Considerations](#security-considerations)
-- [SDK and Code Patterns](#sdk-and-code-patterns)
-- [Managing Agent Identities](#managing-agent-identities)
-- [Reference Links](#reference-links)
-
 ## Concepts and Terminology
 
 [Agent identities](https://learn.microsoft.com/azure/ai-foundry/agents/concepts/agent-identity) are a specialized identity type in [Microsoft Entra ID](https://learn.microsoft.com/entra/fundamentals/what-is-entra) designed specifically for AI agents. They provide a standardized framework for governing, [authenticating](https://learn.microsoft.com/entra/agent-id/identity-platform/agent-on-behalf-of-oauth-flow), and [authorizing](https://learn.microsoft.com/entra/id-governance/agent-id-governance-overview) AI agents across Microsoft services.
@@ -32,7 +15,7 @@ This document explains how [agent identities](https://learn.microsoft.com/azure/
 | **[Agent Identity Blueprint](https://learn.microsoft.com/entra/agent-id/identity-platform/create-blueprint)** | A Microsoft Entra ID application object that acts as the governing template for a class of agent identities. Holds OAuth credentials (managed identity, certificate, or secret) and governs lifecycle operations. |
 | **`agentIdentityId`** | The identifier used when [assigning RBAC permissions](https://learn.microsoft.com/azure/role-based-access-control/overview) to the agent identity on downstream resources. |
 | **Audience** | The OAuth 2.0 resource identifier for the downstream service the token targets (e.g., `https://storage.azure.com`, `https://graph.microsoft.com`). |
-| **Shared Project Identity** | The default agent identity shared by all unpublished agents within a [Foundry project](https://learn.microsoft.com/azure/foundry/agents/concepts/agent-identity#shared-project-identity). |
+| **[Shared Project Identity](https://learn.microsoft.com/azure/foundry/agents/concepts/agent-identity#shared-project-identity)** | The default agent identity shared by all unpublished agents within a Foundry project. |
 | **Distinct Agent Identity** | A dedicated agent identity [automatically created when an agent is published](https://learn.microsoft.com/azure/foundry/agents/how-to/publish-agent), bound to the specific agent application. |
 | **[Agent User](https://learn.microsoft.com/entra/agent-id/identity-platform/autonomous-agent-request-agent-user-tokens)** | A special Entra user account purpose-built for autonomous agents that need user-context resources (e.g., mailbox, Teams channel). |
 
@@ -76,22 +59,22 @@ graph TD
 
 ```mermaid
 stateDiagram-v2
-    [*] --> ProjectCreated: Create Foundry Project
-    ProjectCreated --> FirstAgentCreated: Create first agent in project
-    FirstAgentCreated --> SharedIdentity: Foundry provisions:<br/>• Default Blueprint<br/>• Default Agent Identity
+    [*] --> ProjectCreated : Create Foundry Project
+    ProjectCreated --> FirstAgentCreated : Create first agent in project
+    FirstAgentCreated --> SharedIdentity : Foundry provisions default Blueprint and Agent Identity
 
     state SharedIdentity {
         [*] --> DevAgents
-        DevAgents: All unpublished agents<br/>share the project agent identity
-        DevAgents --> DevAgents: Create more agents
+        DevAgents : All unpublished agents share the project agent identity
+        DevAgents --> DevAgents : Create more agents
     }
 
-    SharedIdentity --> AgentPublished: Publish agent
+    SharedIdentity --> AgentPublished : Publish agent
 
     state DistinctIdentity {
         [*] --> PubAgent
-        PubAgent: Published agent gets:<br/>• Dedicated Blueprint<br/>• Dedicated Agent Identity
-        PubAgent --> ReassignRBAC: Must reassign RBAC<br/>to new agent identity
+        PubAgent : Published agent gets dedicated Blueprint and Agent Identity
+        PubAgent --> ReassignRBAC : Must reassign RBAC to new agent identity
     }
 
     AgentPublished --> DistinctIdentity
