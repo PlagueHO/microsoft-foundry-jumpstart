@@ -311,9 +311,9 @@ The location where **prompts and responses are processed by the LLM** is determi
 |----------------|--------------------------|
 | **Global Standard** / **Global Provisioned** | May be processed in **any Azure region** where the model is available |
 | **Data Zone Standard** / **Data Zone Provisioned** | Processed within the **Microsoft-defined data zone** (US or EU) |
-| **Standard** (regional) / **Regional Provisioned** | Processed in the **deployment region only** |
+| **Regional Standard** / **Regional Provisioned** | Processed in the **deployment region only** |
 
-This means that for any deployment type labeled "Global," prompts and responses may be sent to any geography where the relevant model is deployed for inferencing. For "DataZone" types, processing stays within the defined data zone boundary. Only regional "Standard" deployments guarantee that inferencing occurs in the same region as the resource.
+This means that for any deployment type labeled "Global" prompts and responses may be sent to any geography where the relevant model is deployed for inferencing. For "DataZone" types, processing stays within the defined data zone boundary. Only "Regional" deployments guarantee that inferencing occurs in the same region as the model is deployed.
 
 ### Example: Agent Service in Australia East with Global Standard
 
