@@ -23,7 +23,7 @@ jobs:
           config: ".cspell.json"
 
       - name: Publish Bicep as Workflow Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: infrastructure_bicep
           path: |

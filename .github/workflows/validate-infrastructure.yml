@@ -59,7 +59,7 @@ jobs:
 
     steps:
       - name: Download Build Artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
 
       - name: Azure Login
         uses: azure/login@v2
@@ -78,7 +78,7 @@ jobs:
           scope: subscription
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           location: ${{ inputs.AZURE_LOCATION }}
-          template-file: ./infrastructure_bicep/infra/main.bicep
+          template-file: ./infrastructure_bicep/main.bicep
           parameters: >
             {
               "location": "${{ inputs.AZURE_LOCATION }}",
