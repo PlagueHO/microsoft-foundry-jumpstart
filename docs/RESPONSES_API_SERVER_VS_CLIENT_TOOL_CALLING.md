@@ -77,7 +77,7 @@ The [`mcp_approval_request`](https://learn.microsoft.com/azure/foundry/agents/ho
 - **Progressive migration**: Start with full server-side orchestration. Add function calling tools incrementally as custom requirements emerge, without refactoring existing server-side tool configurations.
 
 > **Tip**: Use [`tool_choice`](https://learn.microsoft.com/azure/foundry/agents/concepts/tool-best-practice) and clear agent instructions to control which tools the model prefers. For example: _"Use Azure AI Search for internal documents. Use the `enrich_record` function only when the search results need enrichment from the CRM system."_
-
+>
 > **References**:
 >
 > - [Function calling with Foundry agents](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/function-calling)
@@ -150,7 +150,7 @@ The [`POST /responses/compact`](https://learn.microsoft.com/azure/foundry/openai
 Compaction is particularly useful for long multi-turn conversations where the accumulated context approaches the model's token limit. Unlike truncation (which simply drops old items), compaction summarizes and preserves the semantic content of earlier conversation turns.
 
 > **Note**: Neither truncation nor compaction is exclusive to server-side or client-side orchestration. Both are Responses API features that can be used regardless of where the ReAct loop runs. The [Chat Completions API](https://learn.microsoft.com/azure/foundry/openai/how-to/chatgpt#manage-conversations) does **not** offer these features — with Chat Completions, context window management is entirely the caller's responsibility.
-
+>
 > **References**:
 >
 > - [Use the Azure OpenAI Responses API — Compact a Response](https://learn.microsoft.com/azure/foundry/openai/how-to/responses#compact-a-response)
