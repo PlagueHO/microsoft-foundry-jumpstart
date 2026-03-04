@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\agent-framework\AzureArchitect\AzureArchitect_Step02b_Foundry_Agent_MultiturnConversation\AzureArchitect_Step02b_Foundry_Agent_MultiturnConversation.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\agent-framework\AzureArchitect\AzureArchitect_Step02b_Foundry_Agent_MultiturnConversation\AzureArchitect_Step02b_Foundry_Agent_MultiturnConversation.csproj" />
   </ItemGroup>
 
 </Project>

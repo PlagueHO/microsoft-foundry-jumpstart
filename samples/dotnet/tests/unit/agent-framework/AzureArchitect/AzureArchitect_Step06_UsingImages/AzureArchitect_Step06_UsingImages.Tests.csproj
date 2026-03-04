@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\agent-framework\AzureArchitect\AzureArchitect_Step06_UsingImages\AzureArchitect_Step06_UsingImages.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\agent-framework\AzureArchitect\AzureArchitect_Step06_UsingImages\AzureArchitect_Step06_UsingImages.csproj" />
   </ItemGroup>
 
 </Project>

@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\agent-framework\AgentPersistence\AgentPersistence_Step01_UnpublishedAgent\AgentPersistence_Step01_UnpublishedAgent.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\agent-framework\AgentPersistence\AgentPersistence_Step01_UnpublishedAgent\AgentPersistence_Step01_UnpublishedAgent.csproj" />
   </ItemGroup>
 
 </Project>

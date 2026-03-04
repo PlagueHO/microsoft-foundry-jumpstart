@@ -531,6 +531,9 @@ module cognitiveService_privateEndpoints 'br/public:avm/res/network/private-endp
 module cognitiveService_projects './project/main.bicep' = [
   for (project, index) in (projects ?? []): {
     name: '${uniqueString(deployment().name, location)}-cognitiveService-project-${index}'
+    dependsOn: [
+      cognitiveService_deployments
+    ]
     scope: az.resourceGroup(
         split(project.?resourceGroupResourceId ?? resourceGroup().id, '/')[2],
         split(project.?resourceGroupResourceId ?? resourceGroup().id, '/')[4]

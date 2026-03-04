@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\agent-framework\AgentPersistence\AgentPersistence_Step02_PublishedWithCosmosDB\AgentPersistence_Step02_PublishedWithCosmosDB.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\agent-framework\AgentPersistence\AgentPersistence_Step02_PublishedWithCosmosDB\AgentPersistence_Step02_PublishedWithCosmosDB.csproj" />
   </ItemGroup>
 
 </Project>
