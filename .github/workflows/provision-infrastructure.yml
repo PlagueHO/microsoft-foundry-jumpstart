@@ -178,6 +178,13 @@ jobs:
             --federated-credential-provider "github" \
             --tenant-id "$AZURE_TENANT_ID"
 
+      - name: Authenticate Azure CLI (Federated Credentials)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Create Azure Developer CLI environment
         run: |
           azd env new "$AZURE_ENV_NAME" --location "$AZURE_LOCATION"
@@ -196,6 +203,7 @@ jobs:
             azd env set AZURE_STORAGE_ACCOUNT_CAPABILITY_HOST "true"
           fi
           azd env set AZURE_PRINCIPAL_ID_TYPE "$AZURE_PRINCIPAL_ID_TYPE"
+          azd env set AZURE_RESOURCE_GROUP "rg-${AZURE_ENV_NAME}"
 
       - name: Provision Infrastructure using Azure Developer CLI
         id: provision
@@ -206,7 +214,46 @@ jobs:
         if: steps.provision.outcome == 'failure'
         run: |
           echo "Provisioning failed. Cleaning up partially deployed infrastructure..."
-          azd down --no-prompt --purge --force
+
+          # Attempt azd down first
+          echo "Attempting cleanup via azd down..."
+          azd down --no-prompt --purge --force || true
+
+          # Fallback: Delete resource group directly via Azure CLI.
+          # azd down may fail to find resources when provisioning didn't complete,
+          # because the azd environment state was never updated with the deployment.
+          RESOURCE_GROUP="rg-${AZURE_ENV_NAME}"
+          echo "Checking if resource group '${RESOURCE_GROUP}' still exists..."
+          if az group exists --name "$RESOURCE_GROUP" 2>/dev/null | grep -qi "true"; then
+            echo "Resource group '${RESOURCE_GROUP}' still exists. Deleting via Azure CLI..."
+            az group delete --name "$RESOURCE_GROUP" --yes
+            echo "Resource group deleted."
+          else
+            echo "Resource group '${RESOURCE_GROUP}' does not exist or was already deleted."
+          fi
+
+          # Purge any soft-deleted Cognitive Services resources that were in the resource group.
+          # These block future deployments with the same name if not purged.
+          echo "Checking for soft-deleted Cognitive Services resources to purge..."
+          DELETED_ACCOUNTS=$(az cognitiveservices account list-deleted \
+            --subscription "$AZURE_SUBSCRIPTION_ID" \
+            --query "[?contains(id, '${RESOURCE_GROUP}')]" -o json 2>/dev/null || echo "[]")
+
+          if [ "$DELETED_ACCOUNTS" != "[]" ] && [ -n "$DELETED_ACCOUNTS" ]; then
+            echo "$DELETED_ACCOUNTS" | jq -c '.[]' | while read -r account; do
+              ACCOUNT_NAME=$(echo "$account" | jq -r '.name')
+              ACCOUNT_LOCATION=$(echo "$account" | jq -r '.location')
+              ACCOUNT_RG=$(echo "$account" | jq -r '.id' | sed 's|.*/resourceGroups/\([^/]*\)/.*|\1|')
+              echo "Purging soft-deleted Cognitive Services account: $ACCOUNT_NAME (location: $ACCOUNT_LOCATION)"
+              az cognitiveservices account purge \
+                --name "$ACCOUNT_NAME" \
+                --resource-group "$ACCOUNT_RG" \
+                --location "$ACCOUNT_LOCATION" || true
+            done
+          else
+            echo "No soft-deleted Cognitive Services resources found to purge."
+          fi
+
           echo "Cleanup completed."
 
       - name: Fail if Provision Failed
