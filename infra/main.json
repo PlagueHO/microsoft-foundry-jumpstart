@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.41.2.15936",
-      "templateHash": "11660126175124005279"
+      "templateHash": "18141024955829135224"
     }
   },
   "definitions": {
@@ -43938,7 +43938,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.41.2.15936",
-              "templateHash": "11284017578028914029"
+              "templateHash": "10556868917833618903"
             },
             "name": "Cognitive Services",
             "description": "This module deploys a Cognitive Service account.\nThis is a temporary module for deploying Azure Foundry Cognitive Services accounts.\nIt is intended to be replaced by the Azure Verified Module (AVM) for Microsoft.CognitiveServices accounts\nonce it supports Foundry V2 (projects, connections etc)\nhttps://github.com/Azure/bicep-registry-modules/issues/5390\n"
@@ -47566,7 +47566,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.41.2.15936",
-                      "templateHash": "8410591486117052134"
+                      "templateHash": "13026498334259110646"
                     },
                     "name": "Cognitive Services Project",
                     "description": "This module deploys a Project within a Cognitive Services account.\nIt allows for the creation of a Foundry Project with optional managed identities and role assignments.\n"
@@ -49697,7 +49697,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.41.2.15936",
-                              "templateHash": "15926531663847845571"
+                              "templateHash": "2658309864736801470"
                             },
                             "name": "Cognitive Services Application",
                             "description": "This module creates an application within a Cognitive Services project.\r\nApplications are agentic application instances that can contain agent deployments.\r\nSee: https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/applications\r\n"
@@ -50249,17 +50249,7 @@
                               "type": "Microsoft.CognitiveServices/accounts/projects/applications",
                               "apiVersion": "2025-10-01-preview",
                               "name": "[format('{0}/{1}/{2}', parameters('accountName'), parameters('projectName'), parameters('name'))]",
-                              "properties": {
-                                "displayName": "[parameters('displayName')]",
-                                "description": "[parameters('description')]",
-                                "authorizationPolicy": "[parameters('authorizationPolicy')]",
-                                "agentIdentityBlueprint": "[parameters('agentIdentityBlueprint')]",
-                                "defaultInstanceIdentity": "[parameters('defaultInstanceIdentity')]",
-                                "baseUrl": "[parameters('baseUrl')]",
-                                "trafficRoutingPolicy": "[parameters('trafficRoutingPolicy')]",
-                                "agents": "[parameters('agents')]",
-                                "tags": "[parameters('tags')]"
-                              }
+                              "properties": "[union(createObject('displayName', parameters('displayName'), 'description', parameters('description'), 'authorizationPolicy', parameters('authorizationPolicy'), 'agentIdentityBlueprint', parameters('agentIdentityBlueprint'), 'defaultInstanceIdentity', parameters('defaultInstanceIdentity'), 'baseUrl', parameters('baseUrl'), 'trafficRoutingPolicy', parameters('trafficRoutingPolicy'), 'tags', parameters('tags')), if(not(equals(parameters('agents'), null())), createObject('agents', parameters('agents')), createObject()))]"
                             },
                             "application_agentDeployments": {
                               "copy": {

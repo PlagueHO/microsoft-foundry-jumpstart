@@ -69,18 +69,21 @@ resource parentProject 'Microsoft.CognitiveServices/accounts/projects@2025-10-01
 resource application 'Microsoft.CognitiveServices/accounts/projects/applications@2025-10-01-preview' = {
   parent: parentProject
   name: name
-  properties: {
-    displayName: displayName
-    description: description
-    #disable-next-line BCP225 BCP078 // authorizationPolicy uses authorizationScheme discriminator; ARM schema still references 'type' (RP schema mismatch)
-    authorizationPolicy: authorizationPolicy
-    agentIdentityBlueprint: agentIdentityBlueprint
-    defaultInstanceIdentity: defaultInstanceIdentity
-    baseUrl: baseUrl
-    trafficRoutingPolicy: trafficRoutingPolicy
-    agents: agents
-    tags: tags
-  }
+  properties: union(
+    {
+      displayName: displayName
+      description: description
+      #disable-next-line BCP225 BCP078 // authorizationPolicy uses authorizationScheme discriminator; ARM schema still references 'type' (RP schema mismatch)
+      authorizationPolicy: authorizationPolicy
+      agentIdentityBlueprint: agentIdentityBlueprint
+      defaultInstanceIdentity: defaultInstanceIdentity
+      baseUrl: baseUrl
+      trafficRoutingPolicy: trafficRoutingPolicy
+      tags: tags
+    },
+    // agents must not be null or empty per the API; only include when specified
+    agents != null ? { agents: agents! } : {}
+  )
 }
 
 @batchSize(1)
