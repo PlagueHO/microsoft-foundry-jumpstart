@@ -159,46 +159,39 @@ sequenceDiagram
 - RBAC roles must be assigned to the `agentIdentityId` on the target resource (e.g., [Storage Blob Data Contributor](https://learn.microsoft.com/azure/role-based-access-control/built-in-roles#storage-blob-data-contributor) on an Azure Storage Account).
 - The user's token (Tc) is used for **authorization to the Agent Service** but the tool call itself uses the agent's own token.
 
-### Mode B: Delegated User Identity (On-Behalf-Of)
+### Mode B: Delegated User Identity (On-Behalf-Of/Unattended)
 
-The agent authenticates to downstream tools **on behalf of the signed-in user** using the [OAuth 2.0 OBO flow](https://learn.microsoft.com/entra/identity-platform/v2-oauth2-on-behalf-of-flow). The downstream resource sees the **user's identity** and enforces the user's permissions.
+The agent authenticates to downstream tools **on behalf of the signed-in user** using the [agent OBO flow](https://learn.microsoft.com/entra/agent-id/identity-platform/agent-on-behalf-of-oauth-flow). The downstream resource sees the **user's identity** and enforces the user's permissions.
 
 **When to use:** Tools where data access must respect per-user permissions — [SharePoint](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/sharepoint) (document-level ACLs), [Microsoft Fabric](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/fabric) (row-level security), [Microsoft Graph](https://learn.microsoft.com/graph/overview) (user's mailbox, calendar).
 
 ```mermaid
 sequenceDiagram
     participant User as 👤 User
-    participant App as Your App
+    participant Client as Client
+    participant Blueprint as Agent Blueprint
+    participant AgentId as Agent Identity
     participant Entra as Microsoft Entra ID
-    participant FAS as Foundry Agent Service
-    participant MI as Managed Identity
-    participant Tool as SharePoint / Fabric / Graph
+    participant Resource as Resource
 
-    User->>App: Authenticates (OAuth 2.0)
-    App->>Entra: Exchange for token scoped to<br/>cognitiveservices.azure.com
-    Entra-->>App: User access token (Tc)
-    App->>FAS: POST /responses<br/>Authorization: Bearer Tc
-    Note over FAS: Agent decides to call an OBO tool
-
-    FAS->>MI: Request managed identity token
-    MI-->>FAS: MI token (TUAMI)
-    FAS->>Entra: ① client_id=Blueprint<br/>client_assertion=TUAMI<br/>fmi_path=AgentIdentity<br/>grant_type=client_credentials
-    Entra-->>FAS: Agent exchange token (T1)
-    FAS->>Entra: ② client_id=AgentIdentity<br/>client_assertion=T1<br/>assertion=Tc (user token)<br/>grant_type=on_behalf_of<br/>scope=https://graph.microsoft.com/.default
-    Entra-->>FAS: Delegated resource token (T2)<br/>Subject = User's identity
-    FAS->>Tool: API call<br/>Authorization: Bearer T2
-    Note over Tool: Tool sees the USER's<br/>identity and permissions
-    Tool-->>FAS: User-scoped response
-    FAS-->>App: Final answer
-    App-->>User: Display result
+    User->>Client: 1. Sign-in / Authentication
+    Client->>Blueprint: 2. Send User Access Token (Tc)
+    Blueprint->>Entra: 3. Request FIC exchange token<br/>(Client Credential: e.g. MSI)
+    Entra-->>Blueprint: 4. Return FIC token (T1)
+    AgentId->>Entra: 5. Token Exchange request (T1 + Tc)
+    Entra-->>AgentId: 6. Return Resource Access Token (TR)
+    AgentId->>Resource: 7. Access resource with TR
 ```
 
 **Key points:**
 
-- The user's access token (Tc) is used **both** for Agent Service authorization **and** as the `assertion` in the [OBO exchange](https://learn.microsoft.com/entra/agent-id/identity-platform/agent-on-behalf-of-oauth-flow).
-- The OBO exchange combines the agent identity credential (T1) with the user token (Tc) to produce a delegated token (T2).
+- The user's access token (Tc) is used **both** for Agent Service authorization **and** as the `assertion` in the [OBO exchange](https://learn.microsoft.com/entra/agent-id/identity-platform/agent-on-behalf-of-oauth-flow). The OBO protocol requires token audience of both T1 and Tc to match the agent identity blueprint's client ID.
+- Agents can't use `/authorize` OBO flows. Supported grant types are `client_credentials`, `jwt-bearer`, and `refresh_token`.
+- The OBO exchange combines the agent identity credential (T1) with the user token (Tc) to produce a delegated token (T2). [Refresh tokens](https://learn.microsoft.com/entra/agent-id/identity-platform/agent-on-behalf-of-oauth-flow#refresh-token-support) can be used for asynchronous scenarios and background processes.
 - Each end user **must have their own access** to the downstream data source, or the tool call fails.
-- Consent must be configured: the agent identity needs [delegated permissions](https://learn.microsoft.com/entra/agent-id/identity-platform/interactive-agent-request-user-authorization) and users must consent to the agent accessing their data.
+- Consent must be configured: the agent identity needs [delegated permissions](https://learn.microsoft.com/entra/agent-id/identity-platform/interactive-agent-request-user-authorization) and users must consent to the agent accessing their data. Agent identities can [inherit delegated permissions](https://learn.microsoft.com/entra/agent-id/identity-platform/agent-on-behalf-of-oauth-flow#permission-inheritance) from their parent blueprint when `InheritDelegatedPermissions` is enabled.
+- [Managed identities](https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview) are the preferred credential type for the agent identity blueprint. Client secrets should **not** be used in production — use [federated identity credentials (FIC) with managed identities](https://learn.microsoft.com/entra/workload-id/workload-identity-federation-config-app-trust-managed-identity) or client certificates instead.
+- Microsoft recommends using approved SDKs (Microsoft.Identity.Web, Microsoft Agent ID SDK) rather than manual protocol implementation.
 
 ### Mode C: OAuth Identity Passthrough
 
