@@ -72,7 +72,7 @@ resource application 'Microsoft.CognitiveServices/accounts/projects/applications
   properties: {
     displayName: displayName
     description: description
-    #disable-next-line BCP225 // authorizationPolicy discriminator resolved at runtime from parameter
+    #disable-next-line BCP225 BCP078 // authorizationPolicy uses authorizationScheme discriminator; ARM schema still references 'type' (RP schema mismatch)
     authorizationPolicy: authorizationPolicy
     agentIdentityBlueprint: agentIdentityBlueprint
     defaultInstanceIdentity: defaultInstanceIdentity
@@ -139,7 +139,7 @@ type agentReferenceType = {
 @sys.description('The type for the authorization policy of an application.')
 type applicationAuthorizationPolicyType = {
   @sys.description('Required. The authorization scheme type.')
-  type: 'Channels' | 'Default' | 'OrganizationScope'
+  authorizationScheme: 'Channels' | 'Default' | 'OrganizationScope'
 }
 
 @export()

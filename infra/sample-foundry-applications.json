@@ -4,7 +4,7 @@
     "displayName": "Sample Agent Application",
     "description": "A sample agentic application for demonstrating Foundry application deployments.",
     "authorizationPolicy": {
-      "type": "Default"
+      "authorizationScheme": "Default"
     },
     "agentDeployments": [
       {

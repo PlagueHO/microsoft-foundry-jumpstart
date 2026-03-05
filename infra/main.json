@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.41.2.15936",
-      "templateHash": "1363014773681334790"
+      "templateHash": "16268967161796024854"
     }
   },
   "definitions": {
@@ -191,7 +191,7 @@
     "_2.applicationAuthorizationPolicyType": {
       "type": "object",
       "properties": {
-        "type": {
+        "authorizationScheme": {
           "type": "string",
           "allowedValues": [
             "Channels",
@@ -1051,7 +1051,7 @@
         "displayName": "Sample Agent Application",
         "description": "A sample agentic application for demonstrating Foundry application deployments.",
         "authorizationPolicy": {
-          "type": "Default"
+          "authorizationScheme": "Default"
         },
         "agentDeployments": [
           {
@@ -43946,7 +43946,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.41.2.15936",
-              "templateHash": "6077551221278892389"
+              "templateHash": "8643302805537699262"
             },
             "name": "Cognitive Services",
             "description": "This module deploys a Cognitive Service account.\nThis is a temporary module for deploying Azure Foundry Cognitive Services accounts.\nIt is intended to be replaced by the Azure Verified Module (AVM) for Microsoft.CognitiveServices accounts\nonce it supports Foundry V2 (projects, connections etc)\nhttps://github.com/Azure/bicep-registry-modules/issues/5390\n"
@@ -45375,7 +45375,7 @@
             "_5.applicationAuthorizationPolicyType": {
               "type": "object",
               "properties": {
-                "type": {
+                "authorizationScheme": {
                   "type": "string",
                   "allowedValues": [
                     "Channels",
@@ -47574,7 +47574,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.41.2.15936",
-                      "templateHash": "5128236393157157023"
+                      "templateHash": "16790919832108225937"
                     },
                     "name": "Cognitive Services Project",
                     "description": "This module deploys a Project within a Cognitive Services account.\nIt allows for the creation of a Foundry Project with optional managed identities and role assignments.\n"
@@ -48490,7 +48490,7 @@
                     "_3.applicationAuthorizationPolicyType": {
                       "type": "object",
                       "properties": {
-                        "type": {
+                        "authorizationScheme": {
                           "type": "string",
                           "allowedValues": [
                             "Channels",
@@ -49705,7 +49705,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.41.2.15936",
-                              "templateHash": "7276826870176122337"
+                              "templateHash": "12550513099260474125"
                             },
                             "name": "Cognitive Services Application",
                             "description": "This module creates an application within a Cognitive Services project.\r\nApplications are agentic application instances that can contain agent deployments.\r\nSee: https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/applications\r\n"
@@ -49737,7 +49737,7 @@
                             "applicationAuthorizationPolicyType": {
                               "type": "object",
                               "properties": {
-                                "type": {
+                                "authorizationScheme": {
                                   "type": "string",
                                   "allowedValues": [
                                     "Channels",
