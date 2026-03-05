@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.41.2.15936",
-      "templateHash": "12550513099260474125"
+      "templateHash": "15926531663847845571"
     },
     "name": "Cognitive Services Application",
     "description": "This module creates an application within a Cognitive Services project.\r\nApplications are agentic application instances that can contain agent deployments.\r\nSee: https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/applications\r\n"
@@ -580,7 +580,7 @@
       "type": "Microsoft.CognitiveServices/accounts/projects/applications/agentDeployments",
       "apiVersion": "2025-10-01-preview",
       "name": "[format('{0}/{1}/{2}/{3}', parameters('accountName'), parameters('projectName'), parameters('name'), coalesce(parameters('agentDeployments'), createArray())[copyIndex()].name)]",
-      "properties": "[union(createObject('deploymentType', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'displayName', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'displayName'), 'description', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'description'), 'deploymentId', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'deploymentId'), 'agents', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'agents'), 'protocols', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'protocols'), 'tags', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'tags')), if(equals(coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'Hosted'), createObject('minReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'minReplicas'), 'maxReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'maxReplicas')), createObject()))]",
+      "properties": "[union(createObject('deploymentType', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'displayName', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'displayName'), 'description', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'description'), 'deploymentId', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'deploymentId'), 'protocols', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'protocols'), 'tags', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'tags')), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'agents'), null())), createObject('agents', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].agents), createObject()), if(equals(coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'Hosted'), createObject('minReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'minReplicas'), 'maxReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'maxReplicas')), createObject()))]",
       "dependsOn": [
         "application"
       ]

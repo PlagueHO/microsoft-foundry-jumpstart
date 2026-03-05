@@ -5,14 +5,6 @@
     "description": "A sample agentic application for demonstrating Foundry application deployments.",
     "authorizationPolicy": {
       "authorizationScheme": "Default"
-    },
-    "agentDeployments": [
-      {
-        "name": "sample-managed-deployment",
-        "deploymentType": "Managed",
-        "displayName": "Sample Managed Deployment",
-        "description": "A sample managed agent deployment."
-      }
-    ]
+    }
   }
 ]

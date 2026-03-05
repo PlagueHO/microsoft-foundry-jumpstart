@@ -85,10 +85,11 @@ resource agentDeployment 'Microsoft.CognitiveServices/accounts/projects/applicat
       displayName: displayName
       description: description
       deploymentId: deploymentId
-      agents: agents
       protocols: protocols
       tags: tags
     },
+    // agents must not be null or empty per the API; only include when specified
+    agents != null ? { agents: agents! } : {},
     deploymentType == 'Hosted'
       ? {
           minReplicas: minReplicas
