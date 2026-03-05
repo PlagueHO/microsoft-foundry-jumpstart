@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.41.2.15936",
-      "templateHash": "1704445113729415819"
+      "templateHash": "6230316077307833514"
     },
     "name": "Cognitive Services Application Agent Deployment",
     "description": "This module creates an agent deployment within an application in a Cognitive Services project.\r\nAgent deployments define how agents within an application are deployed and scaled.\r\nSee: https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/applications/agentdeployments\r\n"
@@ -19,14 +19,13 @@
           "type": "string",
           "nullable": true,
           "metadata": {
-            "description": "Optional. The agent's unique identifier within the organization."
+            "description": "Optional. The agent's unique identifier within the organization (subscription)."
           }
         },
         "agentName": {
           "type": "string",
-          "nullable": true,
           "metadata": {
-            "description": "Optional. The agent's name (unique within the project/app)."
+            "description": "Required. The agent's name (unique within the project/app)."
           }
         },
         "agentVersion": {
@@ -52,9 +51,8 @@
             "Agent",
             "Responses"
           ],
-          "nullable": true,
           "metadata": {
-            "description": "Optional. The protocol used by the agent."
+            "description": "Required. The protocol used by the agent."
           }
         },
         "version": {
@@ -115,9 +113,9 @@
           "items": {
             "$ref": "#/definitions/versionedAgentReferenceType"
           },
-          "nullable": true,
+          "minLength": 1,
           "metadata": {
-            "description": "Optional. List of agent:version pairs deployed in this deployment."
+            "description": "Required. List of agent:version pairs deployed in this deployment."
           }
         },
         "protocols": {
@@ -125,9 +123,9 @@
           "items": {
             "$ref": "#/definitions/agentProtocolVersionType"
           },
-          "nullable": true,
+          "minLength": 1,
           "metadata": {
-            "description": "Optional. Protocol types and versions exposed by this deployment."
+            "description": "Required. Protocol types and versions exposed by this deployment."
           }
         },
         "minReplicas": {
@@ -221,9 +219,9 @@
       "items": {
         "$ref": "#/definitions/versionedAgentReferenceType"
       },
-      "nullable": true,
+      "minLength": 1,
       "metadata": {
-        "description": "Optional. List of agent:version pairs deployed in this deployment."
+        "description": "Required. List of agent:version pairs deployed in this deployment. Must contain at least one entry."
       }
     },
     "protocols": {
@@ -231,9 +229,9 @@
       "items": {
         "$ref": "#/definitions/agentProtocolVersionType"
       },
-      "nullable": true,
+      "minLength": 1,
       "metadata": {
-        "description": "Optional. Protocol types and versions exposed by this deployment."
+        "description": "Required. Protocol types and versions exposed by this deployment."
       }
     },
     "minReplicas": {
@@ -283,7 +281,7 @@
       "type": "Microsoft.CognitiveServices/accounts/projects/applications/agentDeployments",
       "apiVersion": "2025-10-01-preview",
       "name": "[format('{0}/{1}/{2}/{3}', parameters('accountName'), parameters('projectName'), parameters('applicationName'), parameters('name'))]",
-      "properties": "[union(createObject('deploymentType', parameters('deploymentType'), 'displayName', parameters('displayName'), 'description', parameters('description'), 'deploymentId', parameters('deploymentId'), 'protocols', parameters('protocols'), 'tags', parameters('tags')), if(not(equals(parameters('agents'), null())), createObject('agents', parameters('agents')), createObject()), if(equals(parameters('deploymentType'), 'Hosted'), createObject('minReplicas', parameters('minReplicas'), 'maxReplicas', parameters('maxReplicas')), createObject()))]"
+      "properties": "[union(createObject('deploymentType', parameters('deploymentType'), 'agents', parameters('agents'), 'protocols', parameters('protocols')), if(not(equals(parameters('displayName'), null())), createObject('displayName', parameters('displayName')), createObject()), if(not(equals(parameters('description'), null())), createObject('description', parameters('description')), createObject()), if(not(equals(parameters('deploymentId'), null())), createObject('deploymentId', parameters('deploymentId')), createObject()), if(not(equals(parameters('tags'), null())), createObject('tags', parameters('tags')), createObject()), if(equals(parameters('deploymentType'), 'Hosted'), createObject('minReplicas', parameters('minReplicas'), 'maxReplicas', parameters('maxReplicas')), createObject()))]"
     }
   },
   "outputs": {

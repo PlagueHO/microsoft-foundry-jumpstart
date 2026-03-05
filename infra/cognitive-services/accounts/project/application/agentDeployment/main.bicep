@@ -37,11 +37,13 @@ param description string?
 @sys.description('Optional. The unique identifier of the deployment.')
 param deploymentId string?
 
-@sys.description('Optional. List of agent:version pairs deployed in this deployment.')
-param agents versionedAgentReferenceType[]?
+@sys.description('Required. List of agent:version pairs deployed in this deployment. Must contain at least one entry.')
+@minLength(1)
+param agents versionedAgentReferenceType[]
 
-@sys.description('Optional. Protocol types and versions exposed by this deployment.')
-param protocols agentProtocolVersionType[]?
+@sys.description('Required. Protocol types and versions exposed by this deployment.')
+@minLength(1)
+param protocols agentProtocolVersionType[]
 
 @sys.description('Optional. The minimum number of replicas for hosted deployments. Only applicable when deploymentType is "Hosted".')
 @minValue(0)
@@ -82,15 +84,14 @@ resource agentDeployment 'Microsoft.CognitiveServices/accounts/projects/applicat
   properties: union(
     {
       deploymentType: deploymentType
+      agents: agents
+      protocols: protocols
     },
     // Only include optional properties when non-null to avoid API rejecting null values
     displayName != null ? { displayName: displayName! } : {},
     description != null ? { description: description! } : {},
     deploymentId != null ? { deploymentId: deploymentId! } : {},
-    protocols != null ? { protocols: protocols! } : {},
     tags != null ? { tags: tags! } : {},
-    // agents must not be null or empty per the API; only include when non-empty
-    !empty(agents ?? []) ? { agents: agents! } : {},
     deploymentType == 'Hosted'
       ? {
           minReplicas: minReplicas
@@ -120,11 +121,11 @@ output resourceGroupName string = resourceGroup().name
 @export()
 @sys.description('The type for a versioned agent reference.')
 type versionedAgentReferenceType = {
-  @sys.description('Optional. The agent\'s unique identifier within the organization.')
+  @sys.description('Optional. The agent\'s unique identifier within the organization (subscription).')
   agentId: string?
 
-  @sys.description('Optional. The agent\'s name (unique within the project/app).')
-  agentName: string?
+  @sys.description('Required. The agent\'s name (unique within the project/app).')
+  agentName: string
 
   @sys.description('Optional. The agent\'s version (unique for each agent lineage).')
   agentVersion: string?
@@ -133,8 +134,8 @@ type versionedAgentReferenceType = {
 @export()
 @sys.description('The type for an agent protocol version.')
 type agentProtocolVersionType = {
-  @sys.description('Optional. The protocol used by the agent.')
-  protocol: ('A2A' | 'Agent' | 'Responses')?
+  @sys.description('Required. The protocol used by the agent.')
+  protocol: 'A2A' | 'Agent' | 'Responses'
 
   @sys.description('Optional. The version of the protocol.')
   version: string?
@@ -158,11 +159,13 @@ type agentDeploymentType = {
   @sys.description('Optional. The unique identifier of the deployment.')
   deploymentId: string?
 
-  @sys.description('Optional. List of agent:version pairs deployed in this deployment.')
-  agents: versionedAgentReferenceType[]?
+  @sys.description('Required. List of agent:version pairs deployed in this deployment.')
+  @minLength(1)
+  agents: versionedAgentReferenceType[]
 
-  @sys.description('Optional. Protocol types and versions exposed by this deployment.')
-  protocols: agentProtocolVersionType[]?
+  @sys.description('Required. Protocol types and versions exposed by this deployment.')
+  @minLength(1)
+  protocols: agentProtocolVersionType[]
 
   @sys.description('Optional. The minimum number of replicas. Only applicable when deploymentType is "Hosted".')
   @minValue(0)

@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.41.2.15936",
-      "templateHash": "15926531663847845571"
+      "templateHash": "6737514372819333788"
     },
     "name": "Cognitive Services Application",
     "description": "This module creates an application within a Cognitive Services project.\r\nApplications are agentic application instances that can contain agent deployments.\r\nSee: https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/applications\r\n"
@@ -19,14 +19,13 @@
           "type": "string",
           "nullable": true,
           "metadata": {
-            "description": "Optional. The agent's unique identifier within the organization."
+            "description": "Optional. The agent's unique identifier within the organization (subscription)."
           }
         },
         "agentName": {
           "type": "string",
-          "nullable": true,
           "metadata": {
-            "description": "Optional. The agent's name (unique within the project/app)."
+            "description": "Required. The agent's name (unique within the project/app). The agent must already exist in the project."
           }
         }
       },
@@ -242,9 +241,8 @@
           "items": {
             "$ref": "#/definitions/agentReferenceType"
           },
-          "nullable": true,
           "metadata": {
-            "description": "Optional. The list of agent references in this application."
+            "description": "Required. The list of agent references in this application. Must contain at least one agent reference with agentName. Agents must exist in the project before the application can be deployed."
           }
         },
         "tags": {
@@ -301,9 +299,8 @@
             "Agent",
             "Responses"
           ],
-          "nullable": true,
           "metadata": {
-            "description": "Optional. The protocol used by the agent."
+            "description": "Required. The protocol used by the agent."
           }
         },
         "version": {
@@ -328,14 +325,13 @@
           "type": "string",
           "nullable": true,
           "metadata": {
-            "description": "Optional. The agent's unique identifier within the organization."
+            "description": "Optional. The agent's unique identifier within the organization (subscription)."
           }
         },
         "agentName": {
           "type": "string",
-          "nullable": true,
           "metadata": {
-            "description": "Optional. The agent's name (unique within the project/app)."
+            "description": "Required. The agent's name (unique within the project/app)."
           }
         },
         "agentVersion": {
@@ -398,9 +394,9 @@
           "items": {
             "$ref": "#/definitions/_1.versionedAgentReferenceType"
           },
-          "nullable": true,
+          "minLength": 1,
           "metadata": {
-            "description": "Optional. List of agent:version pairs deployed in this deployment."
+            "description": "Required. List of agent:version pairs deployed in this deployment."
           }
         },
         "protocols": {
@@ -408,9 +404,9 @@
           "items": {
             "$ref": "#/definitions/_1.agentProtocolVersionType"
           },
-          "nullable": true,
+          "minLength": 1,
           "metadata": {
-            "description": "Optional. Protocol types and versions exposed by this deployment."
+            "description": "Required. Protocol types and versions exposed by this deployment."
           }
         },
         "minReplicas": {
@@ -518,9 +514,9 @@
       "items": {
         "$ref": "#/definitions/agentReferenceType"
       },
-      "nullable": true,
+      "minLength": 1,
       "metadata": {
-        "description": "Optional. The list of agent references in this application."
+        "description": "Required. The list of agent references in this application. Must contain at least one agent. Agents must exist in the project before the application can be created (created via data-plane APIs or az cognitiveservices agent create)."
       }
     },
     "tags": {
@@ -558,17 +554,7 @@
       "type": "Microsoft.CognitiveServices/accounts/projects/applications",
       "apiVersion": "2025-10-01-preview",
       "name": "[format('{0}/{1}/{2}', parameters('accountName'), parameters('projectName'), parameters('name'))]",
-      "properties": {
-        "displayName": "[parameters('displayName')]",
-        "description": "[parameters('description')]",
-        "authorizationPolicy": "[parameters('authorizationPolicy')]",
-        "agentIdentityBlueprint": "[parameters('agentIdentityBlueprint')]",
-        "defaultInstanceIdentity": "[parameters('defaultInstanceIdentity')]",
-        "baseUrl": "[parameters('baseUrl')]",
-        "trafficRoutingPolicy": "[parameters('trafficRoutingPolicy')]",
-        "agents": "[parameters('agents')]",
-        "tags": "[parameters('tags')]"
-      }
+      "properties": "[union(createObject('displayName', parameters('displayName'), 'description', parameters('description'), 'authorizationPolicy', parameters('authorizationPolicy'), 'agents', parameters('agents')), if(not(equals(parameters('agentIdentityBlueprint'), null())), createObject('agentIdentityBlueprint', parameters('agentIdentityBlueprint')), createObject()), if(not(equals(parameters('defaultInstanceIdentity'), null())), createObject('defaultInstanceIdentity', parameters('defaultInstanceIdentity')), createObject()), if(not(equals(parameters('baseUrl'), null())), createObject('baseUrl', parameters('baseUrl')), createObject()), if(not(equals(parameters('trafficRoutingPolicy'), null())), createObject('trafficRoutingPolicy', parameters('trafficRoutingPolicy')), createObject()), if(not(equals(parameters('tags'), null())), createObject('tags', parameters('tags')), createObject()))]"
     },
     "application_agentDeployments": {
       "copy": {
@@ -580,7 +566,7 @@
       "type": "Microsoft.CognitiveServices/accounts/projects/applications/agentDeployments",
       "apiVersion": "2025-10-01-preview",
       "name": "[format('{0}/{1}/{2}/{3}', parameters('accountName'), parameters('projectName'), parameters('name'), coalesce(parameters('agentDeployments'), createArray())[copyIndex()].name)]",
-      "properties": "[union(createObject('deploymentType', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'displayName', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'displayName'), 'description', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'description'), 'deploymentId', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'deploymentId'), 'protocols', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'protocols'), 'tags', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'tags')), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'agents'), null())), createObject('agents', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].agents), createObject()), if(equals(coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'Hosted'), createObject('minReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'minReplicas'), 'maxReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'maxReplicas')), createObject()))]",
+      "properties": "[union(createObject('deploymentType', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'agents', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].agents, 'protocols', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].protocols), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'displayName'), null())), createObject('displayName', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].displayName), createObject()), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'description'), null())), createObject('description', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].description), createObject()), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'deploymentId'), null())), createObject('deploymentId', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentId), createObject()), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'tags'), null())), createObject('tags', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].tags), createObject()), if(equals(coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'Hosted'), createObject('minReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'minReplicas'), 'maxReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'maxReplicas')), createObject()))]",
       "dependsOn": [
         "application"
       ]

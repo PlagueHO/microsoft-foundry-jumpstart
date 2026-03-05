@@ -39,8 +39,9 @@ param baseUrl string?
 @sys.description('Optional. The traffic routing policy for the application\'s deployments.')
 param trafficRoutingPolicy applicationTrafficRoutingPolicyType?
 
-@sys.description('Optional. The list of agent references in this application.')
-param agents agentReferenceType[]?
+@sys.description('Required. The list of agent references in this application. Must contain at least one agent. Agents must exist in the project before the application can be created (created via data-plane APIs or az cognitiveservices agent create).')
+@minLength(1)
+param agents agentReferenceType[]
 
 @sys.description('Optional. Tags for the application properties.')
 param tags object?
@@ -75,14 +76,13 @@ resource application 'Microsoft.CognitiveServices/accounts/projects/applications
       description: description
       #disable-next-line BCP225 BCP078 // authorizationPolicy uses authorizationScheme discriminator; ARM schema still references 'type' (RP schema mismatch)
       authorizationPolicy: authorizationPolicy
+      agents: agents
     },
     // Only include optional complex properties when non-null to avoid API rejecting null values
     agentIdentityBlueprint != null ? { agentIdentityBlueprint: agentIdentityBlueprint! } : {},
     defaultInstanceIdentity != null ? { defaultInstanceIdentity: defaultInstanceIdentity! } : {},
     baseUrl != null ? { baseUrl: baseUrl! } : {},
     trafficRoutingPolicy != null ? { trafficRoutingPolicy: trafficRoutingPolicy! } : {},
-    // agents must not be null or empty per the API; only include when non-empty
-    !empty(agents ?? []) ? { agents: agents! } : {},
     tags != null ? { tags: tags! } : {}
   )
 }
@@ -95,15 +95,14 @@ resource application_agentDeployments 'Microsoft.CognitiveServices/accounts/proj
     properties: union(
       {
         deploymentType: agentDeployment.deploymentType
+        agents: agentDeployment.agents
+        protocols: agentDeployment.protocols
       },
       // Only include optional properties when non-null to avoid API rejecting null values
       agentDeployment.?displayName != null ? { displayName: agentDeployment.displayName! } : {},
       agentDeployment.?description != null ? { description: agentDeployment.description! } : {},
       agentDeployment.?deploymentId != null ? { deploymentId: agentDeployment.deploymentId! } : {},
-      agentDeployment.?protocols != null ? { protocols: agentDeployment.protocols! } : {},
       agentDeployment.?tags != null ? { tags: agentDeployment.tags! } : {},
-      // agents must not be null or empty per the API; only include when non-empty
-      !empty(agentDeployment.?agents ?? []) ? { agents: agentDeployment.agents! } : {},
       agentDeployment.deploymentType == 'Hosted'
         ? {
             minReplicas: agentDeployment.?minReplicas
@@ -134,11 +133,11 @@ output resourceGroupName string = resourceGroup().name
 @export()
 @sys.description('The type for a reference to an agent within an application.')
 type agentReferenceType = {
-  @sys.description('Optional. The agent\'s unique identifier within the organization.')
+  @sys.description('Optional. The agent\'s unique identifier within the organization (subscription).')
   agentId: string?
 
-  @sys.description('Optional. The agent\'s name (unique within the project/app).')
-  agentName: string?
+  @sys.description('Required. The agent\'s name (unique within the project/app). The agent must already exist in the project.')
+  agentName: string
 }
 
 @export()
@@ -223,8 +222,8 @@ type applicationType = {
   @sys.description('Optional. The traffic routing policy for the application\'s deployments.')
   trafficRoutingPolicy: applicationTrafficRoutingPolicyType?
 
-  @sys.description('Optional. The list of agent references in this application.')
-  agents: agentReferenceType[]?
+  @sys.description('Required. The list of agent references in this application. Must contain at least one agent reference with agentName. Agents must exist in the project before the application can be deployed.')
+  agents: agentReferenceType[]
 
   @sys.description('Optional. Tags for the application properties.')
   tags: object?

@@ -5,6 +5,11 @@
     "description": "A sample agentic application for demonstrating Foundry application deployments.",
     "authorizationPolicy": {
       "authorizationScheme": "Default"
-    }
+    },
+    "agents": [
+      {
+        "agentName": "sample-agent"
+      }
+    ]
   }
 ]
