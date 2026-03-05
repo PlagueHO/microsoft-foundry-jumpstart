@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.41.2.15936",
-      "templateHash": "18141024955829135224"
+      "templateHash": "13379610572174933159"
     }
   },
   "definitions": {
@@ -43938,7 +43938,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.41.2.15936",
-              "templateHash": "10556868917833618903"
+              "templateHash": "3052693012386466081"
             },
             "name": "Cognitive Services",
             "description": "This module deploys a Cognitive Service account.\nThis is a temporary module for deploying Azure Foundry Cognitive Services accounts.\nIt is intended to be replaced by the Azure Verified Module (AVM) for Microsoft.CognitiveServices accounts\nonce it supports Foundry V2 (projects, connections etc)\nhttps://github.com/Azure/bicep-registry-modules/issues/5390\n"
@@ -47566,7 +47566,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.41.2.15936",
-                      "templateHash": "13026498334259110646"
+                      "templateHash": "17252844517908327342"
                     },
                     "name": "Cognitive Services Project",
                     "description": "This module deploys a Project within a Cognitive Services account.\nIt allows for the creation of a Foundry Project with optional managed identities and role assignments.\n"
@@ -49697,7 +49697,7 @@
                             "_generator": {
                               "name": "bicep",
                               "version": "0.41.2.15936",
-                              "templateHash": "2658309864736801470"
+                              "templateHash": "1512460336946515416"
                             },
                             "name": "Cognitive Services Application",
                             "description": "This module creates an application within a Cognitive Services project.\r\nApplications are agentic application instances that can contain agent deployments.\r\nSee: https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/applications\r\n"
@@ -50249,7 +50249,7 @@
                               "type": "Microsoft.CognitiveServices/accounts/projects/applications",
                               "apiVersion": "2025-10-01-preview",
                               "name": "[format('{0}/{1}/{2}', parameters('accountName'), parameters('projectName'), parameters('name'))]",
-                              "properties": "[union(createObject('displayName', parameters('displayName'), 'description', parameters('description'), 'authorizationPolicy', parameters('authorizationPolicy'), 'agentIdentityBlueprint', parameters('agentIdentityBlueprint'), 'defaultInstanceIdentity', parameters('defaultInstanceIdentity'), 'baseUrl', parameters('baseUrl'), 'trafficRoutingPolicy', parameters('trafficRoutingPolicy'), 'tags', parameters('tags')), if(not(equals(parameters('agents'), null())), createObject('agents', parameters('agents')), createObject()))]"
+                              "properties": "[union(createObject('displayName', parameters('displayName'), 'description', parameters('description'), 'authorizationPolicy', parameters('authorizationPolicy')), if(not(equals(parameters('agentIdentityBlueprint'), null())), createObject('agentIdentityBlueprint', parameters('agentIdentityBlueprint')), createObject()), if(not(equals(parameters('defaultInstanceIdentity'), null())), createObject('defaultInstanceIdentity', parameters('defaultInstanceIdentity')), createObject()), if(not(equals(parameters('baseUrl'), null())), createObject('baseUrl', parameters('baseUrl')), createObject()), if(not(equals(parameters('trafficRoutingPolicy'), null())), createObject('trafficRoutingPolicy', parameters('trafficRoutingPolicy')), createObject()), if(not(empty(coalesce(parameters('agents'), createArray()))), createObject('agents', parameters('agents')), createObject()), if(not(equals(parameters('tags'), null())), createObject('tags', parameters('tags')), createObject()))]"
                             },
                             "application_agentDeployments": {
                               "copy": {
@@ -50261,7 +50261,7 @@
                               "type": "Microsoft.CognitiveServices/accounts/projects/applications/agentDeployments",
                               "apiVersion": "2025-10-01-preview",
                               "name": "[format('{0}/{1}/{2}/{3}', parameters('accountName'), parameters('projectName'), parameters('name'), coalesce(parameters('agentDeployments'), createArray())[copyIndex()].name)]",
-                              "properties": "[union(createObject('deploymentType', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'displayName', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'displayName'), 'description', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'description'), 'deploymentId', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'deploymentId'), 'protocols', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'protocols'), 'tags', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'tags')), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'agents'), null())), createObject('agents', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].agents), createObject()), if(equals(coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'Hosted'), createObject('minReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'minReplicas'), 'maxReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'maxReplicas')), createObject()))]",
+                              "properties": "[union(createObject('deploymentType', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'displayName'), null())), createObject('displayName', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].displayName), createObject()), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'description'), null())), createObject('description', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].description), createObject()), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'deploymentId'), null())), createObject('deploymentId', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentId), createObject()), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'protocols'), null())), createObject('protocols', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].protocols), createObject()), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'tags'), null())), createObject('tags', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].tags), createObject()), if(not(empty(coalesce(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'agents'), createArray()))), createObject('agents', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].agents), createObject()), if(equals(coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'Hosted'), createObject('minReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'minReplicas'), 'maxReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'maxReplicas')), createObject()))]",
                               "dependsOn": [
                                 "application"
                               ]

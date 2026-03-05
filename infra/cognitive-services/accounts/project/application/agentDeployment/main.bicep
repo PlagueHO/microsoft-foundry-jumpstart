@@ -82,14 +82,15 @@ resource agentDeployment 'Microsoft.CognitiveServices/accounts/projects/applicat
   properties: union(
     {
       deploymentType: deploymentType
-      displayName: displayName
-      description: description
-      deploymentId: deploymentId
-      protocols: protocols
-      tags: tags
     },
-    // agents must not be null or empty per the API; only include when specified
-    agents != null ? { agents: agents! } : {},
+    // Only include optional properties when non-null to avoid API rejecting null values
+    displayName != null ? { displayName: displayName! } : {},
+    description != null ? { description: description! } : {},
+    deploymentId != null ? { deploymentId: deploymentId! } : {},
+    protocols != null ? { protocols: protocols! } : {},
+    tags != null ? { tags: tags! } : {},
+    // agents must not be null or empty per the API; only include when non-empty
+    !empty(agents ?? []) ? { agents: agents! } : {},
     deploymentType == 'Hosted'
       ? {
           minReplicas: minReplicas

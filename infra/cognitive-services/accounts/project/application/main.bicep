@@ -75,14 +75,15 @@ resource application 'Microsoft.CognitiveServices/accounts/projects/applications
       description: description
       #disable-next-line BCP225 BCP078 // authorizationPolicy uses authorizationScheme discriminator; ARM schema still references 'type' (RP schema mismatch)
       authorizationPolicy: authorizationPolicy
-      agentIdentityBlueprint: agentIdentityBlueprint
-      defaultInstanceIdentity: defaultInstanceIdentity
-      baseUrl: baseUrl
-      trafficRoutingPolicy: trafficRoutingPolicy
-      tags: tags
     },
-    // agents must not be null or empty per the API; only include when specified
-    agents != null ? { agents: agents! } : {}
+    // Only include optional complex properties when non-null to avoid API rejecting null values
+    agentIdentityBlueprint != null ? { agentIdentityBlueprint: agentIdentityBlueprint! } : {},
+    defaultInstanceIdentity != null ? { defaultInstanceIdentity: defaultInstanceIdentity! } : {},
+    baseUrl != null ? { baseUrl: baseUrl! } : {},
+    trafficRoutingPolicy != null ? { trafficRoutingPolicy: trafficRoutingPolicy! } : {},
+    // agents must not be null or empty per the API; only include when non-empty
+    !empty(agents ?? []) ? { agents: agents! } : {},
+    tags != null ? { tags: tags! } : {}
   )
 }
 
@@ -94,14 +95,15 @@ resource application_agentDeployments 'Microsoft.CognitiveServices/accounts/proj
     properties: union(
       {
         deploymentType: agentDeployment.deploymentType
-        displayName: agentDeployment.?displayName
-        description: agentDeployment.?description
-        deploymentId: agentDeployment.?deploymentId
-        protocols: agentDeployment.?protocols
-        tags: agentDeployment.?tags
       },
-      // agents must not be null or empty per the API; only include when specified
-      agentDeployment.?agents != null ? { agents: agentDeployment.agents! } : {},
+      // Only include optional properties when non-null to avoid API rejecting null values
+      agentDeployment.?displayName != null ? { displayName: agentDeployment.displayName! } : {},
+      agentDeployment.?description != null ? { description: agentDeployment.description! } : {},
+      agentDeployment.?deploymentId != null ? { deploymentId: agentDeployment.deploymentId! } : {},
+      agentDeployment.?protocols != null ? { protocols: agentDeployment.protocols! } : {},
+      agentDeployment.?tags != null ? { tags: agentDeployment.tags! } : {},
+      // agents must not be null or empty per the API; only include when non-empty
+      !empty(agentDeployment.?agents ?? []) ? { agents: agentDeployment.agents! } : {},
       agentDeployment.deploymentType == 'Hosted'
         ? {
             minReplicas: agentDeployment.?minReplicas
