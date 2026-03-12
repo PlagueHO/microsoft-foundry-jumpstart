@@ -80,16 +80,6 @@ jobs:
       max-parallel: 1
       matrix:
         include:
-          - name: project-public
-            AZURE_NETWORK_ISOLATION: 'false'
-            DEPLOY_SAMPLE_MODELS: 'true'
-            MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: 'false'
-            DEPLOY_CAPABILITY_HOSTS: 'false'
-          - name: project-isolated
-            AZURE_NETWORK_ISOLATION: 'true'
-            DEPLOY_SAMPLE_MODELS: 'true'
-            MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: 'false'
-            DEPLOY_CAPABILITY_HOSTS: 'false'
           - name: project-apps
             AZURE_NETWORK_ISOLATION: 'false'
             DEPLOY_SAMPLE_MODELS: 'true'
@@ -100,6 +90,16 @@ jobs:
             DEPLOY_SAMPLE_MODELS: 'true'
             MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: 'false'
             DEPLOY_CAPABILITY_HOSTS: 'true'
+          - name: project-public
+            AZURE_NETWORK_ISOLATION: 'false'
+            DEPLOY_SAMPLE_MODELS: 'true'
+            MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: 'false'
+            DEPLOY_CAPABILITY_HOSTS: 'false'
+          - name: project-isolated
+            AZURE_NETWORK_ISOLATION: 'true'
+            DEPLOY_SAMPLE_MODELS: 'true'
+            MICROSOFT_FOUNDRY_APPLICATIONS_FROM_JSON: 'false'
+            DEPLOY_CAPABILITY_HOSTS: 'false'
     uses: ./.github/workflows/e2e-test.yml
     with:
       ENVIRONMENT: test
