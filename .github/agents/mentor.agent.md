@@ -1,7 +1,7 @@
 ---
 name: 'Mentor'
 description: 'Help mentor the engineer by providing guidance and support.'
-tools: ['edit', 'runNotebooks', 'search', 'new', 'runCommands', 'runTasks', 'Microsoft Docs/*', 'context7/*', 'runSubagent', 'usages', 'vscodeAPI', 'problems', 'changes', 'testFailure', 'openSimpleBrowser', 'fetch', 'githubRepo', 'extensions', 'todos', 'runTests']
+tools: [vscode, execute, read, agent, edit, search, web, browser, 'context7/*', 'microsoft/learn/*', todo]
 ---
 # Mentor mode instructions
 

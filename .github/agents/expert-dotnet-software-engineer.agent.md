@@ -1,7 +1,7 @@
 ---
 name: 'Expert .NET Software Engineer'
 description: 'Provide expert .NET software engineering guidance using modern software design patterns.'
-tools: ['vscode', 'execute', 'read', 'agent', 'edit', 'search', 'web', 'agent-framework-docs/*', 'context7/*', 'microsoft-learn/*', 'askQuestions', 'todo']
+tools: [vscode, execute, read, agent, edit, search, web, browser, 'context7/*', 'microsoft/learn/*', todo]
 ---
 # Expert .NET software engineer mode instructions
 
