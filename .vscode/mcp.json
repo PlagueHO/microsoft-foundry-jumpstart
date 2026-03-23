@@ -13,7 +13,7 @@
       "url": "https://api.githubcopilot.com/mcp/",
       "type": "http"
     },
-    "microsoft/learn": {
+    "microsoft-learn": {
       "type": "http",
       "url": "https://learn.microsoft.com/api/mcp"
     },
@@ -26,11 +26,11 @@
       "type": "stdio",
       "env": {}
     },
-    "agent-framework-docs": {
+    "microsoft-agent-framework-repo": {
       "url": "https://gitmcp.io/microsoft/agent-framework",
       "type": "sse"
     },
-    "azure-verified-module-bicep-docs": {
+    "azure-verified-module-bicep-repo": {
       "type": "sse",
       "url": "https://gitmcp.io/Azure/bicep-registry-modules"
     },
@@ -38,7 +38,7 @@
       "type": "http", 
       "url": "https://mcp.ai.azure.com" 
     },
-    "microsoft-aspire-docs": {
+    "microsoft-aspire-repo": {
       "url": "https://gitmcp.io/dotnet/aspire",
       "type": "sse"
     }

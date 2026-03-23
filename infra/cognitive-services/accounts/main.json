@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.41.2.15936",
-      "templateHash": "6077551221278892389"
+      "templateHash": "12602606074955496629"
     },
     "name": "Cognitive Services",
     "description": "This module deploys a Cognitive Service account.\nThis is a temporary module for deploying Azure Foundry Cognitive Services accounts.\nIt is intended to be replaced by the Azure Verified Module (AVM) for Microsoft.CognitiveServices accounts\nonce it supports Foundry V2 (projects, connections etc)\nhttps://github.com/Azure/bicep-registry-modules/issues/5390\n"
@@ -385,6 +385,278 @@
       },
       "metadata": {
         "description": "Defines the nested properties for an Azure Foundry Project, corresponding to the \"properties\" object of the Microsoft.CognitiveServices/accounts/projects resource."
+      }
+    },
+    "raiPolicyType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The name of the RAI policy."
+          }
+        },
+        "basePolicyName": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The base policy name. Defaults to Microsoft.Default."
+          }
+        },
+        "mode": {
+          "type": "string",
+          "allowedValues": [
+            "Asynchronous_filter",
+            "Blocking",
+            "Default",
+            "Deferred"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The RAI policy mode."
+          }
+        },
+        "contentFilters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/raiPolicyContentFilterType"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The list of content filters to apply."
+          }
+        },
+        "customBlocklists": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/raiPolicyCustomBlocklistType"
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The list of custom blocklists to apply."
+          }
+        },
+        "tags": {
+          "type": "object",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Resource tags."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for a cognitive services account RAI policy."
+      }
+    },
+    "raiPolicyContentFilterType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The name of the content filter (e.g., Hate, Sexual, Violence, SelfHarm)."
+          }
+        },
+        "enabled": {
+          "type": "bool",
+          "metadata": {
+            "description": "Required. Whether the content filter is enabled."
+          }
+        },
+        "blocking": {
+          "type": "bool",
+          "metadata": {
+            "description": "Required. Whether blocking is enabled for this filter."
+          }
+        },
+        "severityThreshold": {
+          "type": "string",
+          "allowedValues": [
+            "High",
+            "Low",
+            "Medium"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The severity threshold level at which content is filtered."
+          }
+        },
+        "source": {
+          "type": "string",
+          "allowedValues": [
+            "Completion",
+            "Prompt"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The content source to apply the filter to."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for a RAI policy content filter."
+      }
+    },
+    "raiPolicyCustomBlocklistType": {
+      "type": "object",
+      "properties": {
+        "blocklistName": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The name of the blocklist."
+          }
+        },
+        "blocking": {
+          "type": "bool",
+          "metadata": {
+            "description": "Required. Whether blocking is enabled for this blocklist."
+          }
+        },
+        "source": {
+          "type": "string",
+          "allowedValues": [
+            "Completion",
+            "Prompt"
+          ],
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The content source to apply the blocklist to."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for a RAI policy custom blocklist configuration."
+      }
+    },
+    "raiPolicyOutputType": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "metadata": {
+            "description": "The name of the RAI policy."
+          }
+        },
+        "resourceId": {
+          "type": "string",
+          "metadata": {
+            "description": "The resource ID of the RAI policy."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for the RAI policy output."
+      }
+    },
+    "commitmentPlanType": {
+      "type": "object",
+      "properties": {
+        "autoRenew": {
+          "type": "bool",
+          "metadata": {
+            "description": "Required. Whether the plan should auto-renew at the end of the current commitment period."
+          }
+        },
+        "current": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "int",
+              "metadata": {
+                "description": "Required. The number of committed instances (e.g., number of containers or cores)."
+              }
+            },
+            "tier": {
+              "type": "string",
+              "metadata": {
+                "description": "Required. The tier of the commitment plan (e.g., T1, T2)."
+              }
+            }
+          },
+          "metadata": {
+            "description": "Required. The current commitment configuration."
+          }
+        },
+        "hostingModel": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The hosting model for the commitment plan. (e.g., DisconnectedContainer, ConnectedContainer, ProvisionedWeb, Web)."
+          }
+        },
+        "planType": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The plan type indicating which capability the plan applies to (e.g., NTTS, STT, CUSTOMSTT, ADDON)."
+          }
+        },
+        "commitmentPlanGuid": {
+          "type": "string",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The unique identifier of an existing commitment plan to update. Set to null to create a new plan."
+          }
+        },
+        "next": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "int",
+              "metadata": {
+                "description": "Required. The number of committed instances for the next period."
+              }
+            },
+            "tier": {
+              "type": "string",
+              "metadata": {
+                "description": "Required. The tier for the next commitment period."
+              }
+            }
+          },
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. The configuration of the next commitment period, if scheduled."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "The type for a disconnected container commitment plan."
+      }
+    },
+    "networkInjectionType": {
+      "type": "object",
+      "properties": {
+        "scenario": {
+          "type": "string",
+          "allowedValues": [
+            "agent",
+            "none"
+          ],
+          "metadata": {
+            "description": "Required. The scenario for the network injection."
+          }
+        },
+        "subnetResourceId": {
+          "type": "string",
+          "metadata": {
+            "description": "Required. The Resource ID of the subnet on the Virtual Network on which to inject."
+          }
+        },
+        "useMicrosoftManagedNetwork": {
+          "type": "bool",
+          "nullable": true,
+          "metadata": {
+            "description": "Optional. Whether to use Microsoft Managed Network. Defaults to false."
+          }
+        }
+      },
+      "metadata": {
+        "__bicep_export!": true,
+        "description": "Type for network configuration in AI Foundry where virtual network injection occurs to secure scenarios like Agents entirely within a private network."
       }
     },
     "_1.secretSetOutputType": {
@@ -1299,9 +1571,9 @@
           "items": {
             "$ref": "#/definitions/_4.versionedAgentReferenceType"
           },
-          "nullable": true,
+          "minLength": 1,
           "metadata": {
-            "description": "Optional. List of agent:version pairs deployed in this deployment."
+            "description": "Required. List of agent:version pairs deployed in this deployment."
           }
         },
         "protocols": {
@@ -1309,9 +1581,9 @@
           "items": {
             "$ref": "#/definitions/_4.agentProtocolVersionType"
           },
-          "nullable": true,
+          "minLength": 1,
           "metadata": {
-            "description": "Optional. Protocol types and versions exposed by this deployment."
+            "description": "Required. Protocol types and versions exposed by this deployment."
           }
         },
         "minReplicas": {
@@ -1355,9 +1627,8 @@
             "Agent",
             "Responses"
           ],
-          "nullable": true,
           "metadata": {
-            "description": "Optional. The protocol used by the agent."
+            "description": "Required. The protocol used by the agent."
           }
         },
         "version": {
@@ -1382,14 +1653,13 @@
           "type": "string",
           "nullable": true,
           "metadata": {
-            "description": "Optional. The agent's unique identifier within the organization."
+            "description": "Optional. The agent's unique identifier within the organization (subscription)."
           }
         },
         "agentName": {
           "type": "string",
-          "nullable": true,
           "metadata": {
-            "description": "Optional. The agent's name (unique within the project/app)."
+            "description": "Required. The agent's name (unique within the project/app)."
           }
         },
         "agentVersion": {
@@ -1414,14 +1684,13 @@
           "type": "string",
           "nullable": true,
           "metadata": {
-            "description": "Optional. The agent's unique identifier within the organization."
+            "description": "Optional. The agent's unique identifier within the organization (subscription)."
           }
         },
         "agentName": {
           "type": "string",
-          "nullable": true,
           "metadata": {
-            "description": "Optional. The agent's name (unique within the project/app)."
+            "description": "Required. The agent's name (unique within the project/app). The agent must already exist in the project."
           }
         }
       },
@@ -1435,7 +1704,7 @@
     "_5.applicationAuthorizationPolicyType": {
       "type": "object",
       "properties": {
-        "type": {
+        "authorizationScheme": {
           "type": "string",
           "allowedValues": [
             "Channels",
@@ -1670,9 +1939,8 @@
           "items": {
             "$ref": "#/definitions/_5.agentReferenceType"
           },
-          "nullable": true,
           "metadata": {
-            "description": "Optional. The list of agent references in this application."
+            "description": "Required. The list of agent references in this application. Must contain at least one agent reference with agentName. Agents must exist in the project before the application can be deployed."
           }
         },
         "tags": {
@@ -2459,7 +2727,8 @@
         "S6",
         "S7",
         "S8",
-        "S9"
+        "S9",
+        "DC0"
       ],
       "metadata": {
         "description": "Optional. SKU of the Cognitive Services account. Use 'Get-AzCognitiveServicesAccountSku' to determine a valid combinations of 'kind' and 'SKU' for your Azure region."
@@ -2505,6 +2774,13 @@
       "nullable": true,
       "metadata": {
         "description": "Optional. A collection of rules governing the accessibility from specific network locations."
+      }
+    },
+    "networkInjections": {
+      "$ref": "#/definitions/networkInjectionType",
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. Specifies in AI Foundry where virtual network injection occurs to secure scenarios like Agents entirely within a private network."
       }
     },
     "privateEndpoints": {
@@ -2628,6 +2904,16 @@
         "description": "Optional. Array of deployments about cognitive service accounts to create."
       }
     },
+    "raiPolicies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/raiPolicyType"
+      },
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. Array of RAI policies to create for the Cognitive Services account."
+      }
+    },
     "secretsExportConfiguration": {
       "$ref": "#/definitions/secretsExportConfigurationType",
       "nullable": true,
@@ -2640,6 +2926,16 @@
       "nullable": true,
       "metadata": {
         "description": "Optional. Enable/Disable project management feature for Foundry."
+      }
+    },
+    "commitmentPlans": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/commitmentPlanType"
+      },
+      "nullable": true,
+      "metadata": {
+        "description": "Optional. Commitment plans to deploy for the cognitive services account."
       }
     },
     "projects": {
@@ -2696,6 +2992,7 @@
       }
     ],
     "enableReferencedModulesTelemetry": false,
+    "isHSMManagedCMK": "[equals(tryGet(split(coalesce(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'), ''), '/'), 7), 'managedHSMs')]",
     "formattedUserAssignedIdentities": "[reduce(map(coalesce(tryGet(parameters('managedIdentities'), 'userAssignedResourceIds'), createArray()), lambda('id', createObject(format('{0}', lambdaVariables('id')), createObject()))), createObject(), lambda('cur', 'next', union(lambdaVariables('cur'), lambdaVariables('next'))))]",
     "identity": "[if(not(empty(parameters('managedIdentities'))), createObject('type', if(coalesce(tryGet(parameters('managedIdentities'), 'systemAssigned'), false()), if(not(empty(coalesce(tryGet(parameters('managedIdentities'), 'userAssignedResourceIds'), createObject()))), 'SystemAssigned, UserAssigned', 'SystemAssigned'), if(not(empty(coalesce(tryGet(parameters('managedIdentities'), 'userAssignedResourceIds'), createObject()))), 'UserAssigned', null())), 'userAssignedIdentities', if(not(empty(variables('formattedUserAssignedIdentities'))), variables('formattedUserAssignedIdentities'), null())), null())]",
     "builtInRoleNames": {
@@ -2738,10 +3035,10 @@
   },
   "resources": {
     "cMKKeyVault::cMKKey": {
-      "condition": "[and(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), and(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), not(empty(tryGet(parameters('customerManagedKey'), 'keyName')))))]",
+      "condition": "[and(and(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), not(variables('isHSMManagedCMK'))), and(and(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), not(empty(tryGet(parameters('customerManagedKey'), 'keyName')))), not(variables('isHSMManagedCMK'))))]",
       "existing": true,
       "type": "Microsoft.KeyVault/vaults/keys",
-      "apiVersion": "2023-07-01",
+      "apiVersion": "2025-05-01",
       "subscriptionId": "[split(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'), '/')[2]]",
       "resourceGroup": "[split(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'), '/')[4]]",
       "name": "[format('{0}/{1}', last(split(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'), '/')), tryGet(parameters('customerManagedKey'), 'keyName'))]"
@@ -2767,10 +3064,10 @@
       }
     },
     "cMKKeyVault": {
-      "condition": "[not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId')))]",
+      "condition": "[and(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), not(variables('isHSMManagedCMK')))]",
       "existing": true,
       "type": "Microsoft.KeyVault/vaults",
-      "apiVersion": "2023-07-01",
+      "apiVersion": "2025-05-01",
       "subscriptionId": "[split(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'), '/')[2]]",
       "resourceGroup": "[split(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'), '/')[4]]",
       "name": "[last(split(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'), '/'))]"
@@ -2779,7 +3076,7 @@
       "condition": "[not(empty(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId')))]",
       "existing": true,
       "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
-      "apiVersion": "2023-01-31",
+      "apiVersion": "2025-01-31-preview",
       "subscriptionId": "[split(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'), '/')[2]]",
       "resourceGroup": "[split(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'), '/')[4]]",
       "name": "[last(split(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'), '/'))]"
@@ -2789,9 +3086,9 @@
       "apiVersion": "2025-10-01-preview",
       "name": "[parameters('name')]",
       "kind": "[parameters('kind')]",
-      "identity": "[coalesce(variables('identity'), createObject('type', 'None'))]",
+      "identity": "[variables('identity')]",
       "location": "[parameters('location')]",
-      "tags": "[coalesce(parameters('tags'), createObject())]",
+      "tags": "[parameters('tags')]",
       "sku": {
         "name": "[parameters('sku')]"
       },
@@ -2799,15 +3096,16 @@
         "allowProjectManagement": "[parameters('allowProjectManagement')]",
         "customSubDomainName": "[parameters('customSubDomainName')]",
         "networkAcls": "[if(not(empty(coalesce(parameters('networkAcls'), createObject()))), createObject('defaultAction', tryGet(parameters('networkAcls'), 'defaultAction'), 'virtualNetworkRules', coalesce(tryGet(parameters('networkAcls'), 'virtualNetworkRules'), createArray()), 'ipRules', coalesce(tryGet(parameters('networkAcls'), 'ipRules'), createArray())), null())]",
+        "networkInjections": "[if(not(empty(parameters('networkInjections'))), createArray(createObject('scenario', tryGet(parameters('networkInjections'), 'scenario'), 'subnetArmId', tryGet(parameters('networkInjections'), 'subnetResourceId'), 'useMicrosoftManagedNetwork', coalesce(tryGet(parameters('networkInjections'), 'useMicrosoftManagedNetwork'), false()))), null())]",
         "publicNetworkAccess": "[if(not(equals(parameters('publicNetworkAccess'), null())), parameters('publicNetworkAccess'), if(not(empty(parameters('networkAcls'))), 'Enabled', 'Disabled'))]",
         "allowedFqdnList": "[parameters('allowedFqdnList')]",
         "apiProperties": "[parameters('apiProperties')]",
         "disableLocalAuth": "[parameters('disableLocalAuth')]",
-        "encryption": "[if(not(empty(parameters('customerManagedKey'))), createObject('keySource', 'Microsoft.KeyVault', 'keyVaultProperties', createObject('identityClientId', if(not(empty(coalesce(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'), ''))), tryGet(if(not(empty(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'))), reference('cMKUserAssignedIdentity', '2023-01-31', 'full'), null()), 'properties', 'clientId'), null()), 'keyVaultUri', tryGet(if(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), reference('cMKKeyVault', '2023-07-01', 'full'), null()), 'properties', 'vaultUri'), 'keyName', parameters('customerManagedKey').keyName, 'keyVersion', if(not(empty(coalesce(tryGet(parameters('customerManagedKey'), 'keyVersion'), ''))), tryGet(parameters('customerManagedKey'), 'keyVersion'), last(split(tryGet(if(and(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), and(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), not(empty(tryGet(parameters('customerManagedKey'), 'keyName'))))), reference('cMKKeyVault::cMKKey', '2023-07-01', 'full'), null()), 'properties', 'keyUriWithVersion'), '/'))))), null())]",
+        "encryption": "[if(not(empty(parameters('customerManagedKey'))), createObject('keySource', 'Microsoft.KeyVault', 'keyVaultProperties', createObject('identityClientId', if(not(empty(coalesce(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'), ''))), tryGet(if(not(empty(tryGet(parameters('customerManagedKey'), 'userAssignedIdentityResourceId'))), reference('cMKUserAssignedIdentity', '2025-01-31-preview', 'full'), null()), 'properties', 'clientId'), null()), 'keyVaultUri', if(not(variables('isHSMManagedCMK')), tryGet(if(and(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), not(variables('isHSMManagedCMK'))), reference('cMKKeyVault', '2025-05-01', 'full'), null()), 'properties', 'vaultUri'), format('https://{0}.managedhsm.azure.net/', last(split(parameters('customerManagedKey').keyVaultResourceId, '/')))), 'keyName', parameters('customerManagedKey').keyName, 'keyVersion', if(not(empty(coalesce(tryGet(parameters('customerManagedKey'), 'keyVersion'), ''))), tryGet(parameters('customerManagedKey'), 'keyVersion'), if(not(variables('isHSMManagedCMK')), last(split(tryGet(if(and(and(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), not(variables('isHSMManagedCMK'))), and(and(not(empty(tryGet(parameters('customerManagedKey'), 'keyVaultResourceId'))), not(empty(tryGet(parameters('customerManagedKey'), 'keyName')))), not(variables('isHSMManagedCMK')))), reference('cMKKeyVault::cMKKey', '2025-05-01', 'full'), null()), 'properties', 'keyUriWithVersion'), '/')), fail('Managed HSM CMK encryption requires specifying the ''keyVersion''.'))))), null())]",
         "migrationToken": "[parameters('migrationToken')]",
         "restore": "[parameters('restore')]",
         "restrictOutboundNetworkAccess": "[parameters('restrictOutboundNetworkAccess')]",
-        "userOwnedStorage": "[parameters('userOwnedStorage')]",
+        "userOwnedStorage": "[if(not(empty(parameters('userOwnedStorage'))), parameters('userOwnedStorage'), null())]",
         "dynamicThrottlingEnabled": "[parameters('dynamicThrottlingEnabled')]",
         "storedCompletionsDisabled": "[parameters('storedCompletionsDisabled')]",
         "defaultProject": "[parameters('defaultProject')]"
@@ -2816,6 +3114,25 @@
         "cMKKeyVault",
         "cMKKeyVault::cMKKey",
         "cMKUserAssignedIdentity"
+      ]
+    },
+    "cognitiveService_raiPolicies": {
+      "copy": {
+        "name": "cognitiveService_raiPolicies",
+        "count": "[length(coalesce(parameters('raiPolicies'), createArray()))]"
+      },
+      "type": "Microsoft.CognitiveServices/accounts/raiPolicies",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[format('{0}/{1}', parameters('name'), coalesce(parameters('raiPolicies'), createArray())[copyIndex()].name)]",
+      "properties": {
+        "basePolicyName": "[coalesce(tryGet(coalesce(parameters('raiPolicies'), createArray())[copyIndex()], 'basePolicyName'), 'Microsoft.Default')]",
+        "mode": "[coalesce(tryGet(coalesce(parameters('raiPolicies'), createArray())[copyIndex()], 'mode'), 'Blocking')]",
+        "contentFilters": "[tryGet(coalesce(parameters('raiPolicies'), createArray())[copyIndex()], 'contentFilters')]",
+        "customBlocklists": "[tryGet(coalesce(parameters('raiPolicies'), createArray())[copyIndex()], 'customBlocklists')]"
+      },
+      "tags": "[tryGet(coalesce(parameters('raiPolicies'), createArray())[copyIndex()], 'tags')]",
+      "dependsOn": [
+        "cognitiveService"
       ]
     },
     "cognitiveService_deployments": {
@@ -2835,7 +3152,8 @@
       },
       "sku": "[coalesce(tryGet(coalesce(parameters('deployments'), createArray())[copyIndex()], 'sku'), createObject('name', parameters('sku'), 'capacity', tryGet(parameters('sku'), 'capacity'), 'tier', tryGet(parameters('sku'), 'tier'), 'size', tryGet(parameters('sku'), 'size'), 'family', tryGet(parameters('sku'), 'family')))]",
       "dependsOn": [
-        "cognitiveService"
+        "cognitiveService",
+        "cognitiveService_raiPolicies"
       ]
     },
     "cognitiveService_lock": {
@@ -2846,8 +3164,21 @@
       "name": "[coalesce(tryGet(parameters('lock'), 'name'), format('lock-{0}', parameters('name')))]",
       "properties": {
         "level": "[coalesce(tryGet(parameters('lock'), 'kind'), '')]",
-        "notes": "[if(equals(tryGet(parameters('lock'), 'kind'), 'CanNotDelete'), 'Cannot delete resource or child resources.', 'Cannot delete or modify the resource or child resources.')]"
+        "notes": "[coalesce(tryGet(parameters('lock'), 'notes'), if(equals(tryGet(parameters('lock'), 'kind'), 'CanNotDelete'), 'Cannot delete resource or child resources.', 'Cannot delete or modify the resource or child resources.'))]"
       },
+      "dependsOn": [
+        "cognitiveService"
+      ]
+    },
+    "cognitiveService_commitmentPlans": {
+      "copy": {
+        "name": "cognitiveService_commitmentPlans",
+        "count": "[length(coalesce(parameters('commitmentPlans'), createArray()))]"
+      },
+      "type": "Microsoft.CognitiveServices/accounts/commitmentPlans",
+      "apiVersion": "2025-10-01-preview",
+      "name": "[format('{0}/{1}', parameters('name'), format('{0}-{1}', coalesce(parameters('commitmentPlans'), createArray())[copyIndex()].hostingModel, coalesce(parameters('commitmentPlans'), createArray())[copyIndex()].planType))]",
+      "properties": "[coalesce(parameters('commitmentPlans'), createArray())[copyIndex()]]",
       "dependsOn": [
         "cognitiveService"
       ]
@@ -3634,7 +3965,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.41.2.15936",
-              "templateHash": "5128236393157157023"
+              "templateHash": "9636056188496279552"
             },
             "name": "Cognitive Services Project",
             "description": "This module deploys a Project within a Cognitive Services account.\nIt allows for the creation of a Foundry Project with optional managed identities and role assignments.\n"
@@ -4414,9 +4745,9 @@
                   "items": {
                     "$ref": "#/definitions/_2.versionedAgentReferenceType"
                   },
-                  "nullable": true,
+                  "minLength": 1,
                   "metadata": {
-                    "description": "Optional. List of agent:version pairs deployed in this deployment."
+                    "description": "Required. List of agent:version pairs deployed in this deployment."
                   }
                 },
                 "protocols": {
@@ -4424,9 +4755,9 @@
                   "items": {
                     "$ref": "#/definitions/_2.agentProtocolVersionType"
                   },
-                  "nullable": true,
+                  "minLength": 1,
                   "metadata": {
-                    "description": "Optional. Protocol types and versions exposed by this deployment."
+                    "description": "Required. Protocol types and versions exposed by this deployment."
                   }
                 },
                 "minReplicas": {
@@ -4470,9 +4801,8 @@
                     "Agent",
                     "Responses"
                   ],
-                  "nullable": true,
                   "metadata": {
-                    "description": "Optional. The protocol used by the agent."
+                    "description": "Required. The protocol used by the agent."
                   }
                 },
                 "version": {
@@ -4497,14 +4827,13 @@
                   "type": "string",
                   "nullable": true,
                   "metadata": {
-                    "description": "Optional. The agent's unique identifier within the organization."
+                    "description": "Optional. The agent's unique identifier within the organization (subscription)."
                   }
                 },
                 "agentName": {
                   "type": "string",
-                  "nullable": true,
                   "metadata": {
-                    "description": "Optional. The agent's name (unique within the project/app)."
+                    "description": "Required. The agent's name (unique within the project/app)."
                   }
                 },
                 "agentVersion": {
@@ -4529,14 +4858,13 @@
                   "type": "string",
                   "nullable": true,
                   "metadata": {
-                    "description": "Optional. The agent's unique identifier within the organization."
+                    "description": "Optional. The agent's unique identifier within the organization (subscription)."
                   }
                 },
                 "agentName": {
                   "type": "string",
-                  "nullable": true,
                   "metadata": {
-                    "description": "Optional. The agent's name (unique within the project/app)."
+                    "description": "Required. The agent's name (unique within the project/app). The agent must already exist in the project."
                   }
                 }
               },
@@ -4550,7 +4878,7 @@
             "_3.applicationAuthorizationPolicyType": {
               "type": "object",
               "properties": {
-                "type": {
+                "authorizationScheme": {
                   "type": "string",
                   "allowedValues": [
                     "Channels",
@@ -4785,9 +5113,8 @@
                   "items": {
                     "$ref": "#/definitions/_3.agentReferenceType"
                   },
-                  "nullable": true,
                   "metadata": {
-                    "description": "Optional. The list of agent references in this application."
+                    "description": "Required. The list of agent references in this application. Must contain at least one agent reference with agentName. Agents must exist in the project before the application can be deployed."
                   }
                 },
                 "tags": {
@@ -5368,7 +5695,8 @@
               "Reader": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
               "Role Based Access Control Administrator": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'f58310d9-a9f6-439a-9e8d-f62e7b41a168')]",
               "User Access Administrator": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '18d7d88d-d35e-4fb5-a5c3-7773c20a72d9')]"
-            }
+            },
+            "deployableApplications": "[filter(coalesce(parameters('applications'), createArray()), lambda('app', not(empty(coalesce(tryGet(lambdaVariables('app'), 'agents'), createArray())))))]"
           },
           "resources": {
             "parentAccount": {
@@ -5704,13 +6032,13 @@
             "project_applications": {
               "copy": {
                 "name": "project_applications",
-                "count": "[length(coalesce(parameters('applications'), createArray()))]",
+                "count": "[length(variables('deployableApplications'))]",
                 "mode": "serial",
                 "batchSize": 1
               },
               "type": "Microsoft.Resources/deployments",
               "apiVersion": "2025-04-01",
-              "name": "[format('{0}-app', take(format('{0}-{1}-{2}', parameters('accountName'), parameters('name'), coalesce(parameters('applications'), createArray())[copyIndex()].name), 60))]",
+              "name": "[format('{0}-app', take(format('{0}-{1}-{2}', parameters('accountName'), parameters('name'), variables('deployableApplications')[copyIndex()].name), 60))]",
               "properties": {
                 "expressionEvaluationOptions": {
                   "scope": "inner"
@@ -5724,37 +6052,37 @@
                     "value": "[parameters('name')]"
                   },
                   "name": {
-                    "value": "[coalesce(parameters('applications'), createArray())[copyIndex()].name]"
+                    "value": "[variables('deployableApplications')[copyIndex()].name]"
                   },
                   "displayName": {
-                    "value": "[tryGet(coalesce(parameters('applications'), createArray())[copyIndex()], 'displayName')]"
+                    "value": "[tryGet(variables('deployableApplications')[copyIndex()], 'displayName')]"
                   },
                   "description": {
-                    "value": "[tryGet(coalesce(parameters('applications'), createArray())[copyIndex()], 'description')]"
+                    "value": "[tryGet(variables('deployableApplications')[copyIndex()], 'description')]"
                   },
                   "authorizationPolicy": {
-                    "value": "[tryGet(coalesce(parameters('applications'), createArray())[copyIndex()], 'authorizationPolicy')]"
+                    "value": "[tryGet(variables('deployableApplications')[copyIndex()], 'authorizationPolicy')]"
                   },
                   "agentIdentityBlueprint": {
-                    "value": "[tryGet(coalesce(parameters('applications'), createArray())[copyIndex()], 'agentIdentityBlueprint')]"
+                    "value": "[tryGet(variables('deployableApplications')[copyIndex()], 'agentIdentityBlueprint')]"
                   },
                   "defaultInstanceIdentity": {
-                    "value": "[tryGet(coalesce(parameters('applications'), createArray())[copyIndex()], 'defaultInstanceIdentity')]"
+                    "value": "[tryGet(variables('deployableApplications')[copyIndex()], 'defaultInstanceIdentity')]"
                   },
                   "baseUrl": {
-                    "value": "[tryGet(coalesce(parameters('applications'), createArray())[copyIndex()], 'baseUrl')]"
+                    "value": "[tryGet(variables('deployableApplications')[copyIndex()], 'baseUrl')]"
                   },
                   "trafficRoutingPolicy": {
-                    "value": "[tryGet(coalesce(parameters('applications'), createArray())[copyIndex()], 'trafficRoutingPolicy')]"
+                    "value": "[tryGet(variables('deployableApplications')[copyIndex()], 'trafficRoutingPolicy')]"
                   },
                   "agents": {
-                    "value": "[tryGet(coalesce(parameters('applications'), createArray())[copyIndex()], 'agents')]"
+                    "value": "[variables('deployableApplications')[copyIndex()].agents]"
                   },
                   "tags": {
-                    "value": "[tryGet(coalesce(parameters('applications'), createArray())[copyIndex()], 'tags')]"
+                    "value": "[tryGet(variables('deployableApplications')[copyIndex()], 'tags')]"
                   },
                   "agentDeployments": {
-                    "value": "[coalesce(tryGet(coalesce(parameters('applications'), createArray())[copyIndex()], 'agentDeployments'), createArray())]"
+                    "value": "[coalesce(tryGet(variables('deployableApplications')[copyIndex()], 'agentDeployments'), createArray())]"
                   }
                 },
                 "template": {
@@ -5765,7 +6093,7 @@
                     "_generator": {
                       "name": "bicep",
                       "version": "0.41.2.15936",
-                      "templateHash": "7276826870176122337"
+                      "templateHash": "6737514372819333788"
                     },
                     "name": "Cognitive Services Application",
                     "description": "This module creates an application within a Cognitive Services project.\r\nApplications are agentic application instances that can contain agent deployments.\r\nSee: https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/applications\r\n"
@@ -5778,14 +6106,13 @@
                           "type": "string",
                           "nullable": true,
                           "metadata": {
-                            "description": "Optional. The agent's unique identifier within the organization."
+                            "description": "Optional. The agent's unique identifier within the organization (subscription)."
                           }
                         },
                         "agentName": {
                           "type": "string",
-                          "nullable": true,
                           "metadata": {
-                            "description": "Optional. The agent's name (unique within the project/app)."
+                            "description": "Required. The agent's name (unique within the project/app). The agent must already exist in the project."
                           }
                         }
                       },
@@ -5797,7 +6124,7 @@
                     "applicationAuthorizationPolicyType": {
                       "type": "object",
                       "properties": {
-                        "type": {
+                        "authorizationScheme": {
                           "type": "string",
                           "allowedValues": [
                             "Channels",
@@ -6001,9 +6328,8 @@
                           "items": {
                             "$ref": "#/definitions/agentReferenceType"
                           },
-                          "nullable": true,
                           "metadata": {
-                            "description": "Optional. The list of agent references in this application."
+                            "description": "Required. The list of agent references in this application. Must contain at least one agent reference with agentName. Agents must exist in the project before the application can be deployed."
                           }
                         },
                         "tags": {
@@ -6060,9 +6386,8 @@
                             "Agent",
                             "Responses"
                           ],
-                          "nullable": true,
                           "metadata": {
-                            "description": "Optional. The protocol used by the agent."
+                            "description": "Required. The protocol used by the agent."
                           }
                         },
                         "version": {
@@ -6087,14 +6412,13 @@
                           "type": "string",
                           "nullable": true,
                           "metadata": {
-                            "description": "Optional. The agent's unique identifier within the organization."
+                            "description": "Optional. The agent's unique identifier within the organization (subscription)."
                           }
                         },
                         "agentName": {
                           "type": "string",
-                          "nullable": true,
                           "metadata": {
-                            "description": "Optional. The agent's name (unique within the project/app)."
+                            "description": "Required. The agent's name (unique within the project/app)."
                           }
                         },
                         "agentVersion": {
@@ -6157,9 +6481,9 @@
                           "items": {
                             "$ref": "#/definitions/_1.versionedAgentReferenceType"
                           },
-                          "nullable": true,
+                          "minLength": 1,
                           "metadata": {
-                            "description": "Optional. List of agent:version pairs deployed in this deployment."
+                            "description": "Required. List of agent:version pairs deployed in this deployment."
                           }
                         },
                         "protocols": {
@@ -6167,9 +6491,9 @@
                           "items": {
                             "$ref": "#/definitions/_1.agentProtocolVersionType"
                           },
-                          "nullable": true,
+                          "minLength": 1,
                           "metadata": {
-                            "description": "Optional. Protocol types and versions exposed by this deployment."
+                            "description": "Required. Protocol types and versions exposed by this deployment."
                           }
                         },
                         "minReplicas": {
@@ -6277,9 +6601,9 @@
                       "items": {
                         "$ref": "#/definitions/agentReferenceType"
                       },
-                      "nullable": true,
+                      "minLength": 1,
                       "metadata": {
-                        "description": "Optional. The list of agent references in this application."
+                        "description": "Required. The list of agent references in this application. Must contain at least one agent. Agents must exist in the project before the application can be created (created via data-plane APIs or az cognitiveservices agent create)."
                       }
                     },
                     "tags": {
@@ -6317,17 +6641,7 @@
                       "type": "Microsoft.CognitiveServices/accounts/projects/applications",
                       "apiVersion": "2025-10-01-preview",
                       "name": "[format('{0}/{1}/{2}', parameters('accountName'), parameters('projectName'), parameters('name'))]",
-                      "properties": {
-                        "displayName": "[parameters('displayName')]",
-                        "description": "[parameters('description')]",
-                        "authorizationPolicy": "[parameters('authorizationPolicy')]",
-                        "agentIdentityBlueprint": "[parameters('agentIdentityBlueprint')]",
-                        "defaultInstanceIdentity": "[parameters('defaultInstanceIdentity')]",
-                        "baseUrl": "[parameters('baseUrl')]",
-                        "trafficRoutingPolicy": "[parameters('trafficRoutingPolicy')]",
-                        "agents": "[parameters('agents')]",
-                        "tags": "[parameters('tags')]"
-                      }
+                      "properties": "[union(createObject('displayName', parameters('displayName'), 'description', parameters('description'), 'authorizationPolicy', parameters('authorizationPolicy'), 'agents', parameters('agents')), if(not(equals(parameters('agentIdentityBlueprint'), null())), createObject('agentIdentityBlueprint', parameters('agentIdentityBlueprint')), createObject()), if(not(equals(parameters('defaultInstanceIdentity'), null())), createObject('defaultInstanceIdentity', parameters('defaultInstanceIdentity')), createObject()), if(not(equals(parameters('baseUrl'), null())), createObject('baseUrl', parameters('baseUrl')), createObject()), if(not(equals(parameters('trafficRoutingPolicy'), null())), createObject('trafficRoutingPolicy', parameters('trafficRoutingPolicy')), createObject()), if(not(equals(parameters('tags'), null())), createObject('tags', parameters('tags')), createObject()))]"
                     },
                     "application_agentDeployments": {
                       "copy": {
@@ -6339,7 +6653,7 @@
                       "type": "Microsoft.CognitiveServices/accounts/projects/applications/agentDeployments",
                       "apiVersion": "2025-10-01-preview",
                       "name": "[format('{0}/{1}/{2}/{3}', parameters('accountName'), parameters('projectName'), parameters('name'), coalesce(parameters('agentDeployments'), createArray())[copyIndex()].name)]",
-                      "properties": "[union(createObject('deploymentType', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'displayName', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'displayName'), 'description', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'description'), 'deploymentId', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'deploymentId'), 'agents', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'agents'), 'protocols', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'protocols'), 'tags', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'tags')), if(equals(coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'Hosted'), createObject('minReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'minReplicas'), 'maxReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'maxReplicas')), createObject()))]",
+                      "properties": "[union(createObject('deploymentType', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'agents', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].agents, 'protocols', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].protocols), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'displayName'), null())), createObject('displayName', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].displayName), createObject()), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'description'), null())), createObject('description', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].description), createObject()), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'deploymentId'), null())), createObject('deploymentId', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentId), createObject()), if(not(equals(tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'tags'), null())), createObject('tags', coalesce(parameters('agentDeployments'), createArray())[copyIndex()].tags), createObject()), if(equals(coalesce(parameters('agentDeployments'), createArray())[copyIndex()].deploymentType, 'Hosted'), createObject('minReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'minReplicas'), 'maxReplicas', tryGet(coalesce(parameters('agentDeployments'), createArray())[copyIndex()], 'maxReplicas')), createObject()))]",
                       "dependsOn": [
                         "application"
                       ]
@@ -6414,7 +6728,7 @@
                 "description": "The applications created in the Foundry Project."
               },
               "copy": {
-                "count": "[length(coalesce(parameters('applications'), createArray()))]",
+                "count": "[length(variables('deployableApplications'))]",
                 "input": {
                   "name": "[reference(format('project_applications[{0}]', copyIndex())).outputs.name.value]",
                   "resourceId": "[reference(format('project_applications[{0}]', copyIndex())).outputs.resourceId.value]"
@@ -7796,6 +8110,22 @@
         }
       }
     },
+    "primaryKey": {
+      "type": "securestring",
+      "nullable": true,
+      "metadata": {
+        "description": "The primary access key."
+      },
+      "value": "[if(not(parameters('disableLocalAuth')), listKeys('cognitiveService', '2025-10-01-preview').key1, null())]"
+    },
+    "secondaryKey": {
+      "type": "securestring",
+      "nullable": true,
+      "metadata": {
+        "description": "The secondary access key."
+      },
+      "value": "[if(not(parameters('disableLocalAuth')), listKeys('cognitiveService', '2025-10-01-preview').key2, null())]"
+    },
     "projects": {
       "type": "array",
       "items": {
@@ -7828,6 +8158,22 @@
         "input": {
           "name": "[reference(format('cognitiveServices_capabilityHosts[{0}]', copyIndex())).outputs.name.value]",
           "resourceId": "[reference(format('cognitiveServices_capabilityHosts[{0}]', copyIndex())).outputs.resourceId.value]"
+        }
+      }
+    },
+    "raiPoliciesOutput": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/raiPolicyOutputType"
+      },
+      "metadata": {
+        "description": "The RAI policies created in the Cognitive Services account."
+      },
+      "copy": {
+        "count": "[length(coalesce(parameters('raiPolicies'), createArray()))]",
+        "input": {
+          "name": "[coalesce(parameters('raiPolicies'), createArray())[copyIndex()].name]",
+          "resourceId": "[resourceId('Microsoft.CognitiveServices/accounts/raiPolicies', parameters('name'), coalesce(parameters('raiPolicies'), createArray())[copyIndex()].name)]"
         }
       }
     }
