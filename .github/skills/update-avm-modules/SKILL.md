@@ -148,6 +148,7 @@ az bicep build --file <updated-file>
 ```
 
 If validation fails:
+
 1. Report the specific error.
 2. Attempt to fix parameter issues caused by the version change.
 3. Re-validate.

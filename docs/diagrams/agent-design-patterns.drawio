@@ -1,0 +1,375 @@
+<mxfile host="65bd71144e">
+    <diagram id="overview" name="Overview">
+        <mxGraphModel dx="980" dy="841" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="&lt;b&gt;Microsoft Foundry Agent Design Patterns&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="20" width="500" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="h1" value="&lt;b&gt;Foundry Manages Orchestration&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontColor=#0078D4;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="80" width="620" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="h2" value="&lt;b&gt;Your Code Manages Orchestration&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontColor=#107C10;" parent="1" vertex="1">
+                    <mxGeometry x="531" y="90" width="620" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="p1box" value="" style="rounded=1;whiteSpace=wrap;fillColor=#DEEBF7;strokeColor=#0078D4;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="130" width="280" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="p1title" value="&lt;b&gt;Pattern 1&lt;/b&gt;&lt;br&gt;Prompt Agent&lt;br&gt;(Fully Server-Side)" style="text;html=1;align=center;verticalAlign=top;fontSize=12;fontColor=#0078D4;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="140" width="240" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="p1desc" value="• No code required&lt;br&gt;• All tools server-side&lt;br&gt;• 1 network round-trip&lt;br&gt;• Publish to Teams/M365&lt;br&gt;• Private networking ✅&lt;br&gt;• Full observability" style="text;html=1;align=left;verticalAlign=top;fontSize=10;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="195" width="240" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="p2box" value="" style="rounded=1;whiteSpace=wrap;fillColor=#E2F0D9;strokeColor=#548235;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="390" y="130" width="280" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="p2title" value="&lt;b&gt;Pattern 2&lt;/b&gt;&lt;br&gt;Prompt Agent — Hybrid&lt;br&gt;(Server + Client Functions)" style="text;html=1;align=center;verticalAlign=top;fontSize=12;fontColor=#548235;" parent="1" vertex="1">
+                    <mxGeometry x="410" y="140" width="240" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="p2desc" value="• Server-side + function tools&lt;br&gt;• Agent pauses for client calls&lt;br&gt;• 2N+1 round-trips&lt;br&gt;• Publish to Teams/M365&lt;br&gt;• Private networking ✅&lt;br&gt;• Extend with custom logic" style="text;html=1;align=left;verticalAlign=top;fontSize=10;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="410" y="195" width="240" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="p3box" value="" style="rounded=1;whiteSpace=wrap;fillColor=#DEEBF7;strokeColor=#0078D4;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="360" width="280" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="p3title" value="&lt;b&gt;Pattern 3&lt;/b&gt;&lt;br&gt;Workflow Agent&lt;br&gt;(Declarative Multi-Agent)" style="text;html=1;align=center;verticalAlign=top;fontSize=12;fontColor=#0078D4;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="370" width="240" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="p3desc" value="• No code (YAML optional)&lt;br&gt;• Multi-agent orchestration&lt;br&gt;• Branching &amp; approval steps&lt;br&gt;• Publish to Teams/M365&lt;br&gt;• Private networking ✅&lt;br&gt;• Preview" style="text;html=1;align=left;verticalAlign=top;fontSize=10;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="425" width="240" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="p4box" value="" style="rounded=1;whiteSpace=wrap;fillColor=#FFF2CC;strokeColor=#D6B656;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="390" y="360" width="280" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="p4title" value="&lt;b&gt;Pattern 4&lt;/b&gt;&lt;br&gt;Hosted Agent&lt;br&gt;(Your Code, Foundry Compute)" style="text;html=1;align=center;verticalAlign=top;fontSize=12;fontColor=#D6B656;" parent="1" vertex="1">
+                    <mxGeometry x="410" y="370" width="240" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="p4desc" value="• Your container on Foundry&lt;br&gt;• MAF / LangGraph / custom&lt;br&gt;• Managed scaling &amp; identity&lt;br&gt;• Publish to Teams/M365&lt;br&gt;• Private networking ❌ (preview)&lt;br&gt;• Preview" style="text;html=1;align=left;verticalAlign=top;fontSize=10;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="410" y="425" width="240" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="p5box" value="" style="rounded=1;whiteSpace=wrap;fillColor=#E6F3E6;strokeColor=#107C10;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="701" y="130" width="280" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="p5title" value="&lt;b&gt;Pattern 5&lt;/b&gt;&lt;br&gt;Client-Side Orchestration&lt;br&gt;(Responses API)" style="text;html=1;align=center;verticalAlign=top;fontSize=12;fontColor=#107C10;" parent="1" vertex="1">
+                    <mxGeometry x="721" y="140" width="240" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="p5desc" value="• No agent registered&lt;br&gt;• Responses API features (state, compact)&lt;br&gt;• Built-in tools still available&lt;br&gt;• Your code runs ReAct loop&lt;br&gt;• Private networking ✅&lt;br&gt;• No publishing" style="text;html=1;align=left;verticalAlign=top;fontSize=10;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="721" y="195" width="240" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="p6box" value="" style="rounded=1;whiteSpace=wrap;fillColor=#F2E6F9;strokeColor=#7030A0;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="701" y="360" width="280" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="p6title" value="&lt;b&gt;Pattern 6&lt;/b&gt;&lt;br&gt;Client-Side Orchestration&lt;br&gt;(Stateless Models)" style="text;html=1;align=center;verticalAlign=top;fontSize=12;fontColor=#7030A0;" parent="1" vertex="1">
+                    <mxGeometry x="721" y="370" width="240" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="p6desc" value="• Model inference only&lt;br&gt;• Chat Completions / Responses API&lt;br&gt;• All tools client-side&lt;br&gt;• All state client-managed&lt;br&gt;• Private networking ✅&lt;br&gt;• Provider-portable (Ollama, etc.)" style="text;html=1;align=left;verticalAlign=top;fontSize=10;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="721" y="425" width="240" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="spectrumLabel" value="← &lt;b&gt;More Foundry involvement&lt;/b&gt;                                                                                                         &lt;b&gt;More developer control&lt;/b&gt; →" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontColor=#666666;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="590" width="900" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="spectrum" value="" style="shape=flexArrow;endArrow=classic;startArrow=classic;startSize=6;endSize=6;fillColor=#E0E0E0;strokeColor=#999999;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="80" y="630" as="sourcePoint"/>
+                        <mxPoint x="980" y="630" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="callerBox" value="" style="rounded=1;whiteSpace=wrap;fillColor=#F5F5F5;strokeColor=#999999;strokeWidth=1;dashed=1;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="670" width="900" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="callerLabel" value="&lt;b&gt;Callers / Consumers&lt;/b&gt;: Foundry Portal  |  Custom Web/Mobile App  |  Teams / M365 Copilot  |  Python/C#/.NET SDK  |  Another Agent (A2A)  |  REST API Client" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="680" width="940" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="mafNote" value="&lt;b&gt;Microsoft Agent Framework&lt;/b&gt; provides a unified agent.Run() interface across Patterns 1, 2, 4, 5, and 6 — same code, different provider." style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#0078D4;fontStyle=2;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="770" width="900" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="pattern1" name="Pattern 1 - Prompt Agent (Server-Side)">
+        <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title1" value="&lt;b&gt;Pattern 1: Prompt Agent — Fully Server-Side&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#0078D4;" vertex="1" parent="1">
+                    <mxGeometry x="300" y="10" width="500" height="30" as="geometry"/>
+                </mxCell>
+                <!-- Foundry Agent Service boundary -->
+                <mxCell id="foundryBoundary" value="&lt;b&gt;Microsoft Foundry Agent Service&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#DEEBF7;strokeColor=#0078D4;strokeWidth=2;verticalAlign=top;fontSize=13;fontColor=#0078D4;align=left;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="60" width="900" height="350" as="geometry"/>
+                </mxCell>
+                <!-- Prompt Agent Definition -->
+                <mxCell id="agentDef" value="&lt;b&gt;Prompt Agent Definition&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Instructions&lt;br&gt;• Model (gpt-4o)&lt;br&gt;• Tools config&lt;br&gt;  - Web Search&lt;br&gt;  - File Search&lt;br&gt;  - Code Interpreter&lt;br&gt;  - MCP Servers" style="rounded=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#0078D4;strokeWidth=1;fontSize=10;align=left;spacingLeft=8;verticalAlign=top;spacingTop=5;" vertex="1" parent="1">
+                    <mxGeometry x="130" y="100" width="180" height="170" as="geometry"/>
+                </mxCell>
+                <!-- ReAct Loop -->
+                <mxCell id="reactLoop" value="&lt;b&gt;ReAct Loop (server-side)&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#0078D4;strokeWidth=1;verticalAlign=top;fontSize=11;fontColor=#0078D4;align=center;spacingTop=5;" vertex="1" parent="1">
+                    <mxGeometry x="380" y="100" width="580" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="step1" value="1. LLM Reasoning&lt;br&gt;&lt;i&gt;&#39;I should search the web&#39;&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#E2EFDA;strokeColor=#548235;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="410" y="140" width="200" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="step2" value="2. Web Search&lt;br&gt;&lt;i&gt;(built-in, server-side)&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="660" y="140" width="200" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="step3" value="3. LLM Reasoning&lt;br&gt;&lt;i&gt;&#39;Now I can answer&#39;&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#E2EFDA;strokeColor=#548235;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="410" y="220" width="200" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="step4" value="4. Final Answer" style="rounded=1;whiteSpace=wrap;fillColor=#D9E2F3;strokeColor=#0078D4;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+                    <mxGeometry x="660" y="220" width="200" height="50" as="geometry"/>
+                </mxCell>
+                <!-- Arrows inside loop -->
+                <mxCell id="a12" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="step1" target="step2" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a23" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="step2" target="step3" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="a34" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="step3" target="step4" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <!-- Arrow from def to loop -->
+                <mxCell id="aDefLoop" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0078D4;" edge="1" source="agentDef" target="reactLoop" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <!-- Characteristics -->
+                <mxCell id="chars" value="&lt;b&gt;Key:&lt;/b&gt; 1 round-trip | Agent identity for tools | Conversation state managed | Full observability | Private networking ✅" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+                    <mxGeometry x="380" y="310" width="580" height="30" as="geometry"/>
+                </mxCell>
+                <!-- Caller -->
+                <mxCell id="callerBox1" value="&lt;b&gt;Caller&lt;/b&gt;&lt;br&gt;Web App | Portal | Teams/M365 | SDK Script | Another Agent" style="rounded=1;whiteSpace=wrap;fillColor=#F5F5F5;strokeColor=#999999;strokeWidth=1;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="300" y="460" width="500" height="60" as="geometry"/>
+                </mxCell>
+                <!-- Arrows caller ↔ foundry -->
+                <mxCell id="aUp" value="POST /responses (agent_reference)" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0078D4;fontSize=9;" edge="1" source="callerBox1" target="foundryBoundary" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="pattern2" name="Pattern 2 - Hybrid (Server + Client Functions)">
+        <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title2" value="&lt;b&gt;Pattern 2: Prompt Agent — Hybrid (Server + Client Function Calling)&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#548235;" vertex="1" parent="1">
+                    <mxGeometry x="200" y="10" width="700" height="30" as="geometry"/>
+                </mxCell>
+                <!-- Foundry Agent Service -->
+                <mxCell id="foundry2" value="&lt;b&gt;Microsoft Foundry Agent Service&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#E2F0D9;strokeColor=#548235;strokeWidth=2;verticalAlign=top;fontSize=13;fontColor=#548235;align=left;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="60" width="900" height="380" as="geometry"/>
+                </mxCell>
+                <!-- Phase 1 -->
+                <mxCell id="phase1" value="&lt;b&gt;Phase 1: Server-side tools&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#548235;strokeWidth=1;verticalAlign=top;fontSize=11;align=center;spacingTop=3;" vertex="1" parent="1">
+                    <mxGeometry x="130" y="100" width="400" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="s1" value="LLM Reasons" style="rounded=1;whiteSpace=wrap;fillColor=#E2EFDA;strokeColor=#548235;fontSize=9;" vertex="1" parent="1">
+                    <mxGeometry x="150" y="140" width="110" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="s2" value="AI Search&lt;br&gt;(server-side)" style="rounded=1;whiteSpace=wrap;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=9;" vertex="1" parent="1">
+                    <mxGeometry x="290" y="140" width="110" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="s3" value="LLM Reasons&lt;br&gt;&lt;i&gt;&#39;Need CRM data&#39;&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#E2EFDA;strokeColor=#548235;fontSize=9;" vertex="1" parent="1">
+                    <mxGeometry x="150" y="190" width="110" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="pause" value="⏸ PAUSE&lt;br&gt;Return function_call" style="rounded=1;whiteSpace=wrap;fillColor=#FCE4EC;strokeColor=#C62828;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+                    <mxGeometry x="290" y="190" width="130" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="as12" style="edgeStyle=orthogonalEdgeStyle;fontSize=8;" edge="1" source="s1" target="s2" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="as23" style="edgeStyle=orthogonalEdgeStyle;fontSize=8;" edge="1" source="s2" target="s3" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="as3p" style="edgeStyle=orthogonalEdgeStyle;fontSize=8;" edge="1" source="s3" target="pause" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <!-- Phase 2: Resume -->
+                <mxCell id="phase2" value="&lt;b&gt;Phase 2: Resume after client function&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#548235;strokeWidth=1;verticalAlign=top;fontSize=11;align=center;spacingTop=3;" vertex="1" parent="1">
+                    <mxGeometry x="130" y="280" width="400" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="resume" value="▶ RESUME&lt;br&gt;Receive function_call_output" style="rounded=1;whiteSpace=wrap;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+                    <mxGeometry x="150" y="315" width="160" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="s5" value="LLM Reasons&lt;br&gt;with CRM data" style="rounded=1;whiteSpace=wrap;fillColor=#E2EFDA;strokeColor=#548235;fontSize=9;" vertex="1" parent="1">
+                    <mxGeometry x="340" y="315" width="110" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="s6" value="Final Answer" style="rounded=1;whiteSpace=wrap;fillColor=#D9E2F3;strokeColor=#0078D4;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+                    <mxGeometry x="340" y="360" width="110" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="ar1" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="resume" target="s5" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ar2" style="edgeStyle=orthogonalEdgeStyle;" edge="1" source="s5" target="s6" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <!-- Your App -->
+                <mxCell id="appBox" value="&lt;b&gt;Your Application&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#FFF8E1;strokeColor=#F9A825;strokeWidth=2;verticalAlign=top;fontSize=13;fontColor=#F9A825;align=left;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
+                    <mxGeometry x="600" y="100" width="370" height="320" as="geometry"/>
+                </mxCell>
+                <mxCell id="funcExec" value="&lt;b&gt;Client-side function execution&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Call internal CRM API&lt;br&gt;• Query local database&lt;br&gt;• Run business logic&lt;br&gt;• Validate/transform data" style="rounded=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#F9A825;fontSize=10;align=left;spacingLeft=8;verticalAlign=top;spacingTop=5;" vertex="1" parent="1">
+                    <mxGeometry x="630" y="150" width="310" height="120" as="geometry"/>
+                </mxCell>
+                <!-- Arrows between Foundry and App -->
+                <mxCell id="afunc" value="function_call" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#C62828;fontColor=#C62828;fontSize=9;exitX=1;exitY=0.5;entryX=0;entryY=0.3;" edge="1" source="pause" target="appBox" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="afuncret" value="function_call_output" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#2E7D32;fontColor=#2E7D32;fontSize=9;exitX=0;exitY=0.7;entryX=1;entryY=0.5;" edge="1" source="appBox" target="resume" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <!-- Caller -->
+                <mxCell id="caller2" value="&lt;b&gt;Caller&lt;/b&gt; — Web App | Portal | Teams/M365 | SDK Script" style="rounded=1;whiteSpace=wrap;fillColor=#F5F5F5;strokeColor=#999999;strokeWidth=1;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="300" y="490" width="500" height="40" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="pattern4" name="Pattern 4 - Hosted Agent">
+        <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="800" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title4" value="&lt;b&gt;Pattern 4: Hosted Agent (Your Code, Foundry Compute)&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#D6B656;" vertex="1" parent="1">
+                    <mxGeometry x="250" y="10" width="600" height="30" as="geometry"/>
+                </mxCell>
+                <!-- Foundry boundary -->
+                <mxCell id="foundry4" value="&lt;b&gt;Microsoft Foundry Agent Service&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#FFF8E1;strokeColor=#D6B656;strokeWidth=2;verticalAlign=top;fontSize=13;fontColor=#D6B656;align=left;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="60" width="900" height="400" as="geometry"/>
+                </mxCell>
+                <!-- Container runtime -->
+                <mxCell id="runtime" value="&lt;b&gt;Managed Container Runtime&lt;/b&gt; (autoscaling, identity, state)" style="rounded=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#D6B656;strokeWidth=1;verticalAlign=top;fontSize=11;align=center;spacingTop=3;" vertex="1" parent="1">
+                    <mxGeometry x="130" y="100" width="550" height="330" as="geometry"/>
+                </mxCell>
+                <!-- Your container -->
+                <mxCell id="container" value="&lt;b&gt;YOUR CONTAINER&lt;/b&gt;&lt;br&gt;(Agent Framework / LangGraph / custom)" style="rounded=1;whiteSpace=wrap;fillColor=#E8F5E9;strokeColor=#2E7D32;strokeWidth=2;verticalAlign=top;fontSize=11;fontColor=#2E7D32;align=center;spacingTop=5;" vertex="1" parent="1">
+                    <mxGeometry x="160" y="140" width="490" height="250" as="geometry"/>
+                </mxCell>
+                <mxCell id="orch" value="Your orchestration logic&lt;br&gt;(multi-agent, custom reasoning)" style="rounded=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#2E7D32;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="180" y="185" width="200" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="tools" value="Your local tools&lt;br&gt;(internal APIs, databases)" style="rounded=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#2E7D32;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="180" y="245" width="200" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="modelCall" value="Model calls&lt;br&gt;(via project endpoint)" style="rounded=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#2E7D32;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="180" y="305" width="200" height="45" as="geometry"/>
+                </mxCell>
+                <mxCell id="adapter" value="&lt;b&gt;Hosting Adapter&lt;/b&gt;&lt;br&gt;Responses API ↔ Framework" style="rounded=1;whiteSpace=wrap;fillColor=#E3F2FD;strokeColor=#0078D4;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="420" y="185" width="200" height="45" as="geometry"/>
+                </mxCell>
+                <!-- External resources -->
+                <mxCell id="models" value="&lt;b&gt;Foundry&lt;br&gt;Models&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#DEEBF7;strokeColor=#0078D4;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="750" y="140" width="100" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="ftools" value="&lt;b&gt;Foundry&lt;br&gt;Tools&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#DEEBF7;strokeColor=#0078D4;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="750" y="220" width="100" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="am" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0078D4;" edge="1" source="modelCall" target="models" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="at" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0078D4;" edge="1" source="container" target="ftools" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <!-- Caller -->
+                <mxCell id="caller4" value="&lt;b&gt;Caller&lt;/b&gt; — same Responses API surface as prompt agents (transparent to caller)" style="rounded=1;whiteSpace=wrap;fillColor=#F5F5F5;strokeColor=#999999;strokeWidth=1;fontSize=10;" vertex="1" parent="1">
+                    <mxGeometry x="250" y="510" width="600" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="ac" value="POST /responses (agent_reference)" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#D6B656;fontSize=9;" edge="1" source="caller4" target="foundry4" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="pattern56" name="Patterns 5 &amp; 6 - Client-Side Orchestration">
+        <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="800" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title56" value="&lt;b&gt;Patterns 5 &amp;amp; 6: Client-Side Orchestration&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#333333;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="10" width="500" height="30" as="geometry"/>
+                </mxCell>
+                <!-- Pattern 5 -->
+                <mxCell id="p5label" value="&lt;b&gt;Pattern 5: Client-Side + Responses API&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontColor=#107C10;" vertex="1" parent="1">
+                    <mxGeometry x="50" y="50" width="350" height="25" as="geometry"/>
+                </mxCell>
+                <!-- Your app P5 -->
+                <mxCell id="app5" value="&lt;b&gt;Your Application&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#E6F3E6;strokeColor=#107C10;strokeWidth=2;verticalAlign=top;fontSize=12;fontColor=#107C10;align=left;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
+                    <mxGeometry x="50" y="85" width="350" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="loop5" value="&lt;b&gt;ReAct Loop&lt;/b&gt; (your code / Agent Framework)" style="rounded=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#107C10;strokeWidth=1;verticalAlign=top;fontSize=10;align=center;spacingTop=3;" vertex="1" parent="1">
+                    <mxGeometry x="70" y="120" width="310" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="l5s1" value="POST /responses&lt;br&gt;(tools in request,&lt;br&gt;no agent_reference)" style="rounded=1;whiteSpace=wrap;fillColor=#E8F5E9;strokeColor=#107C10;fontSize=9;" vertex="1" parent="1">
+                    <mxGeometry x="90" y="155" width="140" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="l5s2" value="Execute function&lt;br&gt;LOCALLY" style="rounded=1;whiteSpace=wrap;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=9;" vertex="1" parent="1">
+                    <mxGeometry x="90" y="220" width="140" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="l5s3" value="POST /responses&lt;br&gt;(function_call_output +&lt;br&gt;previous_response_id)" style="rounded=1;whiteSpace=wrap;fillColor=#E8F5E9;strokeColor=#107C10;fontSize=9;" vertex="1" parent="1">
+                    <mxGeometry x="90" y="275" width="140" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="la1" style="edgeStyle=orthogonalEdgeStyle;fontSize=8;" edge="1" source="l5s1" target="l5s2" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="la2" style="edgeStyle=orthogonalEdgeStyle;fontSize=8;" edge="1" source="l5s2" target="l5s3" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <!-- Foundry P5 -->
+                <mxCell id="foundry5" value="&lt;b&gt;Foundry (Responses API)&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Model inference&lt;br&gt;• Built-in tools (MCP, code_interpreter)&lt;br&gt;• Response storage&lt;br&gt;• Truncation &amp; compaction&lt;br&gt;• &lt;b&gt;No agent definition&lt;/b&gt;&lt;br&gt;• &lt;b&gt;No publishing&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#DEEBF7;strokeColor=#0078D4;strokeWidth=1;fontSize=10;align=left;spacingLeft=8;verticalAlign=top;spacingTop=5;" vertex="1" parent="1">
+                    <mxGeometry x="50" y="400" width="350" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="la3" value="" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#107C10;" edge="1" source="app5" target="foundry5" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <!-- Divider -->
+                <mxCell id="divider" value="" style="endArrow=none;dashed=1;strokeColor=#999999;strokeWidth=2;" edge="1" parent="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="470" y="50" as="sourcePoint"/>
+                        <mxPoint x="470" y="570" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <!-- Pattern 6 -->
+                <mxCell id="p6label" value="&lt;b&gt;Pattern 6: Client-Side + Stateless Models&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=13;fontColor=#7030A0;" vertex="1" parent="1">
+                    <mxGeometry x="530" y="50" width="380" height="25" as="geometry"/>
+                </mxCell>
+                <!-- Your app P6 -->
+                <mxCell id="app6" value="&lt;b&gt;Your Application&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;fillColor=#F2E6F9;strokeColor=#7030A0;strokeWidth=2;verticalAlign=top;fontSize=12;fontColor=#7030A0;align=left;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
+                    <mxGeometry x="530" y="85" width="380" height="280" as="geometry"/>
+                </mxCell>
+                <mxCell id="loop6" value="&lt;b&gt;ReAct Loop&lt;/b&gt; (Semantic Kernel / Agent Framework / LangChain)" style="rounded=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#7030A0;strokeWidth=1;verticalAlign=top;fontSize=10;align=center;spacingTop=3;" vertex="1" parent="1">
+                    <mxGeometry x="550" y="120" width="340" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="l6s1" value="Send messages&lt;br&gt;to model" style="rounded=1;whiteSpace=wrap;fillColor=#F3E5F5;strokeColor=#7030A0;fontSize=9;" vertex="1" parent="1">
+                    <mxGeometry x="570" y="155" width="130" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="l6s2" value="Execute tool&lt;br&gt;LOCALLY" style="rounded=1;whiteSpace=wrap;fillColor=#FFF2CC;strokeColor=#D6B656;fontSize=9;" vertex="1" parent="1">
+                    <mxGeometry x="570" y="210" width="130" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="l6s3" value="Send tool result +&lt;br&gt;history to model" style="rounded=1;whiteSpace=wrap;fillColor=#F3E5F5;strokeColor=#7030A0;fontSize=9;" vertex="1" parent="1">
+                    <mxGeometry x="570" y="265" width="130" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="l6note" value="&lt;b&gt;YOU manage:&lt;/b&gt;&lt;br&gt;state, context,&lt;br&gt;retries, errors,&lt;br&gt;observability" style="text;html=1;align=left;verticalAlign=top;fontSize=9;fontColor=#666666;" vertex="1" parent="1">
+                    <mxGeometry x="730" y="170" width="120" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="lb1" style="edgeStyle=orthogonalEdgeStyle;fontSize=8;" edge="1" source="l6s1" target="l6s2" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="lb2" style="edgeStyle=orthogonalEdgeStyle;fontSize=8;" edge="1" source="l6s2" target="l6s3" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <!-- Foundry P6 -->
+                <mxCell id="foundry6" value="&lt;b&gt;Foundry (Model Inference ONLY)&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Chat Completions or Responses API&lt;br&gt;• &lt;b&gt;No orchestration&lt;/b&gt;&lt;br&gt;• &lt;b&gt;No tools&lt;/b&gt;&lt;br&gt;• &lt;b&gt;No state&lt;/b&gt;&lt;br&gt;• Any deployment type&lt;br&gt;• Provider-portable (Ollama, Anthropic)" style="rounded=1;whiteSpace=wrap;fillColor=#DEEBF7;strokeColor=#0078D4;strokeWidth=1;fontSize=10;align=left;spacingLeft=8;verticalAlign=top;spacingTop=5;" vertex="1" parent="1">
+                    <mxGeometry x="530" y="400" width="380" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="lb3" value="" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#7030A0;" edge="1" source="app6" target="foundry6" parent="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <!-- VNet note -->
+                <mxCell id="vnet6" value="🔒 VNet + Private Endpoints (optional)" style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#7030A0;fontStyle=2;" vertex="1" parent="1">
+                    <mxGeometry x="550" y="370" width="340" height="20" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

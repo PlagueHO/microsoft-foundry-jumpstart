@@ -1,0 +1,69 @@
+<mxfile host="65bd71144e">
+    <diagram id="pattern3arch" name="Pattern 3 Architecture">
+        <mxGraphModel dx="918" dy="841" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="950" pageHeight="420" background="#FFFFFF" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="Pattern 3: Workflow Agent" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#0078D4;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="10" width="870" height="28" as="geometry"/>
+                </mxCell>
+                <mxCell id="foundryBg" value="" style="rounded=1;whiteSpace=wrap;fillColor=#E8F3FB;strokeColor=#0078D4;strokeWidth=2.5;opacity=60;arcSize=3;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="48" width="870" height="270" as="geometry"/>
+                </mxCell>
+                <mxCell id="foundryLabel" value="Microsoft Foundry Agent Service v2" style="text;html=1;align=left;verticalAlign=top;fontSize=14;fontStyle=1;fontColor=#0078D4;spacingLeft=6;" parent="1" vertex="1">
+                    <mxGeometry x="48" y="53" width="300" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="workflowBox" value="" style="rounded=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#2B7CD3;strokeWidth=1.5;arcSize=8;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="82" width="730" height="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="workflowHeaderBg" value="" style="rounded=0;whiteSpace=wrap;fillColor=#2B7CD3;strokeColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="82" width="730" height="28" as="geometry"/>
+                </mxCell>
+                <mxCell id="workflowHeader" value="Workflow Definition (YAML / Visual Builder) - example" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="82" width="730" height="28" as="geometry"/>
+                </mxCell>
+                <mxCell id="step1" value="Step 1: Research Agent" style="rounded=1;whiteSpace=wrap;fillColor=#E8F5E9;strokeColor=#388E3C;strokeWidth=1.5;fontSize=11;fontColor=#2E7D32;fontStyle=1;align=center;verticalAlign=middle;" parent="1" vertex="1">
+                    <mxGeometry x="130" y="130" width="160" height="38" as="geometry"/>
+                </mxCell>
+                <mxCell id="step2" value="Step 2: Classify Agent" style="rounded=1;whiteSpace=wrap;fillColor=#E8F5E9;strokeColor=#388E3C;strokeWidth=1.5;fontSize=11;fontColor=#2E7D32;fontStyle=1;align=center;verticalAlign=middle;" parent="1" vertex="1">
+                    <mxGeometry x="390" y="130" width="160" height="38" as="geometry"/>
+                </mxCell>
+                <mxCell id="step3" value="Step 3: Route to specialist" style="rounded=1;whiteSpace=wrap;fillColor=#FFF8E1;strokeColor=#F57F17;strokeWidth=1.5;fontSize=11;fontColor=#E65100;fontStyle=1;align=center;verticalAlign=middle;" parent="1" vertex="1">
+                    <mxGeometry x="650" y="130" width="170" height="38" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow12" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#666666;strokeWidth=1.5;endArrow=block;endFill=1;" parent="1" source="step1" target="step2" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow23" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#666666;strokeWidth=1.5;endArrow=block;endFill=1;" parent="1" source="step2" target="step3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="toolsBox" value="Tools: Search, File" style="rounded=1;whiteSpace=wrap;fillColor=#F0F7FF;strokeColor=#2B7CD3;strokeWidth=1.5;fontSize=11;fontColor=#1F5EA8;fontStyle=1;align=center;verticalAlign=middle;" parent="1" vertex="1">
+                    <mxGeometry x="130" y="195" width="160" height="28" as="geometry"/>
+                </mxCell>
+                <mxCell id="approvalBox" value="Human Approval Step" style="rounded=1;whiteSpace=wrap;fillColor=#FDE7E9;strokeColor=#C50F1F;strokeWidth=1.5;fontSize=11;fontColor=#A4262C;fontStyle=1;align=center;verticalAlign=middle;" parent="1" vertex="1">
+                    <mxGeometry x="650" y="195" width="170" height="28" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrowTools" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#666666;strokeWidth=1.5;endArrow=block;endFill=1;" parent="1" source="step1" target="toolsBox" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrowApproval" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#666666;strokeWidth=1.5;endArrow=block;endFill=1;" parent="1" source="step3" target="approvalBox" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="callerBox" value="Calling Application" style="rounded=1;whiteSpace=wrap;fillColor=#F8F8F8;strokeColor=#888888;strokeWidth=1.5;dashed=1;dashPattern=8 4;arcSize=8;fontSize=13;fontStyle=1;fontColor=#333333;align=center;verticalAlign=middle;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="343" width="870" height="42" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrowPost" value="POST /responses" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0078D4;strokeWidth=2;endArrow=block;endFill=1;fontSize=10;fontStyle=1;fontColor=#0078D4;align=right;verticalAlign=middle;" parent="1" source="callerBox" target="workflowBox" edge="1">
+                    <mxGeometry x="0.1648" y="15" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="iconAttrib" value="Azure icons from github.com/dwarfered/azure-architecture-icons-for-drawio" style="text;html=1;align=right;verticalAlign=middle;fontSize=8;fontColor=#AAAAAA;" parent="1" vertex="1">
+                    <mxGeometry x="530" y="395" width="380" height="14" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="" style="shape=image;verticalLabelPosition=bottom;verticalAlign=top;imageAspect=0;aspect=fixed;image=data:image/svg+xml,PHN2ZyBpZD0idXVpZC02YjgzODBjMy0wZWU1LTRjNDQtOTJhMi1mMTg1YzgyZGI2YmEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiB2aWV3Qm94PSIwIDAgMTggMTgiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0idXVpZC0wNTg3NmM3Mi04ZjI2LTQwZGEtOTk2ZS1hNDg4MTcyZWMwNzIiIHgxPSItNjAzLjU2MyIgeTE9Ii0yMTguMzc4IiB4Mj0iLTYwNi42IiB5Mj0iLTIwNi4yMiIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSg2MTcuMTI2IC0yMDUuNzU4KSBzY2FsZSgxIC0xKSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzcxMjU3NSIgLz48c3RvcCBvZmZzZXQ9Ii4wOSIgc3RvcC1jb2xvcj0iIzlhMjg4NCIgLz48c3RvcCBvZmZzZXQ9Ii4xOCIgc3RvcC1jb2xvcj0iI2JmMmM5MiIgLz48c3RvcCBvZmZzZXQ9Ii4yNyIgc3RvcC1jb2xvcj0iI2RhMmU5YyIgLz48c3RvcCBvZmZzZXQ9Ii4zNCIgc3RvcC1jb2xvcj0iI2ViMzBhMiIgLz48c3RvcCBvZmZzZXQ9Ii40IiBzdG9wLWNvbG9yPSIjZjEzMWE1IiAvPjxzdG9wIG9mZnNldD0iLjUiIHN0b3AtY29sb3I9IiNlYzMwYTMiIC8+PHN0b3Agb2Zmc2V0PSIuNjEiIHN0b3AtY29sb3I9IiNkZjJmOWUiIC8+PHN0b3Agb2Zmc2V0PSIuNzIiIHN0b3AtY29sb3I9IiNjOTJkOTYiIC8+PHN0b3Agb2Zmc2V0PSIuODMiIHN0b3AtY29sb3I9IiNhYTJhOGEiIC8+PHN0b3Agb2Zmc2V0PSIuOTUiIHN0b3AtY29sb3I9IiM4MzI2N2MiIC8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNzEyNTc1IiAvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJ1dWlkLWM0YTJmNjI3LWQ3MzAtNDQ3ZS05MTUyLTYyMDA5YzY0YzM2MSIgeDE9Ii02MDIuNDEyIiB5MT0iLTIwNi4wMjUiIHgyPSItNjAyLjQxMiIgeTI9Ii0yMjMuMTc1IiBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKDYxNy4xMjYgLTIwNS43NTgpIHNjYWxlKDEgLTEpIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZGE3ZWQwIiAvPjxzdG9wIG9mZnNldD0iLjA4IiBzdG9wLWNvbG9yPSIjYjE3YmQ1IiAvPjxzdG9wIG9mZnNldD0iLjE5IiBzdG9wLWNvbG9yPSIjODc3OGRiIiAvPjxzdG9wIG9mZnNldD0iLjMiIHN0b3AtY29sb3I9IiM2Mjc2ZTEiIC8+PHN0b3Agb2Zmc2V0PSIuNDEiIHN0b3AtY29sb3I9IiM0NTc0ZTUiIC8+PHN0b3Agb2Zmc2V0PSIuNTQiIHN0b3AtY29sb3I9IiMyZTcyZTgiIC8+PHN0b3Agb2Zmc2V0PSIuNjciIHN0b3AtY29sb3I9IiMxZDcxZWIiIC8+PHN0b3Agb2Zmc2V0PSIuODEiIHN0b3AtY29sb3I9IiMxNDcxZWMiIC8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMTE3MWVkIiAvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJ1dWlkLTVhNGNmMjE1LTQ5MzItNGYxMi04YWYxLTFiNjgzM2RmMjU5YyIgeDE9Ii02MDMuNDM4IiB5MT0iLTIwNi40MTQiIHgyPSItNjE0LjgwNyIgeTI9Ii0yMjQuNjQ0IiBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKDYxNy4xMjYgLTIwNS43NTgpIHNjYWxlKDEgLTEpIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjZGE3ZWQwIiAvPjxzdG9wIG9mZnNldD0iLjA1IiBzdG9wLWNvbG9yPSIjYjc3YmQ0IiAvPjxzdG9wIG9mZnNldD0iLjExIiBzdG9wLWNvbG9yPSIjOTA3OWRhIiAvPjxzdG9wIG9mZnNldD0iLjE4IiBzdG9wLWNvbG9yPSIjNmU3N2RmIiAvPjxzdG9wIG9mZnNldD0iLjI1IiBzdG9wLWNvbG9yPSIjNTE3NWUzIiAvPjxzdG9wIG9mZnNldD0iLjMzIiBzdG9wLWNvbG9yPSIjMzk3M2U3IiAvPjxzdG9wIG9mZnNldD0iLjQyIiBzdG9wLWNvbG9yPSIjMjc3MmU5IiAvPjxzdG9wIG9mZnNldD0iLjU0IiBzdG9wLWNvbG9yPSIjMWE3MWViIiAvPjxzdG9wIG9mZnNldD0iLjY4IiBzdG9wLWNvbG9yPSIjMTM3MWVjIiAvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzExNzFlZCIgLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cGF0aCBkPSJtMTIuMDYxLjAxMmMuNTM0LDAsMS4wMDguNDAxLDEuMTc4Ljk4NHMxLjE2Niw0LjE5LDEuMTY2LDQuMTl2Ny4xNjZoLTMuNjA3bC4wNzMtMTIuMzUyaDEuMTl2LjAxMloiIGZpbGw9InVybCgjdXVpZC0wNTg3NmM3Mi04ZjI2LTQwZGEtOTk2ZS1hNDg4MTcyZWMwNzIpIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHN0cm9rZS13aWR0aD0iMCIgLz48cGF0aCBkPSJtMTcuMzU2LDUuNjExYzAtLjI1NS0uMjA2LS40NDktLjQ0OS0uNDQ5aC0yLjEyNmMtMS40OTQsMC0yLjcwOSwxLjIxNS0yLjcwOSwyLjcwOXY0LjQ5NGgyLjU3NWMxLjQ5NCwwLDIuNzA5LTEuMjE1LDIuNzA5LTIuNzA5di00LjA0NVoiIGZpbGw9InVybCgjdXVpZC1jNGEyZjYyNy1kNzMwLTQ0N2UtOTE1Mi02MjAwOWM2NGMzNjEpIiBzdHJva2Utd2lkdGg9IjAiIC8+PHBhdGggZD0ibTEyLjA2MS4wMTJjLS40MTMsMC0uNzQxLjMyOC0uNzQxLjc0MWwtLjA3MywxMy42NGMwLDEuOTkyLTEuNjE1LDMuNjA3LTMuNjA3LDMuNjA3SDEuMDkzYy0uMzE2LDAtLjUyMi0uMzA0LS40MjUtLjU5NUw1LjkxNSwyLjQyOUM2LjQyNS45ODQsNy43ODUuMDEyLDkuMzE2LjAxMmgyLjc1Ny0uMDEyWiIgZmlsbD0idXJsKCN1dWlkLTVhNGNmMjE1LTQ5MzItNGYxMi04YWYxLTFiNjgzM2RmMjU5YykiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc3Ryb2tlLXdpZHRoPSIwIiAvPjwvc3ZnPg==" parent="1" vertex="1">
+                    <mxGeometry x="860" y="60" width="32" height="32" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

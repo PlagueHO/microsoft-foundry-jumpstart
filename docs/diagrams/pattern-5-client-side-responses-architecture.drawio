@@ -1,0 +1,25 @@
+<mxfile host="65bd71144e">
+    <diagram id="pattern5arch" name="Pattern 5 Architecture">
+        <mxGraphModel dx="1289" dy="841" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="950" pageHeight="420" background="#FFFFFF" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="Pattern 5: Client-Side Orchestration via Responses API" style="text;html=1;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#0078D4;" parent="1" vertex="1"><mxGeometry x="40" y="10" width="870" height="28" as="geometry"/></mxCell>
+                <mxCell id="appBox" value="" style="rounded=1;whiteSpace=wrap;fillColor=#F8F8F8;strokeColor=#888888;strokeWidth=1.5;dashed=1;dashPattern=8 4;arcSize=8;" parent="1" vertex="1"><mxGeometry x="40" y="48" width="870" height="220" as="geometry"/></mxCell>
+                <mxCell id="appLabel" value="Your Application" style="text;html=1;align=left;verticalAlign=top;fontSize=14;fontStyle=1;fontColor=#444444;spacingLeft=6;" parent="1" vertex="1"><mxGeometry x="48" y="53" width="220" height="22" as="geometry"/></mxCell>
+                <mxCell id="loopBox" value="" style="rounded=1;whiteSpace=wrap;fillColor=#FFFFFF;strokeColor=#0078D4;strokeWidth=1.5;arcSize=8;" parent="1" vertex="1"><mxGeometry x="120" y="82" width="550" height="150" as="geometry"/></mxCell>
+                <mxCell id="loopHeaderBg" value="" style="rounded=0;whiteSpace=wrap;fillColor=#0078D4;strokeColor=none;" parent="1" vertex="1"><mxGeometry x="120" y="82" width="550" height="28" as="geometry"/></mxCell>
+                <mxCell id="loopHeader" value="Your Orchestration Loop" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1"><mxGeometry x="120" y="82" width="550" height="28" as="geometry"/></mxCell>
+                <mxCell id="loopContent" value="• POST /responses with tools defined in request&lt;br&gt;• Receive function_call items&lt;br&gt;• Execute functions locally&lt;br&gt;• POST function_call_output + previous_response_id" style="text;html=1;align=left;verticalAlign=middle;fontSize=11;fontColor=#333333;spacingLeft=14;" parent="1" vertex="1"><mxGeometry x="120" y="116" width="550" height="102" as="geometry"/></mxCell>
+                <mxCell id="functionBox" value="Local function execution" style="rounded=1;whiteSpace=wrap;fillColor=#FFF8E1;strokeColor=#F57F17;strokeWidth=1.5;fontSize=11;fontColor=#E65100;fontStyle=1;align=center;verticalAlign=middle;" parent="1" vertex="1"><mxGeometry x="700" y="132" width="150" height="38" as="geometry"/></mxCell>
+                <mxCell id="foundryBox" value="" style="rounded=1;whiteSpace=wrap;fillColor=#E8F3FB;strokeColor=#0078D4;strokeWidth=2;arcSize=8;" parent="1" vertex="1"><mxGeometry x="40" y="300" width="870" height="85" as="geometry"/></mxCell>
+                <mxCell id="foundryHeaderBg" value="" style="rounded=0;whiteSpace=wrap;fillColor=#2B7CD3;strokeColor=none;" parent="1" vertex="1"><mxGeometry x="40" y="300" width="870" height="28" as="geometry"/></mxCell>
+                <mxCell id="foundryHeader" value="Microsoft Foundry (Responses API endpoint)" style="text;html=1;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#FFFFFF;" parent="1" vertex="1"><mxGeometry x="40" y="300" width="870" height="28" as="geometry"/></mxCell>
+                <mxCell id="foundryContent" value="Model inference • Built-in tool execution • Response storage • Truncation / compaction • No agent definition" style="text;html=1;align=center;verticalAlign=middle;fontSize=11;fontColor=#1F5EA8;" parent="1" vertex="1"><mxGeometry x="40" y="334" width="870" height="36" as="geometry"/></mxCell>
+                <mxCell id="arrowDown" value="Responses API calls" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0078D4;strokeWidth=2;endArrow=block;endFill=1;fontSize=10;fontStyle=1;fontColor=#0078D4;" parent="1" source="loopBox" target="foundryBox" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+                <mxCell id="arrowFunc" value="function calls" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#F57F17;strokeWidth=2;endArrow=block;endFill=1;fontSize=10;fontStyle=1;fontColor=#E65100;" parent="1" source="loopBox" target="functionBox" edge="1"><mxGeometry relative="1" as="geometry"/></mxCell>
+                <mxCell id="iconAttrib" value="Azure icons from github.com/dwarfered/azure-architecture-icons-for-drawio" style="text;html=1;align=right;verticalAlign=middle;fontSize=8;fontColor=#AAAAAA;" parent="1" vertex="1"><mxGeometry x="530" y="395" width="380" height="14" as="geometry"/></mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
