@@ -58,6 +58,9 @@ The Agent Service classifies tools by where they execute:
 
 An agent can have **any combination** of these registered simultaneously. See the [tool support matrix](https://learn.microsoft.com/azure/foundry/agents/concepts/tool-best-practice) for region and model availability.
 
+> [!NOTE]
+> All tools must be registered in the agent's definition at creation time via `create_version`. You **cannot** pass additional `tools` in the `POST /responses` request when using `agent_reference`. See [Known limitation: all tools must be defined at agent creation time](#known-limitation-all-tools-must-be-defined-at-agent-creation-time) below for details and workarounds.
+
 ### Hybrid flow
 
 When an agent has both server-side and function calling tools, a single run interleaves both execution modes:
@@ -69,6 +72,29 @@ The Agent Service executes server-side tools internally within the ReAct loop bu
 ### MCP approval requests: another hybrid variant
 
 The [`mcp_approval_request`](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/model-context-protocol#set-up-the-mcp-connection) pattern is a second form of hybrid flow. MCP tools execute server-side, but when an approval-required tool is invoked, the Agent Service pauses to return an approval request to the client. The client reviews the tool name and arguments, approves or rejects, and control returns to the server. This combines server-side credential isolation with client-side human oversight.
+
+### Known limitation: all tools must be defined at agent creation time
+
+> [!IMPORTANT]
+> When using `agent_reference` to invoke a stored agent via `POST /responses`, the `tools` parameter **cannot** be included in the request. Attempting to pass `tools` alongside `agent_reference` returns:
+>
+> ```text
+> openai.BadRequestError: 400 - 'Not allowed when agent is specified'
+> ```
+>
+> This means **all tools — both server-side and function calling — must be defined in the agent's `create_version` call**. You cannot dynamically add, remove, or override tools at invocation time when using a stored agent.
+
+This constraint has the following implications:
+
+- **No per-request tool customization**: You cannot tailor the tool set for individual requests. If different users or scenarios need different tools, you must either create separate agent versions or include all possible tools in a single agent definition and use `tool_choice` and instructions to guide the model.
+- **`structured_inputs` does not add new tools**: The [`structured_inputs`](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/function-calling) parameter can parameterize existing tool configurations (e.g., passing a vector store ID or MCP server URL at invocation time), but it **cannot** inject new tool schemas that were not defined at creation time.
+- **Microsoft Agent Framework behavior**: The [Microsoft Agent Framework](https://learn.microsoft.com/agent-framework/overview/) Python SDK explicitly enforces this constraint. The `AzureAIAgentClient` strips any runtime tool overrides with a warning: _"AzureAIClient does not support runtime tools overrides after agent creation. Use AzureOpenAIResponsesClient instead."_ The `FoundryAgentChatClient` raises a `TypeError` if non-`FunctionTool` types are passed at runtime.
+
+#### Workaround: client-side orchestration
+
+If you need to combine a stored agent's server-side tools with dynamically defined client-side tools (e.g., local function tools or MCP tools discovered at runtime), use **client-side orchestration** ([Pattern 5](AGENT_DESIGN_PATTERNS.md#pattern-5-client-side-orchestration-via-responses-api)) instead of `agent_reference`. With the `AzureOpenAIResponsesClient` (or equivalent), all tools are passed per-request and the client manages the ReAct loop — allowing any combination of tool types without the creation-time constraint.
+
+See the [hybrid tool calling samples](../samples/README.md) for working examples in both Python and .NET that demonstrate combining MCP tools with local function tools using client-side orchestration.
 
 ### When to use hybrid orchestration
 

@@ -35,6 +35,8 @@ builder.AddProject<Projects.AzureArchitect_Step06_UsingImages>("azurearchitect-s
 
 builder.AddProject<Projects.AzureArchitect_Step07_WorkflowConcurrent>("azurearchitect-step07-workflows");
 
+builder.AddProject<Projects.AzureArchitect_Step08_HybridToolCalling>("azurearchitect-step08-hybridtoolcalling");
+
 // Agent Framework - Agent Persistence Samples
 builder.AddProject<Projects.AgentPersistence_Step01_UnpublishedAgent>("agentpersistence-step01-unpublished");
 

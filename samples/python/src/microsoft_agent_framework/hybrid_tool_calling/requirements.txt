@@ -1,0 +1,8 @@
+# Microsoft Agent Framework (Preview)
+agent-framework>=0.1.0a1
+
+# Azure Identity for authentication
+azure-identity>=1.15.0
+
+# Environment variable loading
+python-dotenv>=1.0.0

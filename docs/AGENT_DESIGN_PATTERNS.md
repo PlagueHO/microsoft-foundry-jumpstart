@@ -48,6 +48,7 @@ A named, versioned agent is registered in Foundry Agent Service v2 with a `Promp
 - **Conversation state** managed by Foundry (conversations, memory)
 - **Full observability** — Application Insights, tracing, continuous evaluation
 - **Private networking** — fully supported
+- **Tools are fixed at creation time** — all tools must be defined in `create_version`; you cannot pass additional `tools` in the `POST /responses` request when using `agent_reference` (see [Known limitation](#known-limitation-tools-cannot-be-added-at-invocation-time) below)
 
 ### Code Example
 
@@ -108,6 +109,7 @@ This is the most common pattern for production applications that need to extend 
 - **Client must handle** the function call loop (or use Agent Framework which abstracts it)
 - **Agent identity** handles server-side tool auth; **your app's identity** handles function tool auth
 - **Conversation state** managed by Foundry
+- **Tools are fixed at creation time** — both server-side and function calling tools must be defined in `create_version`; you cannot pass additional `tools` alongside `agent_reference` at invocation time (see [Known limitation](#known-limitation-tools-cannot-be-added-at-invocation-time) below)
 
 ### Code Example
 
@@ -165,6 +167,43 @@ print(final.output_text)
 - [Tool best practices](https://learn.microsoft.com/azure/foundry/agents/concepts/tool-best-practice)
 - [MCP tool approval](https://learn.microsoft.com/azure/foundry/agents/how-to/tools/model-context-protocol)
 - [RESPONSES_API_SERVER_VS_CLIENT_TOOL_CALLING.md](RESPONSES_API_SERVER_VS_CLIENT_TOOL_CALLING.md) — detailed hybrid flow analysis
+
+---
+
+## Known Limitation: Tools Cannot Be Added at Invocation Time
+
+> [!IMPORTANT]
+> **Applies to Patterns 1 and 2** (any pattern using `agent_reference` in `POST /responses`).
+
+When invoking a stored agent via `POST /responses` with `agent_reference`, the Responses API **rejects** the `tools` parameter:
+
+```text
+openai.BadRequestError: 400 - 'Not allowed when agent is specified'
+```
+
+**All tools — both server-side (MCP, Code Interpreter, File Search, etc.) and client-side (function calling) — must be defined at agent creation time** via `create_version`. You cannot dynamically add, remove, or override tools at invocation time.
+
+### Impact
+
+| Scenario | Supported? | Workaround |
+|----------|-----------|------------|
+| Agent with fixed tools across all requests | ✅ Yes | N/A — Patterns 1 and 2 work as designed |
+| Different tool sets per request or per user | ❌ No | Create separate agent versions per tool set, or use [Pattern 5](#pattern-5-client-side-orchestration-via-responses-api) (client-side orchestration) |
+| Adding a client-discovered MCP server at invocation time | ❌ No | Use [Pattern 5](#pattern-5-client-side-orchestration-via-responses-api) where all tools are passed per-request |
+| Parameterizing existing tool configs at invocation time | ⚠️ Partial | `structured_inputs` can inject values (e.g., vector store IDs) into tools defined at creation, but cannot add new tool schemas |
+
+### Microsoft Agent Framework behavior
+
+The [Agent Framework](https://learn.microsoft.com/agent-framework/overview/) SDKs enforce this constraint:
+
+- **Python**: `AzureAIAgentClient._remove_agent_level_run_options()` explicitly strips runtime tool overrides with a warning: _"AzureAIClient does not support runtime tools overrides after agent creation. Use AzureOpenAIResponsesClient instead."_ `FoundryAgentChatClient._prepare_options()` raises `TypeError` for non-`FunctionTool` types at runtime.
+- **.NET**: The `PersistentAgentsClient` silently ignores tools passed at invocation time when using a stored agent.
+
+### Recommended workaround
+
+Use **[Pattern 5: Client-Side Orchestration via Responses API](#pattern-5-client-side-orchestration-via-responses-api)** with `AzureOpenAIResponsesClient` (Python) or `AzureOpenAIClient.GetChatClient()` (.NET). In client-side orchestration, tools are defined per-request — there is no `agent_reference` and no creation-time constraint. This enables combining any tool types (MCP, function calling, etc.) dynamically at invocation time.
+
+See the [hybrid tool calling samples](../samples/README.md) for working examples and [RESPONSES_API_SERVER_VS_CLIENT_TOOL_CALLING.md](RESPONSES_API_SERVER_VS_CLIENT_TOOL_CALLING.md#known-limitation-all-tools-must-be-defined-at-agent-creation-time) for the full technical analysis.
 
 ---
 
@@ -285,38 +324,9 @@ Frameworks like **Microsoft Agent Framework** or **Semantic Kernel** can fully a
 
 ### Architecture
 
-> **Diagram**: See [pattern-5-client-side-responses-architecture.drawio](diagrams/pattern-5-client-side-responses-architecture.drawio) — open in draw.io or the VS Code Draw.io Integration extension.
+![Pattern 5 client-side responses architecture](diagrams/pattern-5-client-side-responses-architecture.svg)
 
-```text
-┌─────────────────────────────────────────────────────────────────────┐
-│  Your Application (Web App / Container App / AKS / etc.)            │
-│                                                                     │
-│  ┌──────────────────────────────────────────────────────────────┐   │
-│  │ YOUR Orchestration Loop (or Agent Framework / Semantic Kernel)│   │
-│  │                                                               │   │
-│  │  ┌──► POST /responses (tools defined in request) ────────────│───┐
-│  │  │    ◄── response with function_call items ─────────────────│───┘
-│  │  │                                                           │   │
-│  │  ├──► Execute function LOCALLY                               │   │
-│  │  │    (your APIs, databases, custom logic)                   │   │
-│  │  │                                                           │   │
-│  │  ├──► POST /responses (function_call_output +                │   │
-│  │  │    previous_response_id) ─────────────────────────────────│───┐
-│  │  │    ◄── final response ────────────────────────────────────│───┘
-│  │  └───                                                        │   │
-│  └──────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────┘
-                              │                         ▲
-                              ▼                         │
-┌─────────────────────────────────────────────────────────────────────┐
-│  Microsoft Foundry (Responses API endpoint)                         │
-│  • Model inference                                                  │
-│  • Built-in tool execution (code_interpreter, MCP, web_search)      │
-│  • Response storage (previous_response_id chaining)                 │
-│  • Truncation and compaction                                        │
-│  • NO agent definition, NO conversations, NO publishing             │
-└─────────────────────────────────────────────────────────────────────┘
-```
+> **Diagram**: See [pattern-5-client-side-responses-architecture.drawio](diagrams/pattern-5-client-side-responses-architecture.drawio) — open in draw.io or the VS Code Draw.io Integration extension.
 
 ### When to Use
 
@@ -325,6 +335,7 @@ Frameworks like **Microsoft Agent Framework** or **Semantic Kernel** can fully a
 - You're using Agent Framework or Semantic Kernel and want client-side orchestration with the Responses API backend
 - You don't need publishing, versioning, or Foundry-managed conversations
 - Private networking is required (and hosted agents don't support it yet)
+- **You need per-request tool flexibility** — tools vary by request or are discovered dynamically at runtime (this is the workaround for the [agent_reference + tools limitation](#known-limitation-tools-cannot-be-added-at-invocation-time))
 
 ### Key Characteristics
 
@@ -407,44 +418,9 @@ This is the most flexible pattern and the only one that works with non-Foundry m
 
 ### Architecture
 
-> **Diagram**: See [pattern-6-client-side-stateless-architecture.drawio](diagrams/pattern-6-client-side-stateless-architecture.drawio) — open in draw.io or the VS Code Draw.io Integration extension.
+![Pattern 6 client-side stateless architecture](diagrams/pattern-6-client-side-stateless-architecture.svg)
 
-```text
-┌─────────────────────────────────────────────────────────────────────┐
-│  Your Application (Web App / Container App / AKS / on-premises)     │
-│                                                                     │
-│  ┌──────────────────────────────────────────────────────────────┐   │
-│  │ YOUR Orchestration (Semantic Kernel / Agent Framework /       │   │
-│  │                      LangChain / custom code)                 │   │
-│  │                                                               │   │
-│  │  ┌──► Send messages to model ─────────────────────────────────│───┐
-│  │  │    ◄── tool_call response ─────────────────────────────────│───┘
-│  │  │                                                            │   │
-│  │  ├──► Execute tool LOCALLY                                    │   │
-│  │  │    (any API, database, computation, ML model)              │   │
-│  │  │                                                            │   │
-│  │  ├──► Send tool result + history back to model ───────────────│───┐
-│  │  │    ◄── final response ─────────────────────────────────────│───┘
-│  │  └───                                                         │   │
-│  │                                                               │   │
-│  │  YOU manage: conversation state, context window, retries,     │   │
-│  │  tool schemas, error handling, observability                  │   │
-│  └──────────────────────────────────────────────────────────────┘   │
-│                                                                     │
-│  ┌──────────────────────────┐                                       │
-│  │ VNet Integration /       │ (optional — private endpoint to       │
-│  │ Private Endpoints        │  Foundry model endpoint)              │
-│  └──────────────────────────┘                                       │
-└─────────────────────────────────────────────────────────────────────┘
-                              │                         ▲
-                              ▼                         │
-┌─────────────────────────────────────────────────────────────────────┐
-│  Microsoft Foundry (Model inference endpoint ONLY)                  │
-│  • Chat Completions API or Responses API (no agent_reference)       │
-│  • Model inference only — no orchestration, no tools, no state      │
-│  • Any deployment type (Global, DataZone, Regional)                 │
-└─────────────────────────────────────────────────────────────────────┘
-```
+> **Diagram**: See [pattern-6-client-side-stateless-architecture.drawio](diagrams/pattern-6-client-side-stateless-architecture.drawio) — open in draw.io or the VS Code Draw.io Integration extension.
 
 ### When to Use
 
