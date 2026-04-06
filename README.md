@@ -31,7 +31,8 @@ Before you begin, ensure you have the following prerequisites in place:
 1. An active Azure subscription - [Create a free account](https://azure.microsoft.com/free/) if you don't have one.
 1. [Azure Developer CLI (azd)](https://aka.ms/install-azd) Install or update to the latest version. Instructions can be found on the linked page.
 1. **Windows Only** [PowerShell](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-windows) of the latest version, needed only for local application development on Windows operation system. Please make sure that PowerShell executable `pwsh.exe` is added to the `PATH` variable.
-1. **Recommended for using sample tools** [Python 3.10+](https://www.python.org/downloads/)
+1. **Recommended for using sample tools** [Python 3.11+](https://www.python.org/downloads/)
+1. **For .NET samples** [.NET 10.0 SDK or later](https://dotnet.microsoft.com/download)
 
 ## Key Features
 

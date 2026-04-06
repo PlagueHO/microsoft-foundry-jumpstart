@@ -28,6 +28,7 @@
     <ProjectReference Include="..\..\agent-framework\AzureArchitect\AzureArchitect_Step05_MCPServer\AzureArchitect_Step05_MCPServer.csproj" />
     <ProjectReference Include="..\..\agent-framework\AzureArchitect\AzureArchitect_Step06_UsingImages\AzureArchitect_Step06_UsingImages.csproj" />
     <ProjectReference Include="..\..\agent-framework\AzureArchitect\AzureArchitect_Step07_Workflows\AzureArchitect_Step07_WorkflowConcurrent.csproj" />
+    <ProjectReference Include="..\..\agent-framework\AzureArchitect\AzureArchitect_Step08_HybridToolCalling\AzureArchitect_Step08_HybridToolCalling.csproj" />
     <ProjectReference Include="..\..\agent-framework\AgentPersistence\AgentPersistence_Step01_UnpublishedAgent\AgentPersistence_Step01_UnpublishedAgent.csproj" />
     <ProjectReference Include="..\..\agent-framework\AgentPersistence\AgentPersistence_Step02_PublishedWithCosmosDB\AgentPersistence_Step02_PublishedWithCosmosDB.csproj" />
     <ProjectReference Include="..\..\agent-framework\DocumentClassifierWorkflow\DocumentClassifierWorkflow.csproj" />

@@ -50,19 +50,11 @@ import asyncio
 from typing import Any
 
 from common import (  # pylint: disable=import-error
-    AZURE_ARCHITECT_INSTRUCTIONS,
-    AZURE_ARCHITECT_NAME,
-    AZURE_ARCHITECT_TOOLS,
-    MCP_SERVER_NAME,
-    MCP_SERVER_URL,
     ClientSideThread,
     create_argument_parser,
-    estimate_azure_costs,
-    generate_bicep_snippet,
     get_application_endpoint,
     load_environment,
     print_header,
-    validate_architecture,
 )
 
 
@@ -80,25 +72,25 @@ def create_openai_client_for_published_agent(
 ) -> tuple[Any, str, str]:
     """
     Create an HTTP client configured for a published agent application.
-    
+
     Published agents use the OpenAI Responses API format but at a non-standard
     endpoint. The standard OpenAI SDK doesn't properly handle Azure's api-version
     query parameter for these endpoints, so we use httpx directly.
-    
+
     Args:
         application_endpoint: The full application endpoint URL from
             AZURE_AI_APPLICATION_ENDPOINT environment variable.
-    
+
     Returns:
         A tuple of (token_provider callable, responses_endpoint, api_version).
-    
+
     Future Migration:
         When Agent Framework supports published agents, this function will be
         replaced with framework's built-in client initialization.
     """
     # pylint: disable=import-outside-toplevel
     from azure.identity import DefaultAzureCredential, get_bearer_token_provider
-    
+
     # Extract api-version from query string if present
     api_version = "2025-11-15-preview"  # Default
     if "?" in application_endpoint:
@@ -109,14 +101,14 @@ def create_openai_client_for_published_agent(
                 break
     else:
         base_part = application_endpoint
-    
+
     # Ensure endpoint ends with /responses
     if not base_part.endswith('/responses'):
         base_part = f"{base_part}/responses"
-    
+
     # Build full endpoint with api-version
     responses_endpoint = f"{base_part}?api-version={api_version}"
-    
+
     # Setup Azure credential and token provider
     # Published agents use ai.azure.com scope
     credential = DefaultAzureCredential()
@@ -124,27 +116,27 @@ def create_openai_client_for_published_agent(
         credential,
         "https://ai.azure.com/.default"
     )
-    
+
     return token_provider, responses_endpoint, api_version
 
 
 def extract_response_text(response_json: dict[str, Any]) -> str:
     """
     Extract the text content from an OpenAI Responses API response.
-    
+
     The Responses API returns a different structure than Chat Completions:
     - output_text: Direct text output (convenience field)
     - output: Array of output items (messages, tool calls, approval requests, etc.)
-    
+
     For published agents with MCP tools requiring approval, the response may
     contain tool approval requests instead of a final answer.
-    
+
     Args:
         response_json: The JSON response dict from the Responses API.
-    
+
     Returns:
         The extracted text content or status message.
-    
+
     Future Migration:
         When Agent Framework supports published agents, response parsing
         will be handled by the framework automatically.
@@ -152,15 +144,15 @@ def extract_response_text(response_json: dict[str, Any]) -> str:
     # Check for output_text convenience field first
     if response_json.get("output_text"):
         return response_json["output_text"]
-    
+
     # Otherwise parse the output array
     output = response_json.get("output", [])
     texts: list[str] = []
     tool_requests: list[str] = []
-    
+
     for output_item in output:
         item_type = output_item.get("type", "")
-        
+
         # Handle message output with text content
         if item_type == "message":
             for content_item in output_item.get("content", []):
@@ -168,17 +160,17 @@ def extract_response_text(response_json: dict[str, Any]) -> str:
                     text = content_item.get("text", "")
                     if text:
                         texts.append(text)
-        
+
         # Handle MCP tool approval requests (tools with require_approval: 'always')
         elif item_type == "mcp_approval_request":
             server = output_item.get("server_label", "unknown")
             tool_name = output_item.get("name", "unknown")
             tool_requests.append(f"{server}/{tool_name}")
-    
+
     # If we have text responses, return them
     if texts:
         return "\n\n".join(texts)
-    
+
     # If there are pending tool approval requests, explain what's happening
     if tool_requests:
         return (
@@ -187,7 +179,7 @@ def extract_response_text(response_json: dict[str, Any]) -> str:
             f"For automated responses, reconfigure the agent with 'require_approval: never' "
             f"or implement a tool approval handler."
         )
-    
+
     # Check status for any errors
     status = response_json.get("status", "unknown")
     if status == "completed":
@@ -195,7 +187,7 @@ def extract_response_text(response_json: dict[str, Any]) -> str:
     elif status == "failed":
         error = response_json.get("error", {})
         return f"[Agent failed: {error.get('message', 'Unknown error')}]"
-    
+
     # Fallback - return string representation
     return str(response_json)
 
@@ -207,7 +199,7 @@ async def run_with_hosted_mcp() -> None:
     This function uses the OpenAI Responses API format to communicate with
     the published agent via direct HTTP calls. The agent's MCP tools and local
     tools are pre-configured server-side.
-    
+
     **Why httpx instead of OpenAI SDK?**
     The standard OpenAI Python SDK doesn't properly handle Azure's api-version
     query parameter for published agent endpoints. We use httpx directly with
@@ -222,7 +214,6 @@ async def run_with_hosted_mcp() -> None:
     # pylint: disable=import-outside-toplevel
     try:
         import httpx
-        from azure.identity import DefaultAzureCredential, get_bearer_token_provider
     except ImportError as e:
         print(f"Error: Required packages not installed. {e}")
         print("Install with: pip install httpx azure-identity")
@@ -269,7 +260,7 @@ async def run_with_hosted_mcp() -> None:
         if args.interactive:
             print("\n=== INTERACTIVE MODE (Published Agent - Responses API) ===")
             print("Type 'quit' to exit. Type 'clear' to reset history.\n")
-            
+
             while True:
                 try:
                     question = input("Your question: ").strip()
@@ -279,7 +270,7 @@ async def run_with_hosted_mcp() -> None:
                         thread.clear()
                         print("Conversation cleared.")
                         continue
-                    
+
                     # Build input for Responses API
                     # Format: array of message objects with type, role, content
                     inputs: list[dict[str, Any]] = [
@@ -287,9 +278,9 @@ async def run_with_hosted_mcp() -> None:
                         for msg in thread.get_messages()
                     ]
                     inputs.append({"type": "message", "role": "user", "content": question})
-                    
+
                     print("\n[Calling published agent via Responses API...]")
-                    
+
                     # Make Responses API call
                     response = await client.post(
                         responses_endpoint,
@@ -303,20 +294,20 @@ async def run_with_hosted_mcp() -> None:
                             # Using a placeholder that the service should override
                         },
                     )
-                    
+
                     if response.status_code == 200:
                         result = response.json()
                         assistant_message = extract_response_text(result)
-                        
+
                         # Update conversation history
                         thread.add_message("user", question)
                         thread.add_message("assistant", assistant_message)
-                        
+
                         print(f"\nAssistant: {assistant_message}\n")
                     else:
                         print(f"\nError: HTTP {response.status_code}")
                         print(f"Response: {response.text}\n")
-                    
+
                 except KeyboardInterrupt:
                     break
                 except Exception as ex:
@@ -325,11 +316,11 @@ async def run_with_hosted_mcp() -> None:
             # Single question mode
             print(f"\nUser: {args.question}")
             print("\n[Calling published agent via Responses API...]")
-            
+
             try:
                 # Single message input using Responses API format
                 inputs = [{"type": "message", "role": "user", "content": args.question}]
-                
+
                 response = await client.post(
                     responses_endpoint,
                     headers={
@@ -340,19 +331,19 @@ async def run_with_hosted_mcp() -> None:
                         "input": inputs,
                     },
                 )
-                
+
                 if response.status_code == 200:
                     result = response.json()
                     assistant_message = extract_response_text(result)
-                    
+
                     thread.add_message("user", args.question)
                     thread.add_message("assistant", assistant_message)
-                    
+
                     print(f"\nAssistant: {assistant_message}")
                 else:
                     print(f"\nError: HTTP {response.status_code}")
                     print(f"Response: {response.text}")
-                
+
             except Exception as ex:
                 print(f"\nError: {ex}")
 
@@ -374,7 +365,7 @@ async def run_with_local_mcp() -> None:
     2. Parses tool_calls from responses
     3. Executes MCP tools locally
     4. Returns tool results to the API
-    
+
     This is complex and outside the scope of this sample. The current
     implementation uses the same approach as hosted MCP - relying on
     server-side tool execution.
@@ -387,7 +378,6 @@ async def run_with_local_mcp() -> None:
     # pylint: disable=import-outside-toplevel
     try:
         import httpx
-        from azure.identity import DefaultAzureCredential, get_bearer_token_provider
     except ImportError as e:
         print(f"Error: Required packages not installed. {e}")
         print("Install with: pip install httpx azure-identity")
@@ -426,7 +416,7 @@ async def run_with_local_mcp() -> None:
         if args.interactive:
             print("\n=== INTERACTIVE MODE (Published Agent - Responses API) ===")
             print("Type 'quit' to exit. Type 'clear' to reset history.\n")
-            
+
             while True:
                 try:
                     question = input("Your question: ").strip()
@@ -436,15 +426,15 @@ async def run_with_local_mcp() -> None:
                         thread.clear()
                         print("Conversation cleared.")
                         continue
-                    
+
                     inputs: list[dict[str, Any]] = [
                         {"type": "message", "role": msg["role"], "content": msg["content"]}
                         for msg in thread.get_messages()
                     ]
                     inputs.append({"type": "message", "role": "user", "content": question})
-                    
+
                     print("\n[Calling published agent via Responses API...]")
-                    
+
                     response = await client.post(
                         responses_endpoint,
                         headers={
@@ -453,19 +443,19 @@ async def run_with_local_mcp() -> None:
                         },
                         json={"input": inputs},
                     )
-                    
+
                     if response.status_code == 200:
                         result = response.json()
                         assistant_message = extract_response_text(result)
-                        
+
                         thread.add_message("user", question)
                         thread.add_message("assistant", assistant_message)
-                        
+
                         print(f"\nAssistant: {assistant_message}\n")
                     else:
                         print(f"\nError: HTTP {response.status_code}")
                         print(f"Response: {response.text}\n")
-                    
+
                 except KeyboardInterrupt:
                     break
                 except Exception as ex:
@@ -473,10 +463,10 @@ async def run_with_local_mcp() -> None:
         else:
             print(f"\nUser: {args.question}")
             print("\n[Calling published agent via Responses API...]")
-            
+
             try:
                 inputs = [{"type": "message", "role": "user", "content": args.question}]
-                
+
                 response = await client.post(
                     responses_endpoint,
                     headers={
@@ -485,19 +475,19 @@ async def run_with_local_mcp() -> None:
                     },
                     json={"input": inputs},
                 )
-                
+
                 if response.status_code == 200:
                     result = response.json()
                     assistant_message = extract_response_text(result)
-                    
+
                     thread.add_message("user", args.question)
                     thread.add_message("assistant", assistant_message)
-                    
+
                     print(f"\nAssistant: {assistant_message}")
                 else:
                     print(f"\nError: HTTP {response.status_code}")
                     print(f"Response: {response.text}")
-                
+
             except Exception as ex:
                 print(f"\nError: {ex}")
 

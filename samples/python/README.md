@@ -18,8 +18,9 @@ python/
 
 ## Prerequisites
 
-- Python 3.8 or later
+- Python 3.11 or later
 - Azure subscription with AI Foundry resources
+- Microsoft Agent Framework v1.0.0 or later
 
 ## Getting Started
 

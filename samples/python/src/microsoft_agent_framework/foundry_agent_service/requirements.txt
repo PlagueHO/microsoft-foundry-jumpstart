@@ -1,10 +1,10 @@
-# Microsoft Agent Framework (Preview)
+# Microsoft Agent Framework (GA Release)
 # Install from PyPI - this includes all core components
-agent-framework>=0.1.0a1
+agent-framework>=1.0.0
 
-# Microsoft Agent Framework Redis Support (Official)
+# Microsoft Agent Framework Redis Support (GA Release)
 # Provides RedisChatMessageStore for persistent thread storage
-agent-framework-redis>=0.1.0a1
+agent-framework-redis>=1.0.0
 
 # Azure Identity for authentication
 azure-identity>=1.15.0

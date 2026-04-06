@@ -15,8 +15,9 @@ dotnet/
 
 ## Prerequisites
 
-- .NET 8.0 SDK or later
+- .NET 10.0 SDK or later
 - Azure subscription with AI Foundry resources
+- Microsoft Agent Framework v1.0.0 or later
 
 ## Getting Started
 

@@ -44,7 +44,7 @@ public sealed class IndexModel(AIProjectClient aiProjectClient, IConfiguration c
                 Instructions = instructions
             });
 
-            AgentVersion agentVersion = aiProjectClient.Agents.CreateAgentVersion(agentName: agentName, options);
+            AgentVersion agentVersion = aiProjectClient.AgentAdministrationClient.CreateAgentVersion(agentName: agentName, options);
             AIAgent agent = aiProjectClient.GetAIAgent(agentVersion);
 
             var responseBuilder = new System.Text.StringBuilder();
@@ -56,7 +56,7 @@ public sealed class IndexModel(AIProjectClient aiProjectClient, IConfiguration c
             Answer = responseBuilder.ToString();
 
             // Clean up the server-side agent
-            await aiProjectClient.Agents.DeleteAgentAsync(agent.Name);
+            await aiProjectClient.AgentAdministrationClient.DeleteAgentAsync(agent.Name);
         }
         catch (Exception ex)
         {

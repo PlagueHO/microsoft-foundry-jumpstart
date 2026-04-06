@@ -42,6 +42,7 @@ This pattern deploys a **hybrid multi-region Foundry architecture** that enables
 ## When to Use This Pattern
 
 ✅ **Use this pattern if you need:**
+
 - Data residency in a specific region (e.g., APAC, EU) with Agent Service
 - Access to models only available in geographically distant regions
 - Zero-trust networking with no public internet exposure
@@ -49,6 +50,7 @@ This pattern deploys a **hybrid multi-region Foundry architecture** that enables
 - Sovereign capability hosts with global model access
 
 ❌ **Don't use this pattern if:**
+
 - All required models are available in your primary region
 - You don't need cross-region private endpoint overhead
 - Your compliance doesn't mandate data residency
@@ -158,11 +160,13 @@ Edit `main.bicepparam` or override on the command line:
 ## Cost & Performance Considerations
 
 ### Cost
+
 - **Primary region**: Full stack (Foundry, Agent Service, storage, networking)
 - **Foreign region**: Minimal (Azure OpenAI resource + models only; no compute/storage overhead)
 - **Cross-region data transfer**: Negligible for metadata; model inference calls incur egress
 
 ### Performance
+
 - **Latency**: ~50–150ms round-trip to foreign models (via private backbone)
 - **Throughput**: Depends on Azure OpenAI deployment quota
 - **DNS resolution**: Instant (private DNS zones cache answers)
