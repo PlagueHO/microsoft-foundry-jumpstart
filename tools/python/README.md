@@ -82,6 +82,7 @@ ruff format src/
 ## Adding New Tools
 
 1. Create a new directory under `src/` with this structure:
+
    ```
    src/my_new_tool/
    ├── __init__.py

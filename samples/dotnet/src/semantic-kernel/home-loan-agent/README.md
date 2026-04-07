@@ -93,6 +93,7 @@ dotnet run -- --interactive
 **User**: Can you calculate my monthly payment if I take a 30-year fixed mortgage on a $450,000 home with a $90,000 down payment at a 6.5% interest rate?
 
 **Agent Response**: The agent will use the built-in mortgage calculator to provide:
+
 - Loan amount calculation ($360,000)
 - Monthly payment calculation
 - Total interest over the life of the loan
@@ -137,6 +138,7 @@ home_loan_agent/
 ### MortgageCalculatorPlugin
 
 Provides mathematical functions for:
+
 - Monthly payment calculations
 - Affordability analysis based on income and DTI ratios
 - Loan amount calculations based on purchase price and down payment
@@ -144,6 +146,7 @@ Provides mathematical functions for:
 ### ChatCompletionAgent
 
 Configured with domain-specific instructions for:
+
 - Mortgage lending expertise
 - Document guidance
 - Customer service best practices

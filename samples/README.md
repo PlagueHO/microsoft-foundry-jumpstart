@@ -38,6 +38,7 @@ samples/
 For .NET samples, see [dotnet/README.md](dotnet/README.md).
 
 Quick start:
+
 ```bash
 cd samples/dotnet
 dotnet restore
@@ -50,6 +51,7 @@ dotnet run --project src/<sample-path>
 For Python samples, see [python/README.md](python/README.md).
 
 Quick start:
+
 ```bash
 cd samples/python/src/<sample-category>/<sample-name>
 pip install -r requirements.txt
@@ -59,15 +61,19 @@ python <sample-script>.py
 ## Sample Categories
 
 ### Agent Framework (.NET)
+
 Progressive samples showing the Microsoft Agent Framework capabilities from simple agents to complex workflows with tools, approvals, and multi-modal inputs.
 
 ### Semantic Kernel (.NET & Python)
+
 Samples demonstrating the Semantic Kernel SDK for building AI applications with both .NET and Python.
 
 ### Azure AI Inference (Python)
+
 Samples using the Azure AI Inference SDK for building intelligent applications with critical thinking and analysis capabilities.
 
 ### Foundry Agent Service SDK (Python)
+
 Samples using the Foundry Agent Service SDK for building and deploying agents on Azure AI Foundry.
 
 ## Prerequisites
@@ -80,6 +86,7 @@ Samples using the Foundry Agent Service SDK for building and deploying agents on
 ## Contributing
 
 When adding new samples:
+
 1. Place them in the appropriate language and framework directory under `src/`
 2. Include a `README.md` with setup and usage instructions
 3. Add corresponding tests in the `tests/` directory

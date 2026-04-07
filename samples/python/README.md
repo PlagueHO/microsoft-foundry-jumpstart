@@ -25,11 +25,13 @@ python/
 ## Getting Started
 
 1. Navigate to a specific sample:
+
    ```bash
    cd samples/python/src/<sample-category>/<sample-name>
    ```
 
 2. Install dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
@@ -37,6 +39,7 @@ python/
 3. Configure environment variables (create `.env` file based on `.env.template` if provided)
 
 4. Run the sample:
+
    ```bash
    python <sample-script>.py
    ```
@@ -66,6 +69,7 @@ python/
 ## Running Tests
 
 From the `python/` directory:
+
 ```bash
 pytest tests/
 ```
@@ -73,11 +77,13 @@ pytest tests/
 ## Development
 
 Lint code:
+
 ```bash
 ruff check src/
 ```
 
 Type checking:
+
 ```bash
 mypy src/
 ```

@@ -6,12 +6,14 @@ down-payment requirements, and document checklists to help applicants understand
 products they may qualify for.
 
 ## Table of Contents
+
 1. [Credit Score Tiers & Minimum Requirements](#credit-score-tiers--minimum-requirements)
 2. [Loan Product Matrix](#loan-product-matrix)
 3. [Detailed Product Guidelines](#detailed-product-guidelines)
 4. [Frequently Asked Questions](#frequently-asked-questions)
 
 ## 1. Credit Score Tiers & Minimum Requirements
+
 - **Excellent**: 760 and above
 - **Very Good**: 720 - 759
 - **Good**: 680 - 719
@@ -20,6 +22,7 @@ products they may qualify for.
 - **Poor**: below 580
 
 ## 2. Loan Product Matrix
+
 | Loan Type               | Min Credit | Max DTI % | Highlights                           |
 |-------------------------|------------|-----------|--------------------------------------|
 | Conventional 30yr Fix   | 660        | 45        | Standard conforming loan             |
@@ -32,30 +35,35 @@ products they may qualify for.
 ## 3. Detailed Product Guidelines
 
 ### Conventional Loans
+
 - Minimum credit score: 660 (30yr), 680 (15yr).
 - Down payment: minimum 5% (may be gifted).
 - Mortgage insurance required if LTV > 80%.
 - Reserves: 2 months PITI for primary residence.
 
 ### FHA Loans
+
 - Minimum credit score: 580 with 3.5% down.
 - Upfront MIP: 1.75%; annual MIP varies by LTV.
 - Flexible ratios up to 50% with compensating factors.
 - Non-occupant co-borrowers allowed.
 
 ### VA Loans
+
 - Minimum credit score: 620 (lender overlay).
 - Funding fee may be financed; waived for some veterans.
 - Residual income test may override max DTI.
 - No mortgage insurance; 0% down up to conforming limits.
 
 ### USDA Loans
+
 - Property must be in eligible rural area.
 - Income limits apply by county and household size.
 - Guarantee fee: 1% upfront, 0.35% annual.
 - Minimum credit score typically 640.
 
 ### Jumbo Loans
+
 - Loan amounts above $750,000 (varies by county).
 - Minimum credit score: 720; max LTV 80%.
 - 12 months reserves typically required.

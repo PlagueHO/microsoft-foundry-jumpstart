@@ -23,6 +23,7 @@ dotnet/
 ## Getting Started
 
 1. Open the solution in Visual Studio or VS Code:
+
    ```bash
    cd samples/dotnet
    dotnet restore
@@ -31,6 +32,7 @@ dotnet/
 2. Configure environment variables (see individual sample READMEs)
 
 3. Build and run samples:
+
    ```bash
    dotnet build
    dotnet run --project src/<sample-path>
@@ -39,6 +41,7 @@ dotnet/
 ## Available Samples
 
 ### Agent Framework
+
 - **AzureArchitect** - Multi-step samples showing agent capabilities
   - Step 01: Simple agent
   - Step 02: Foundry agents (single-turn, multi-turn, prebuilt)
@@ -46,9 +49,11 @@ dotnet/
 - **AgentPersistence** - Managing agent state and persistence
 
 ### Semantic Kernel
+
 - **HomeLoanAgent** - Loan processing agent with eligibility checking
 
 ### Blazor
+
 - **mai-image-2-simple** - Minimal prompt-to-image sample using MAI-Image-2 and DefaultAzureCredential
 
 ## Running Tests
