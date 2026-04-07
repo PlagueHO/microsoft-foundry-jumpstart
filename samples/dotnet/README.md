@@ -8,6 +8,7 @@ This directory contains .NET sample projects demonstrating various Azure AI Foun
 dotnet/
 ├── src/                    # Sample source code
 │   ├── agent-framework/    # Microsoft Agent Framework samples
+│   ├── blazor/             # Blazor Web App samples
 │   └── semantic-kernel/    # Semantic Kernel samples
 ├── tests/                  # Tests for samples
 └── microsoft-foundry-jumpstart-samples.slnx  # Solution file
@@ -46,6 +47,9 @@ dotnet/
 
 ### Semantic Kernel
 - **HomeLoanAgent** - Loan processing agent with eligibility checking
+
+### Blazor
+- **mai-image-2-simple** - Minimal prompt-to-image sample using MAI-Image-2 and DefaultAzureCredential
 
 ## Running Tests
 
