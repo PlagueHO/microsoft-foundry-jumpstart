@@ -45,19 +45,6 @@ jobs:
       contents: read
     
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install azd
-        uses: Azure/setup-azd@v2.1.0
-
-      - name: Authenticate azd (Federated Credentials)
-        run: |
-          azd auth login \
-            --client-id "$AZURE_CLIENT_ID" \
-            --federated-credential-provider "github" \
-            --tenant-id "$AZURE_TENANT_ID"
-
       - name: Authenticate Azure CLI (Federated Credentials)
         uses: azure/login@v2
         with:
@@ -65,22 +52,11 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Set Azure Developer CLI environment variables
-        run: |
-          azd env new "$AZURE_ENV_NAME" --location "$AZURE_LOCATION"
-          azd env set AZURE_RESOURCE_GROUP "rg-${AZURE_ENV_NAME}"
-
       - name: Delete Infrastructure
         run: |
           echo "Deleting infrastructure..."
 
-          # Attempt azd down first
-          echo "Attempting cleanup via azd down..."
-          azd down --no-prompt --purge --force || true
-
-          # Fallback: Delete resource group directly via Azure CLI.
-          # azd down may fail to find resources when provisioning didn't complete,
-          # because the azd environment state was never updated with the deployment.
+          # Delete resource group directly via Azure CLI.
           RESOURCE_GROUP="rg-${AZURE_ENV_NAME}"
           echo "Checking if resource group '${RESOURCE_GROUP}' still exists..."
           if az group exists --name "$RESOURCE_GROUP" 2>/dev/null | grep -qi "true"; then

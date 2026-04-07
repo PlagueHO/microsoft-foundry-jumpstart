@@ -59,7 +59,7 @@ None.
 | Data URL construction | [Home.razor line 77](samples/dotnet/src/blazor/mai-image-2-simple/Components/Pages/Home.razor#L77): $"data:image/png;base64,{result.Base64Image}" properly formats base64 payload. | ✓ Pass |
 | State management | [Home.razor @code lines 60-89](samples/dotnet/src/blazor/mai-image-2-simple/Components/Pages/Home.razor#L60-L89): isSubmitting, errorMessage, imageDataUrl managed in GenerateImageAsync with proper initialization and reset. | ✓ Pass |
 | Service injection | [Home.razor line 5](samples/dotnet/src/blazor/mai-image-2-simple/Components/Pages/Home.razor#L5): IMaiImageService injected and invoked with await. | ✓ Pass |
-| Options binding | [Home.razor line 6](samples/dotnet/src/blazor/mai-image-2-simple/Components/Pages/Home.razor#L6): IOptions<MicrosoftFoundryOptions> injected and defaults applied in OnInitialized. | ✓ Pass |
+| Options binding | [Home.razor line 6](samples/dotnet/src/blazor/mai-image-2-simple/Components/Pages/Home.razor#L6): `IOptions<MicrosoftFoundryOptions>` injected and defaults applied in OnInitialized. | ✓ Pass |
 | Minimal CSS | [app.css lines 62-67](samples/dotnet/src/blazor/mai-image-2-simple/wwwroot/app.css#L62-L67): Only necessary styles for .image-form and .image-panel img added. | ✓ Pass |
 
 **Finding**: Step 3.1 **PASS**. Home.razor fully implements all required workflow elements with proper state management, async handling, and error/success rendering.

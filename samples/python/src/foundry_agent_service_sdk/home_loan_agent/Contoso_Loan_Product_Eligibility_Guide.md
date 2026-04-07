@@ -7,10 +7,10 @@ products they may qualify for.
 
 ## Table of Contents
 
-1. [Credit Score Tiers & Minimum Requirements](#credit-score-tiers--minimum-requirements)
-2. [Loan Product Matrix](#loan-product-matrix)
-3. [Detailed Product Guidelines](#detailed-product-guidelines)
-4. [Frequently Asked Questions](#frequently-asked-questions)
+1. [Credit Score Tiers & Minimum Requirements](#1-credit-score-tiers--minimum-requirements)
+2. [Loan Product Matrix](#2-loan-product-matrix)
+3. [Detailed Product Guidelines](#3-detailed-product-guidelines)
+4. [Frequently Asked Questions](#4-frequently-asked-questions)
 
 ## 1. Credit Score Tiers & Minimum Requirements
 
