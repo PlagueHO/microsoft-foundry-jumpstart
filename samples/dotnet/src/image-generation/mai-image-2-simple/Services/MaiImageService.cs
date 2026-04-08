@@ -1,31 +1,33 @@
 using MaiImage2Simple.Models;
 using Microsoft.Extensions.Options;
-using OpenAI;
-using OpenAI.Images;
-using System.ClientModel;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 
 namespace MaiImage2Simple.Services;
 
-#pragma warning disable OPENAI001
-
 /// <summary>
-/// Calls MAI image generation over the OpenAI Images client.
+/// Calls MAI image generation over the MAI REST API.
 /// </summary>
 public sealed class MaiImageService : IMaiImageService
 {
     private const int MinimumDimension = 768;
     private const int MaximumArea = 1_048_576;
 
+    private readonly HttpClient _httpClient;
     private readonly MicrosoftFoundryOptions _options;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MaiImageService"/> class.
     /// </summary>
+    /// <param name="httpClient">HTTP client used for MAI requests.</param>
     /// <param name="options">Foundry configuration values.</param>
-    public MaiImageService(IOptions<MicrosoftFoundryOptions> options)
+    public MaiImageService(HttpClient httpClient, IOptions<MicrosoftFoundryOptions> options)
     {
+        ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(options);
 
+        _httpClient = httpClient;
         _options = options.Value;
     }
 
@@ -58,46 +60,120 @@ public sealed class MaiImageService : IMaiImageService
             return MaiImageResult.Failure("The configured Foundry resource endpoint is invalid.");
         }
 
+        var endpointUri = NormalizeMaiEndpoint(resourceUri);
+
         if (string.IsNullOrWhiteSpace(_options.ApiKey))
         {
             return MaiImageResult.Failure("Set MicrosoftFoundry:ApiKey before generating images.");
         }
 
-        var size = request.Width switch
+        var payload = new MaiImageGenerationRequestDto
         {
-            1024 when request.Height == 1024 => GeneratedImageSize.W1024xH1024,
-            1024 when request.Height == 1536 => GeneratedImageSize.W1024xH1536,
-            1536 when request.Height == 1024 => GeneratedImageSize.W1536xH1024,
-            _ => GeneratedImageSize.W1024xH1024,
+            Model = _options.ImageDeployment,
+            Prompt = request.Prompt,
+            Width = request.Width,
+            Height = request.Height,
         };
 
-        ImageClient client = new(
-            credential: new ApiKeyCredential(_options.ApiKey),
-            model: _options.ImageDeployment,
-            options: new OpenAIClientOptions
-            {
-                Endpoint = resourceUri,
-            });
+        var payloadJson = JsonSerializer.Serialize(payload);
+        var payloadBytes = Encoding.UTF8.GetBytes(payloadJson);
+        using var content = new ByteArrayContent(payloadBytes);
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, endpointUri);
+        requestMessage.Headers.Add("api-key", _options.ApiKey);
+        requestMessage.Content = content;
 
         try
         {
-            var result = await client.GenerateImageAsync(
-                request.Prompt,
-                new ImageGenerationOptions { Size = size },
-                cancellationToken: cancellationToken).ConfigureAwait(false);
+            using var response = await _httpClient.SendAsync(requestMessage, cancellationToken)
+                .ConfigureAwait(false);
 
-            var bytes = result.Value.ImageBytes;
-            if (bytes is null || bytes.ToArray().Length == 0)
+            var responseText = await response.Content.ReadAsStringAsync(cancellationToken)
+                .ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var apiMessage = TryReadApiErrorMessage(responseText);
+                var statusCode = (int)response.StatusCode;
+
+                if (statusCode == 404 ||
+                    (apiMessage?.Contains("unknown_model", StringComparison.OrdinalIgnoreCase) ?? false))
+                {
+                    return MaiImageResult.Failure(
+                        "Unknown model or deployment. Use the exact deployment name from Foundry Deployments.",
+                        statusCode);
+                }
+
+                return MaiImageResult.Failure(
+                    apiMessage ?? "Image generation request failed.",
+                    statusCode);
+            }
+
+            MaiImageGenerationResponseDto? responseDto;
+            try
+            {
+                responseDto = JsonSerializer.Deserialize<MaiImageGenerationResponseDto>(responseText);
+            }
+            catch (JsonException)
+            {
+                return MaiImageResult.Failure("The service returned an unexpected response format.");
+            }
+
+            var base64 = responseDto?.Data.FirstOrDefault()?.Base64Json;
+            if (string.IsNullOrWhiteSpace(base64))
             {
                 return MaiImageResult.Failure("The service did not return an image payload.");
             }
 
-            var base64 = Convert.ToBase64String(bytes.ToArray());
             return MaiImageResult.Success(base64);
         }
         catch (Exception ex)
         {
             return MaiImageResult.Failure($"Image generation failed: {ex.Message}");
+        }
+    }
+
+    private static Uri NormalizeMaiEndpoint(Uri resourceUri)
+    {
+        var uriBuilder = new UriBuilder(resourceUri);
+
+        if (uriBuilder.Host.EndsWith(".openai.azure.com", StringComparison.OrdinalIgnoreCase))
+        {
+            uriBuilder.Host = uriBuilder.Host.Replace(
+                ".openai.azure.com",
+                ".services.ai.azure.com",
+                StringComparison.OrdinalIgnoreCase);
+        }
+
+        return new Uri(uriBuilder.Uri, "/mai/v1/images/generations");
+    }
+
+    private static string? TryReadApiErrorMessage(string responseText)
+    {
+        if (string.IsNullOrWhiteSpace(responseText))
+        {
+            return null;
+        }
+
+        try
+        {
+            var error = JsonSerializer.Deserialize<MaiErrorEnvelopeDto>(responseText);
+            if (string.IsNullOrWhiteSpace(error?.Error?.Message))
+            {
+                return null;
+            }
+
+            if (string.IsNullOrWhiteSpace(error.Error.Code))
+            {
+                return error.Error.Message;
+            }
+
+            return $"{error.Error.Message} ({error.Error.Code})";
+        }
+        catch (JsonException)
+        {
+            return null;
         }
     }
 }

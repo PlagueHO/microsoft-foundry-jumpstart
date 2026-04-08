@@ -14,7 +14,7 @@ builder.Services.AddOptions<MicrosoftFoundryOptions>()
         options => options.DefaultWidth * options.DefaultHeight <= 1_048_576,
         "MicrosoftFoundry:DefaultWidth * DefaultHeight must be <= 1048576 for MAI-Image-2.")
     .ValidateOnStart();
-builder.Services.AddScoped<IMaiImageService, MaiImageService>();
+builder.Services.AddHttpClient<IMaiImageService, MaiImageService>();
 
 var app = builder.Build();
 

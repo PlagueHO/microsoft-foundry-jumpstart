@@ -29,8 +29,6 @@ public sealed class MicrosoftFoundryOptions
     /// <summary>
     /// Gets or sets the API key used to call the image model deployment.
     /// </summary>
-    [Required]
-    [MinLength(1)]
     public string ApiKey { get; set; } = string.Empty;
 
     /// <summary>
