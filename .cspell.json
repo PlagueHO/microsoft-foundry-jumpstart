@@ -75,7 +75,19 @@
     "aifhp",
     "aisvc",
     "agentic",
-    "Entra"
+    "Entra",
+    "apim",
+    "vnet",
+    "serverfarm",
+    "dotnetcore",
+    "eastus",
+    "australiaeast",
+    "managedhsm",
+    "blocklist",
+    "blocklists",
+    "ntts",
+    "customstt",
+    "workflow_dispatch"
   ],
   "ignorePaths": [
     "node_modules/**",

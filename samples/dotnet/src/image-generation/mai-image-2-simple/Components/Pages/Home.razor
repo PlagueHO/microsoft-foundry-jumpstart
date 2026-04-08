@@ -7,9 +7,22 @@
 
 <PageTitle>MAI Image Generator</PageTitle>
 
-<h1>MAI Image Generator</h1>
+<h1>MAI-Image-2 Image Generator</h1>
 
 <p>Enter a prompt, choose an output size, and generate an image.</p>
+
+<section class="alert alert-info" role="note">
+	<h2 class="h5">Configure Foundry connection</h2>
+	<p class="mb-2">Set these values in appsettings.json or environment variables before running.</p>
+	<ul class="mb-2">
+		<li>Endpoint: use your Azure OpenAI-compatible endpoint, for example https://msf-foundrysandbox.openai.azure.com/openai/v1/</li>
+		<li>Deployment: set your model deployment name, for example MAI-Image-2</li>
+		<li>API key: set the key from your Foundry resource</li>
+	</ul>
+	<pre class="mb-0"><code>MicrosoftFoundry__ResourceEndpoint=https://msf-foundrysandbox.openai.azure.com/openai/v1/
+MicrosoftFoundry__ImageDeployment=MAI-Image-2
+MicrosoftFoundry__ApiKey=&lt;your-api-key&gt;</code></pre>
+</section>
 
 <EditForm Model="request" OnSubmit="GenerateImageAsync" class="image-form">
 	<div class="mb-3">

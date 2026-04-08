@@ -27,6 +27,13 @@ public sealed class MicrosoftFoundryOptions
     public string ImageDeployment { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the API key used to call the image model deployment.
+    /// </summary>
+    [Required]
+    [MinLength(1)]
+    public string ApiKey { get; set; } = string.Empty;
+
+    /// <summary>
     /// Gets or sets the default output width in pixels.
     /// </summary>
     [Range(768, 8192)]

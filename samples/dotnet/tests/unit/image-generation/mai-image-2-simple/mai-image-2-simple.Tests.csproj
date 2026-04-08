@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\blazor\mai-image-2-simple\mai-image-2-simple.csproj" />
+    <ProjectReference Include="..\..\..\..\src\image-generation\mai-image-2-simple\mai-image-2-simple.csproj" />
   </ItemGroup>
 
 </Project>

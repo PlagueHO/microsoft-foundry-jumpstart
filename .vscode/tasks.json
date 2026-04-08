@@ -237,6 +237,246 @@
             }
         },
         {
+            "label": "dotnet: run: AzureArchitect: Step01",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/AzureArchitect/AzureArchitect_Step01_Simple"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: AzureArchitect: Step02a",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/AzureArchitect/AzureArchitect_Step02a_Foundry_Agent_SingleTurn"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: AzureArchitect: Step02b",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/AzureArchitect/AzureArchitect_Step02b_Foundry_Agent_MultiturnConversation"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: AzureArchitect: Step02c",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/AzureArchitect/AzureArchitect_Step02c_Foundry_Agent_PrebuiltAgent"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: AzureArchitect: Step03",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/AzureArchitect/AzureArchitect_Step03_UsingFunctionTools"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: AzureArchitect: Step04",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/AzureArchitect/AzureArchitect_Step04_UsingFunctionToolsWithApprovals"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: AzureArchitect: Step05",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/AzureArchitect/AzureArchitect_Step05_MCPServer"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: AzureArchitect: Step06",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/AzureArchitect/AzureArchitect_Step06_UsingImages"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: AzureArchitect: Step07",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/AzureArchitect/AzureArchitect_Step07_Workflows"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: AzureArchitect: Step08",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/AzureArchitect/AzureArchitect_Step08_HybridToolCalling"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: AgentPersistence: Step01",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/AgentPersistence/AgentPersistence_Step01_UnpublishedAgent"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: AgentPersistence: Step02",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/AgentPersistence/AgentPersistence_Step02_PublishedWithCosmosDB"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: AgentFramework: DocumentClassifierWorkflow",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/DocumentClassifierWorkflow"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: Orchestrator: AppHost",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/orchestrator/AppHost"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: SemanticKernel: HomeLoanAgent",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/semantic-kernel/home-loan-agent"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
+            "label": "dotnet: run: ImageGeneration: mai-image-2-simple",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/image-generation/mai-image-2-simple"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
             "label": "dotnet: test (unit)",
             "type": "shell",
             "command": "dotnet",

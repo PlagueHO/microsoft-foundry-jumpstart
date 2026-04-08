@@ -4,9 +4,9 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Folder Name="/blazor/">
-    <Project Path="src/blazor/mai-image-2-simple/mai-image-2-simple.csproj" />
-    <Project Path="tests/unit/blazor/mai-image-2-simple/mai-image-2-simple.Tests.csproj" />
+  <Folder Name="/image-generation/">
+    <Project Path="src/image-generation/mai-image-2-simple/mai-image-2-simple.csproj" />
+    <Project Path="tests/unit/image-generation/mai-image-2-simple/mai-image-2-simple.Tests.csproj" />
   </Folder>
   <Folder Name="/orchestrator/">
     <Project Path="src/orchestrator/AppHost/AppHost.csproj" />
