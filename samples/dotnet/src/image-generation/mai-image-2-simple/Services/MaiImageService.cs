@@ -1,3 +1,4 @@
+using Azure.Core;
 using MaiImage2Simple.Models;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
@@ -16,19 +17,26 @@ public sealed class MaiImageService : IMaiImageService
 
     private readonly HttpClient _httpClient;
     private readonly MicrosoftFoundryOptions _options;
+    private readonly TokenCredential _credential;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MaiImageService"/> class.
     /// </summary>
     /// <param name="httpClient">HTTP client used for MAI requests.</param>
     /// <param name="options">Foundry configuration values.</param>
-    public MaiImageService(HttpClient httpClient, IOptions<MicrosoftFoundryOptions> options)
+    /// <param name="credential">Token credential used when no API key is configured.</param>
+    public MaiImageService(
+        HttpClient httpClient,
+        IOptions<MicrosoftFoundryOptions> options,
+        TokenCredential credential)
     {
         ArgumentNullException.ThrowIfNull(httpClient);
         ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(credential);
 
         _httpClient = httpClient;
         _options = options.Value;
+        _credential = credential;
     }
 
     /// <inheritdoc/>
@@ -62,27 +70,32 @@ public sealed class MaiImageService : IMaiImageService
 
         var endpointUri = NormalizeMaiEndpoint(resourceUri);
 
-        if (string.IsNullOrWhiteSpace(_options.ApiKey))
-        {
-            return MaiImageResult.Failure("Set MicrosoftFoundry:ApiKey before generating images.");
-        }
-
-        var payload = new MaiImageGenerationRequestDto
-        {
-            Model = _options.ImageDeployment,
-            Prompt = request.Prompt,
-            Width = request.Width,
-            Height = request.Height,
-        };
-
-        var payloadJson = JsonSerializer.Serialize(payload);
-        var payloadBytes = Encoding.UTF8.GetBytes(payloadJson);
+        var payloadBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(
+            new MaiImageGenerationRequestDto
+            {
+                Model = !string.IsNullOrWhiteSpace(request.Deployment)
+                    ? request.Deployment
+                    : _options.ImageDeployment,
+                Prompt = request.Prompt,
+                Width = request.Width,
+                Height = request.Height,
+            }));
         using var content = new ByteArrayContent(payloadBytes);
         content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
         using var requestMessage = new HttpRequestMessage(HttpMethod.Post, endpointUri);
-        requestMessage.Headers.Add("api-key", _options.ApiKey);
         requestMessage.Content = content;
+
+        if (!string.IsNullOrWhiteSpace(_options.ApiKey))
+        {
+            requestMessage.Headers.Add("api-key", _options.ApiKey);
+        }
+        else
+        {
+            var tokenContext = new TokenRequestContext(["https://cognitiveservices.azure.com/.default"]);
+            var token = await _credential.GetTokenAsync(tokenContext, cancellationToken).ConfigureAwait(false);
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
+        }
 
         try
         {

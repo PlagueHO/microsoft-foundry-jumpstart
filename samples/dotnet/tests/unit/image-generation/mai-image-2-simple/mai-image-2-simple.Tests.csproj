@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.18.0-beta.2" />
     <PackageReference Include="FluentAssertions" Version="7.0.0" />
   </ItemGroup>
 

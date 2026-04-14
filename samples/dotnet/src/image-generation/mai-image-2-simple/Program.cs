@@ -1,3 +1,5 @@
+using Azure.Core;
+using Azure.Identity;
 using MaiImage2Simple.Components;
 using MaiImage2Simple.Models;
 using MaiImage2Simple.Services;
@@ -14,6 +16,7 @@ builder.Services.AddOptions<MicrosoftFoundryOptions>()
         options => options.DefaultWidth * options.DefaultHeight <= 1_048_576,
         "MicrosoftFoundry:DefaultWidth * DefaultHeight must be <= 1048576 for MAI-Image-2.")
     .ValidateOnStart();
+builder.Services.AddSingleton<TokenCredential>(new DefaultAzureCredential());
 builder.Services.AddHttpClient<IMaiImageService, MaiImageService>();
 
 var app = builder.Build();

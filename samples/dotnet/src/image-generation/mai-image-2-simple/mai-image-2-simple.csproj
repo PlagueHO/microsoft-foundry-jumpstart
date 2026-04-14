@@ -9,4 +9,8 @@
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.18.0-beta.2" />
+  </ItemGroup>
+
 </Project>

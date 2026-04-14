@@ -42,4 +42,9 @@ public sealed class MicrosoftFoundryOptions
     /// </summary>
     [Range(768, 8192)]
     public int DefaultHeight { get; set; } = 1024;
+
+    /// <summary>
+    /// Gets or sets the list of available image model deployments offered in the UI selector.
+    /// </summary>
+    public IList<string> AvailableDeployments { get; set; } = ["mai-image-2", "mai-image-2e"];
 }

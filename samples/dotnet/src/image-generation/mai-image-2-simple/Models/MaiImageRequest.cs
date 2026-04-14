@@ -19,4 +19,10 @@ public sealed class MaiImageRequest
     /// Gets or sets the output height in pixels.
     /// </summary>
     public int Height { get; set; }
+
+    /// <summary>
+    /// Gets or sets the deployment name to use, overriding the configured default.
+    /// When null or empty, the value from <c>MicrosoftFoundry:ImageDeployment</c> is used.
+    /// </summary>
+    public string? Deployment { get; set; }
 }
