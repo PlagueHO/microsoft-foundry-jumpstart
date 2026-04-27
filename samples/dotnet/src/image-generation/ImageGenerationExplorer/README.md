@@ -46,8 +46,8 @@ Each model requires its own endpoint URL. Edit `appsettings.json` in this projec
     "ApiKey": "",
     "Models": [
       {
-        "DeploymentName": "mai-image-2-1",
-        "DisplayName": "MAI Image 2",
+        "DeploymentName": "mai-image-2e-1",
+        "DisplayName": "MAI Image 2e",
         "ApiType": "Mai",
         "Endpoint": "https://<resource>.services.ai.azure.com",
         "DefaultWidth": 1024,
@@ -57,14 +57,26 @@ Each model requires its own endpoint URL. Edit `appsettings.json` in this projec
         "Enabled": true
       },
       {
-        "DeploymentName": "gpt-image-1",
-        "DisplayName": "GPT Image",
+        "DeploymentName": "gpt-image-1.5-1",
+        "DisplayName": "GPT Image 1.5",
         "ApiType": "OpenAi",
         "Endpoint": "https://<resource>.openai.azure.com",
         "DefaultWidth": 1024,
         "DefaultHeight": 1024,
         "MaxWidth": 1792,
         "MaxHeight": 1792,
+        "Enabled": true
+      },
+      ,
+      {
+        "DeploymentName": "gpt-image-2-1",
+        "DisplayName": "GPT Image 2",
+        "ApiType": "OpenAi",
+        "Endpoint": "https://<resource>.openai.azure.com",
+        "DefaultWidth": 1024,
+        "DefaultHeight": 1024,
+        "MaxWidth": 4096,
+        "MaxHeight": 4096,
         "Enabled": true
       }
     ]
@@ -87,7 +99,4 @@ From the `samples/dotnet` directory:
 dotnet run --project src/image-generation/ImageGenerationExplorer
 ```
 
-Open the URL shown in the terminal output. The app is available at `https://localhost:7201` by default.
-
-> [!NOTE]
-> If you run both this app and the `image-gen-explorer` sample at the same time, they use different ports (5134/7201 vs 5133/7200) so there is no conflict.
+Open the URL shown in the terminal output. The app is available at `ttp://localhost:5134` by default.
