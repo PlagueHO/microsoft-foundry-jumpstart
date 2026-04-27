@@ -1,4 +1,7 @@
 <Project>
+  <!-- Chain to root Directory.Build.props to inherit shared NuGet audit suppressions -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
   <PropertyGroup>
     <!-- Shared settings for all Agent Persistence samples -->
     <LangVersion>latest</LangVersion>

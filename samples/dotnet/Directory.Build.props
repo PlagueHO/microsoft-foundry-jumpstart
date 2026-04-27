@@ -1,0 +1,15 @@
+<Project>
+
+  <!--
+    NuGet audit suppressions for transitive dependencies with known moderate vulnerabilities.
+    These are development-time sample projects — the affected packages are not used in
+    production workloads and the vulnerabilities are not exploitable in this context.
+  -->
+  <ItemGroup>
+    <!-- OpenTelemetry.Api (transitive): https://github.com/advisories/GHSA-g94r-2vxg-569j -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-g94r-2vxg-569j" />
+    <!-- KubernetesClient (transitive via Aspire.Hosting.AppHost): https://github.com/advisories/GHSA-w7r3-mgwf-4mqq -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-w7r3-mgwf-4mqq" />
+  </ItemGroup>
+
+</Project>

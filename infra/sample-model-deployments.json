@@ -41,7 +41,7 @@
       "name": "MAI-Image-2",
       "version": "2026-02-20"
     },
-    "name": "mai-image-2",
+    "name": "mai-image-2-1",
     "sku": {
       "name": "GlobalStandard",
       "capacity": 9
@@ -51,12 +51,24 @@
     "model": {
       "format": "OpenAI",
       "name": "MAI-Image-2e",
-      "version": "2026-04-15"
+      "version": "2026-04-09"
     },
-    "name": "mai-image-2e",
+    "name": "mai-image-2e-1",
     "sku": {
       "name": "GlobalStandard",
       "capacity": 9
+    }
+  },
+  {
+    "model": {
+      "format": "OpenAI",
+      "name": "gpt-image-2",
+      "version": "2026-04-21"
+    },
+    "name": "gpt-image-2-1",
+    "sku": {
+      "name": "GlobalStandard",
+      "capacity": 2
     }
   }
 ]

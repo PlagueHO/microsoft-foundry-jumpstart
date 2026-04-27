@@ -1,0 +1,284 @@
+@page "/"
+@rendermode InteractiveServer
+@using ImageGenerationExplorer.Models
+@using ImageGenerationExplorer.Services
+@inject ImageComparisonService ComparisonService
+@inject Microsoft.Extensions.Options.IOptions<ImageGenerationExplorerOptions> ExplorerOptions
+
+<PageTitle>Image Comparison — Image Generation Explorer</PageTitle>
+
+<MudAlert Severity="Severity.Info" Class="mb-4" Variant="Variant.Outlined">
+    <MudText Typo="Typo.body2"><strong>Configure Foundry connection</strong></MudText>
+    <MudText Typo="Typo.body2" Class="mb-2">
+        Set these values in appsettings.json or environment variables before running.
+    </MudText>
+    <MudList T="string" Dense="true">
+        <MudListItem T="string"><strong>Endpoint:</strong> set per model in appsettings.json (e.g. MAI: <code>https://&lt;resource&gt;.services.ai.azure.com</code>, OpenAI: <code>https://&lt;resource&gt;.openai.azure.com</code>)</MudListItem>
+        <MudListItem T="string"><strong>API key:</strong> set the key, or leave empty for <strong>DefaultAzureCredential</strong></MudListItem>
+    </MudList>
+    <MudText Typo="Typo.caption" Class="mt-2" Style="font-family: monospace;">
+        ImageGenerationExplorer__ApiKey=&lt;your-api-key-or-leave-empty-for-managed-identity&gt;
+    </MudText>
+</MudAlert>
+
+<MudTextField T="string"
+              @bind-Value="prompt"
+              Label="Prompt"
+              Placeholder="Example: A watercolor landscape at sunrise"
+              Lines="3"
+              MaxLength="4000"
+              Variant="Variant.Outlined"
+              FullWidth="true"
+              Required="true"
+              Class="mb-2" />
+
+<div class="d-flex align-center gap-3 mb-4">
+    <MudSelect T="SamplePrompt?" Label="Sample prompts" Variant="Variant.Outlined"
+               Dense="true" Style="max-width: 280px;"
+               Value="_selectedSample"
+               ValueChanged="OnSamplePromptSelected">
+        @foreach (var sample in SamplePrompts)
+        {
+            <MudSelectItem T="SamplePrompt?" Value="sample">@sample.Description</MudSelectItem>
+        }
+    </MudSelect>
+    <MudSpacer />
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="GenerateComparisonAsync"
+               Disabled="isGenerating" StartIcon="@Icons.Material.Filled.AutoAwesome">
+        @if (isGenerating)
+        {
+            <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+            <span>Generating...</span>
+        }
+        else
+        {
+            <span>Generate comparison</span>
+        }
+    </MudButton>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <MudAlert Severity="Severity.Error" Class="mb-3" ShowCloseIcon="true"
+              CloseIconClicked="() => errorMessage = null">
+        @errorMessage
+    </MudAlert>
+}
+
+<MudTable T="ModelState" Items="modelStates" Dense="true" Outlined="true" Elevation="0"
+         Loading="isGenerating" LoadingProgressColor="Color.Primary"
+         FixedHeader="true" HorizontalScrollbar="true">
+    <HeaderContent>
+        <MudTh Style="width: 200px; min-width: 200px; max-width: 200px; position: sticky; left: 0; z-index: 2; background: var(--mud-palette-surface); border-right: 2px solid var(--mud-palette-lines-default);">
+            Model
+        </MudTh>
+        @foreach (var run in comparisons)
+        {
+            <MudTh Style="width: 510px; min-width: 510px; max-width: 510px; text-align: center; border-right: 2px solid var(--mud-palette-lines-default);">
+                <div class="d-flex flex-column align-center">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                        @run.Timestamp.LocalDateTime.ToString("HH:mm:ss")
+                    </MudText>
+                    <MudText Typo="Typo.caption" Class="mud-text-truncate" Style="max-width: 480px;">
+                        @run.Prompt
+                    </MudText>
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small"
+                                   Color="Color.Error" OnClick="() => comparisons.Remove(run)" />
+                </div>
+            </MudTh>
+        }
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd Style="width: 200px; min-width: 200px; max-width: 200px; position: sticky; left: 0; z-index: 1; background: var(--mud-palette-surface); vertical-align: top; border-right: 2px solid var(--mud-palette-lines-default); overflow-wrap: break-word;">
+            <MudCheckBox T="bool" @bind-Value="context.Enabled" Dense="true"
+                         Label="@context.Config.DisplayName" Class="mb-1" />
+            <MudNumericField T="int" @bind-Value="context.Width"
+                             Label="W" Variant="Variant.Outlined"
+                             Min="256" Max="context.Config.MaxWidth" Step="64"
+                             Disabled="!context.Enabled" Margin="Margin.Dense"
+                             Class="mb-1" />
+            <MudNumericField T="int" @bind-Value="context.Height"
+                             Label="H" Variant="Variant.Outlined"
+                             Min="256" Max="context.Config.MaxHeight" Step="64"
+                             Disabled="!context.Enabled" Margin="Margin.Dense" />
+        </MudTd>
+        @foreach (var run in comparisons)
+        {
+            var result = run.Results.FirstOrDefault(r => r.DeploymentName == context.Config.DeploymentName);
+            var wasEnabled = run.EnabledDeployments.Contains(context.Config.DeploymentName);
+            <MudTd Style="width: 510px; min-width: 510px; max-width: 510px; vertical-align: top; text-align: center; border-right: 2px solid var(--mud-palette-lines-default);">
+                @if (result is null && wasEnabled)
+                {
+                    <div class="d-flex justify-center align-center" style="min-height: 200px;">
+                        <MudProgressCircular Indeterminate="true" Size="Size.Large" />
+                    </div>
+                }
+                else if (result is not null && result.IsSuccess && !string.IsNullOrWhiteSpace(result.Base64Image))
+                {
+                    <MudImage Src="@($"data:image/png;base64,{result.Base64Image}")" 
+                              Alt="@($"Generated by {result.DisplayName}")"
+                              Fluid="true" Class="rounded" Style="max-width: 500px;" />
+                    <div class="d-flex justify-center gap-2 mt-1">
+                        <MudChip T="string" Size="Size.Small" Color="Color.Success" Variant="Variant.Filled">
+                            @(result.ElapsedMs)ms
+                        </MudChip>
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">
+                            @(result.Width)×@(result.Height)
+                        </MudText>
+                    </div>
+                }
+                else if (result is not null)
+                {
+                    <MudAlert Severity="Severity.Error" Dense="true" Class="mb-0">
+                        @(result.ErrorMessage ?? "Generation failed.")
+                        @if (result.StatusCode.HasValue)
+                        {
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Class="ml-1">
+                                HTTP @result.StatusCode
+                            </MudChip>
+                        }
+                    </MudAlert>
+                    <MudChip T="string" Size="Size.Small" Color="Color.Error" Variant="Variant.Filled" Class="mt-1">
+                        @(result.ElapsedMs)ms
+                    </MudChip>
+                }
+                else
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">&mdash;</MudText>
+                }
+            </MudTd>
+        }
+    </RowTemplate>
+</MudTable>
+
+@code {
+    private string prompt = string.Empty;
+    private bool isGenerating;
+    private string? errorMessage;
+    private SamplePrompt? _selectedSample;
+    private readonly List<ComparisonRun> comparisons = [];
+    private readonly List<ModelState> modelStates = [];
+
+    private static readonly IReadOnlyList<SamplePrompt> SamplePrompts =
+    [
+        new(
+            "Vampire descending castle stairs",
+            "A photograph of a tall, elegant figure wearing a fitted vest of rich scarlet above a crisp white shirt, each ornate fastening meticulously buttoned. his long, velvet-black cloak whispering through the air behind him flickering light of the torches dances across his pale skin, his crimson eyes glinting like rubies. He has long black hair. He descends a medieval castle staircase in a grand entrance stone hall."),
+        new(
+            "Cyberpunk city at night",
+            "A rain-slicked cyberpunk megacity at night, towering neon-lit skyscrapers reflected in flooded streets, holographic advertisements flickering above crowded market stalls, thick fog rolling between concrete pillars, cinematic wide-angle shot, photorealistic."),
+        new(
+            "Cosy autumn reading nook",
+            "A warm, cosy reading nook beside a stone fireplace, a ginger tabby cat curled on a plaid blanket, shelves of worn leather-bound books, a steaming mug on the armrest, amber lamplight, falling autumn leaves visible through a rain-streaked window."),
+        new(
+            "Bioluminescent forest at midnight",
+            "An ancient forest at midnight where every mushroom, fern and moss glows with soft blue and violet bioluminescence, twisted tree roots weaving through glowing undergrowth, fireflies drifting through the mist, magical realism, ultra-detailed digital art."),
+        new(
+            "Astronaut floating above Earth",
+            "An astronaut in a white EVA spacesuit floating freely above the curved horizon of Earth, the ISS visible in the background, sunlight glinting off the visor, stars filling the void of space, highly detailed photorealistic render."),
+        new(
+            "Japanese tea garden in autumn",
+            "A tranquil traditional Japanese tea garden in peak autumn, crimson and gold maple leaves carpeting a stone path, a weathered stone lantern beside a koi pond, a small wooden teahouse with shoji screens, soft morning mist, ink-wash painting style."),
+        new(
+            "Tropical coral reef",
+            "A vibrant shallow tropical coral reef teeming with life, schools of neon clownfish and parrotfish weaving through staghorn coral, sunbeams piercing the crystal-clear turquoise water, sea turtles gliding overhead, underwater photography, ultra-high detail."),
+        new(
+            "Steampunk clockwork dragon",
+            "A colossal steampunk dragon constructed from interlocking brass gears, copper pipes and riveted iron plates, jets of steam billowing from vents along its spine, glowing amber eyes, perched atop a Victorian clock tower at dusk, concept art, dramatic lighting."),
+        new(
+            "Mountain peak at golden hour",
+            "The snow-dusted summit of a jagged mountain at golden hour, alpenglow painting the peaks deep rose and amber, a lone pine silhouetted against a vast dramatic sky streaked with violet clouds, sweeping landscape photography, long exposure."),
+        new(
+            "Mediterranean coastal village",
+            "A sunlit Mediterranean coastal village tumbling down white-washed cliffs to a turquoise bay, terracotta roof tiles, bougainvillea cascading over balconies, fishing boats bobbing in the harbour, watercolour painting style, soft pastel palette."),
+    ];
+
+    private void OnSamplePromptSelected(SamplePrompt? sample)
+    {
+        _selectedSample = sample;
+        if (sample is not null)
+        {
+            prompt = sample.Text;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        var options = ExplorerOptions.Value;
+        foreach (var model in options.Models)
+        {
+            modelStates.Add(new ModelState
+            {
+                Config = model,
+                Enabled = model.Enabled,
+                Width = model.DefaultWidth,
+                Height = model.DefaultHeight,
+            });
+        }
+    }
+
+    private async Task GenerateComparisonAsync()
+    {
+        if (isGenerating)
+        {
+            return;
+        }
+
+        errorMessage = null;
+
+        var enabledModels = modelStates
+            .Where(m => m.Enabled)
+            .Select(m => (m.Config, m.Width, m.Height))
+            .ToList();
+
+        if (enabledModels.Count == 0)
+        {
+            errorMessage = "Enable at least one model to generate a comparison.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(prompt))
+        {
+            errorMessage = "Enter a prompt before generating.";
+            return;
+        }
+
+        isGenerating = true;
+
+        try
+        {
+            // Insert a placeholder run immediately so the column appears
+            var placeholderRun = new ComparisonRun
+            {
+                Prompt = prompt,
+                Results = [],
+                EnabledDeployments = enabledModels.Select(m => m.Config.DeploymentName).ToHashSet(),
+            };
+            comparisons.Insert(0, placeholderRun);
+            StateHasChanged();
+
+            var run = await ComparisonService.CompareAsync(prompt, enabledModels);
+
+            // Replace the placeholder with the completed results
+            placeholderRun.Results = run.Results;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Comparison failed: {ex.Message}";
+        }
+        finally
+        {
+            isGenerating = false;
+        }
+    }
+
+    private sealed class ModelState
+    {
+        public required ImageModelConfig Config { get; init; }
+        public bool Enabled { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
+
+    private sealed record SamplePrompt(string Description, string Text);
+}

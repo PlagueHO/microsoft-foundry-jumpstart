@@ -5,8 +5,7 @@
     <Platform Name="x86" />
   </Configurations>
   <Folder Name="/image-generation/">
-    <Project Path="src/image-generation/mai-image-2-simple/mai-image-2-simple.csproj" />
-    <Project Path="tests/unit/image-generation/mai-image-2-simple/mai-image-2-simple.Tests.csproj" />
+    <Project Path="src/image-generation/ImageGenerationExplorer/ImageGenerationExplorer.csproj" />
   </Folder>
   <Folder Name="/orchestrator/">
     <Project Path="src/orchestrator/AppHost/AppHost.csproj" />

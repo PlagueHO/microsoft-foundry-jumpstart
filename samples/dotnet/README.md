@@ -54,7 +54,7 @@ dotnet/
 
 ### Image Generation
 
-- **mai-image-2-simple** - Minimal prompt-to-image sample using MAI-Image-2 and DefaultAzureCredential
+- **image-gen-explorer** - Image generation explorer with parallel model comparison across MAI-Image-2, MAI-Image-2e, and gpt-image-2
 
 ## Running Tests
 

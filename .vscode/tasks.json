@@ -147,8 +147,12 @@
         {
             "label": "dotnet: test",
             "type": "shell",
-            "command": "dotnet",
-            "args": ["test", "microsoft-foundry-jumpstart-samples.slnx", "--no-build"],
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-Command",
+                "$failed = 0; Get-ChildItem -Path tests -Recurse -Filter '*.Tests.csproj' | ForEach-Object { dotnet run --project $_.FullName --no-build; if ($LASTEXITCODE -ne 0) { $failed++ } }; exit $failed"
+            ],
             "options": {
                 "cwd": "${workspaceFolder}/samples/dotnet"
             },
@@ -166,8 +170,12 @@
         {
             "label": "dotnet: test (watch)",
             "type": "shell",
-            "command": "dotnet",
-            "args": ["watch", "test", "microsoft-foundry-jumpstart-samples.slnx"],
+            "command": "pwsh",
+            "args": [
+                "-NoProfile",
+                "-Command",
+                "$failed = 0; Get-ChildItem -Path tests -Recurse -Filter '*.Tests.csproj' | ForEach-Object { dotnet watch run --project $_.FullName; if ($LASTEXITCODE -ne 0) { $failed++ } }; exit $failed"
+            ],
             "options": {
                 "cwd": "${workspaceFolder}/samples/dotnet"
             },
@@ -462,10 +470,10 @@
             }
         },
         {
-            "label": "dotnet: run: ImageGeneration: mai-image-2-simple",
+            "label": "dotnet: run: ImageGeneration: ImageGenerationExplorer",
             "type": "shell",
             "command": "dotnet",
-            "args": ["run", "--project", "src/image-generation/mai-image-2-simple"],
+            "args": ["run", "--project", "src/image-generation/ImageGenerationExplorer"],
             "options": {
                 "cwd": "${workspaceFolder}/samples/dotnet"
             },
@@ -479,22 +487,11 @@
         {
             "label": "dotnet: test (unit)",
             "type": "shell",
-            "command": "dotnet",
+            "command": "pwsh",
             "args": [
-                "test",
-                "--solution",
-                "microsoft-foundry-jumpstart-samples.slnx",
-                "--filter",
-                "TestCategory=Unit",
-                "--configuration",
-                "Release",
-                "--no-restore",
-                "--results-directory",
-                "./TestResults",
-                "--coverage",
-                "--coverage-output-format",
-                "cobertura",
-                "--report-trx"
+                "-NoProfile",
+                "-Command",
+                "$failed = 0; Get-ChildItem -Path tests -Recurse -Filter '*.Tests.csproj' | ForEach-Object { dotnet run --project $_.FullName --no-build --configuration Release -- --filter 'TestCategory=Unit' --results-directory (Join-Path $PWD 'TestResults') --coverage --coverage-output-format cobertura --report-trx; if ($LASTEXITCODE -ne 0) { $failed++ } }; exit $failed"
             ],
             "options": {
                 "cwd": "${workspaceFolder}/samples/dotnet"
