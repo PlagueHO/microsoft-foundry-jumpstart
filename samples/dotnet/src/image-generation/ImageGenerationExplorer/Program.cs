@@ -21,8 +21,10 @@ builder.Services.AddOptions<ImageGenerationExplorerOptions>()
     .ValidateDataAnnotations()
     .ValidateOnStart();
 builder.Services.AddSingleton<TokenCredential>(new DefaultAzureCredential());
-builder.Services.AddHttpClient<IImageGenerationProvider, MaiImageGenerationProvider>();
-builder.Services.AddHttpClient<OpenAiImageGenerationProvider>();
+builder.Services.AddHttpClient<IImageGenerationProvider, MaiImageGenerationProvider>(client =>
+    client.Timeout = TimeSpan.FromMinutes(5));
+builder.Services.AddHttpClient<OpenAiImageGenerationProvider>(client =>
+    client.Timeout = TimeSpan.FromMinutes(5));
 builder.Services.AddSingleton<IImageGenerationProvider>(sp => sp.GetRequiredService<OpenAiImageGenerationProvider>());
 builder.Services.AddTransient<ImageComparisonService>();
 
