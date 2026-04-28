@@ -60,15 +60,15 @@ public sealed class ImageGenerationResult
         int width,
         int height,
         long elapsedMs) => new()
-    {
-        DeploymentName = deploymentName,
-        DisplayName = displayName,
-        IsSuccess = true,
-        Base64Image = base64Image,
-        Width = width,
-        Height = height,
-        ElapsedMs = elapsedMs,
-    };
+        {
+            DeploymentName = deploymentName,
+            DisplayName = displayName,
+            IsSuccess = true,
+            Base64Image = base64Image,
+            Width = width,
+            Height = height,
+            ElapsedMs = elapsedMs,
+        };
 
     /// <summary>
     /// Creates a failed result.
@@ -79,12 +79,12 @@ public sealed class ImageGenerationResult
         string errorMessage,
         long elapsedMs,
         int? statusCode = null) => new()
-    {
-        DeploymentName = deploymentName,
-        DisplayName = displayName,
-        IsSuccess = false,
-        ErrorMessage = errorMessage,
-        ElapsedMs = elapsedMs,
-        StatusCode = statusCode,
-    };
+        {
+            DeploymentName = deploymentName,
+            DisplayName = displayName,
+            IsSuccess = false,
+            ErrorMessage = errorMessage,
+            ElapsedMs = elapsedMs,
+            StatusCode = statusCode,
+        };
 }
