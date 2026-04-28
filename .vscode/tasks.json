@@ -440,6 +440,21 @@
             }
         },
         {
+            "label": "dotnet: run: AgentFramework: DriverSafetyAgent",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["run", "--project", "src/agent-framework/DriverSafetyAgent"],
+            "options": {
+                "cwd": "${workspaceFolder}/samples/dotnet"
+            },
+            "problemMatcher": "$msCompile",
+            "group": "test",
+            "icon": {
+                "id": "play",
+                "color": "terminal.ansiGreen"
+            }
+        },
+        {
             "label": "dotnet: run: Orchestrator: AppHost",
             "type": "shell",
             "command": "dotnet",

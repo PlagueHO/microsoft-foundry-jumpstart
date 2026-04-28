@@ -25,6 +25,7 @@
     <Project Path="src/agent-framework/AgentPersistence/AgentPersistence_Step01_UnpublishedAgent/AgentPersistence_Step01_UnpublishedAgent.csproj" />
     <Project Path="src/agent-framework/AgentPersistence/AgentPersistence_Step02_PublishedWithCosmosDB/AgentPersistence_Step02_PublishedWithCosmosDB.csproj" />
     <Project Path="src/agent-framework/DocumentClassifierWorkflow/DocumentClassifierWorkflow.csproj" />
+    <Project Path="src/agent-framework/DriverSafetyAgent/DriverSafetyAgent.csproj" />
     <Project Path="tests/unit/agent-framework/AzureArchitect/AzureArchitect_Step01_Simple/AzureArchitect_Step01_Simple.Tests.csproj" />
     <Project Path="tests/unit/agent-framework/AzureArchitect/AzureArchitect_Step02a_Foundry_Agent_SingleTurn/AzureArchitect_Step02a_Foundry_Agent_SingleTurn.Tests.csproj" />
     <Project Path="tests/unit/agent-framework/AzureArchitect/AzureArchitect_Step02b_Foundry_Agent_MultiturnConversation/AzureArchitect_Step02b_Foundry_Agent_MultiturnConversation.Tests.csproj" />
