@@ -209,7 +209,7 @@ var foundryServiceProjects = [for project in effectiveProjectList: {
 }]
 
 // ---------- RESOURCE GROUP ----------
-module resourceGroup 'br/public:avm/res/resources/resource-group:0.4.3' = {
+module resourceGroup 'br/public:avm/res/resources/resource-group:0.4.4' = {
   name: 'resource-group-deployment-${location}'
   params: {
     name: effectiveResourceGroupName
@@ -219,7 +219,7 @@ module resourceGroup 'br/public:avm/res/resources/resource-group:0.4.3' = {
 }
 
 // ---------- MONITORING RESOURCES ----------
-module logAnalyticsWorkspace 'br/public:avm/res/operational-insights/workspace:0.15.0' = {
+module logAnalyticsWorkspace 'br/public:avm/res/operational-insights/workspace:0.16.1' = {
   name: 'logAnalytics-workspace-deployment'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -230,7 +230,7 @@ module logAnalyticsWorkspace 'br/public:avm/res/operational-insights/workspace:0
   }
 }
 
-module applicationInsights 'br/public:avm/res/insights/component:0.7.1' = {
+module applicationInsights 'br/public:avm/res/insights/component:0.8.0' = {
   name: 'application-insights-deployment'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -289,7 +289,7 @@ var subnets = [
   }
 ]
 
-module virtualNetwork 'br/public:avm/res/network/virtual-network:0.7.2' = if (azureNetworkIsolation) {
+module virtualNetwork 'br/public:avm/res/network/virtual-network:0.10.2' = if (azureNetworkIsolation) {
   name: 'virtualNetwork'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -299,6 +299,7 @@ module virtualNetwork 'br/public:avm/res/network/virtual-network:0.7.2' = if (az
     addressPrefixes: [
       '10.0.0.0/16'
     ]
+    enablePrivateEndpointVNetPolicies: 'Basic'
     subnets: subnets
     tags: tags
     ddosProtectionPlanResourceId: null // Corrected parameter name
@@ -306,7 +307,7 @@ module virtualNetwork 'br/public:avm/res/network/virtual-network:0.7.2' = if (az
 }
 
 // ---------- PRIVATE DNS ZONES (REQUIRED FOR NETWORK ISOLATION) ----------
-module storageBlobPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0' = if (deploySampleData && azureNetworkIsolation) {
+module storageBlobPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.1' = if (deploySampleData && azureNetworkIsolation) {
   name: 'storage-blobservice-private-dns-zone'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -324,7 +325,7 @@ module storageBlobPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8
 }
 
 // Private DNS zones for AI Search
-module aiSearchPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0' = if (azureNetworkIsolation && azureAiSearchDeploy) {
+module aiSearchPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.1' = if (azureNetworkIsolation && azureAiSearchDeploy) {
   name: 'ai-search-private-dns-zone'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -342,7 +343,7 @@ module aiSearchPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0'
 }
 
 // Private DNS zones for AI Services
-module aiServicesPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0' = if (azureNetworkIsolation) {
+module aiServicesPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.1' = if (azureNetworkIsolation) {
   name: 'ai-services-private-dns-zone'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -359,7 +360,7 @@ module aiServicesPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.
   }
 }
 
-module aiServicesOpenAiDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0' = if (azureNetworkIsolation) {
+module aiServicesOpenAiDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.1' = if (azureNetworkIsolation) {
   name: 'ai-services-openai-dns-zone'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -376,7 +377,7 @@ module aiServicesOpenAiDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0
   }
 }
 
-module aiServicesAiDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0' = if (azureNetworkIsolation) {
+module aiServicesAiDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.1' = if (azureNetworkIsolation) {
   name: 'ai-services-ai-dns-zone'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -394,7 +395,7 @@ module aiServicesAiDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0' = 
 }
 
 // Private DNS zones for Cosmos DB (for thread storage)
-module cosmosDbPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0' = if (azureNetworkIsolation && cosmosDbDeploy) {
+module cosmosDbPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.1' = if (azureNetworkIsolation && cosmosDbDeploy) {
   name: 'cosmos-db-private-dns-zone'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -412,7 +413,7 @@ module cosmosDbPrivateDnsZone 'br/public:avm/res/network/private-dns-zone:0.8.0'
 }
 
 // ---------- STORAGE ACCOUNT SAMPLE DATA (OPTIONAL) ----------
-module sampleDataStorageAccount 'br/public:avm/res/storage/storage-account:0.31.0' = if (deploySampleData) {
+module sampleDataStorageAccount 'br/public:avm/res/storage/storage-account:0.33.1' = if (deploySampleData) {
   name: 'sample-data-storage-account-deployment'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -514,7 +515,7 @@ module sampleDataStorageAccountRoles './core/security/role_storageaccount.bicep'
 }
 
 // ---------- AI SEARCH (OPTIONAL) ----------
-module aiSearchService 'br/public:avm/res/search/search-service:0.12.0' = if (azureAiSearchDeploy) {
+module aiSearchService 'br/public:avm/res/search/search-service:0.13.0' = if (azureAiSearchDeploy) {
   name: 'ai-search-service-deployment'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
@@ -530,6 +531,9 @@ module aiSearchService 'br/public:avm/res/search/search-service:0.12.0' = if (az
           { 
             category: 'AllMetrics'
           }
+        ]
+        logCategoriesAndGroups: [
+          { categoryGroup: 'allLogs' }
         ]
         name: sendTologAnalyticsCustomSettingName
         workspaceResourceId: logAnalyticsWorkspace.outputs.resourceId
@@ -606,22 +610,23 @@ module aiSearchRoleAssignments './core/security/role_aisearch.bicep' = if (azure
 }
 
 // ---------- COSMOS DB (OPTIONAL - FOR THREAD STORAGE) ----------
-module cosmosDbAccount 'br/public:avm/res/document-db/database-account:0.18.0' = if (cosmosDbDeploy) {
+module cosmosDbAccount 'br/public:avm/res/document-db/database-account:0.21.1' = if (cosmosDbDeploy) {
   name: 'cosmos-db-account-deployment'
   scope: az.resourceGroup(effectiveResourceGroupName)
   dependsOn: [resourceGroup]
   params: {
     name: cosmosDbAccountName
     location: location
-    capabilitiesToAdd: [
-      'EnableServerless'
-    ]
+    capacityMode: 'Serverless'
     diagnosticSettings: [
       {
         metricCategories: [
           {
             category: 'AllMetrics'
           }
+        ]
+        logCategoriesAndGroups: [
+          { categoryGroup: 'allLogs' }
         ]
         name: sendTologAnalyticsCustomSettingName
         workspaceResourceId: logAnalyticsWorkspace.outputs.resourceId

@@ -13,7 +13,7 @@ param name string
 @sys.description('Required. The location for the Foundry Project.')
 param location string
 
-import { diagnosticSettingFullType } from 'br/public:avm/utl/types/avm-common-types:0.6.1'
+import { diagnosticSettingFullType } from 'br/public:avm/utl/types/avm-common-types:0.7.0'
 @sys.description('Optional. The diagnostic settings of the service.')
 param diagnosticSettings diagnosticSettingFullType[]?
 
@@ -21,11 +21,11 @@ param diagnosticSettings diagnosticSettingFullType[]?
 @sys.description('Optional. Resource tags for the Foundry Project.')
 param tags object?
 
-import { managedIdentityAllType } from 'br/public:avm/utl/types/avm-common-types:0.6.1'
+import { managedIdentityAllType } from 'br/public:avm/utl/types/avm-common-types:0.7.0'
 @sys.description('Optional. The managed identity definition for this resource.')
 param managedIdentities managedIdentityAllType?
 
-import { roleAssignmentType } from 'br/public:avm/utl/types/avm-common-types:0.6.0'
+import { roleAssignmentType } from 'br/public:avm/utl/types/avm-common-types:0.7.0'
 @sys.description('Optional. Role assignments to apply to the Foundry Project.')
 param roleAssignments roleAssignmentType[]?
 
