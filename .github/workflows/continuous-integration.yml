@@ -36,3 +36,37 @@ jobs:
   lint-and-test-dotnet-apps:
     name: Lint and Test .NET Apps
     uses: ./.github/workflows/lint-and-test-dotnet-apps.yml
+
+  # Keep pull request analysis in the active CI workflow. GitHub can disable
+  # the standalone scheduled CodeQL workflow after repository inactivity.
+  codeql:
+    name: CodeQL Analyze (${{ matrix.language }})
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: actions
+          - language: csharp
+          - language: javascript-typescript
+          - language: python
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
